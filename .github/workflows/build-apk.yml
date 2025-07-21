@@ -30,6 +30,9 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       
+    - name: Accept Android SDK licenses
+      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      
     - name: Install dependencies
       run: npm ci
       
@@ -41,11 +44,14 @@ jobs:
     - name: Copy to Capacitor
       run: npx cap copy android
       
+    - name: Sync Capacitor
+      run: npx cap sync android
+      
     - name: Build APK
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug
+        ./gradlew assembleDebug --no-daemon --stacktrace
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
