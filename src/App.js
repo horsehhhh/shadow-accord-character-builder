@@ -680,7 +680,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
   // =========================
   // XP COST CALCULATIONS
   // =========================
-  const calculateXPCost = (character, type, itemId, level = 1) => {
+  const calculateXPCost = useCallback((character, type, itemId, level = 1) => {
     // Merit cost calculation with progressive costs and first merit free for humans
     if (type === 'merit') {
       // Delirium is always free for Commoners
@@ -765,7 +765,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     // Stat costs
     const costData = gameData.xpCosts.find(x => x.item_type === type);
     return costData ? parseInt(costData.base_cost) : 0;
-  };
+  }, [gameData.merits, gameData.xpCosts, gameData.lores]);
 
   // Check for redundant powers (free advancement)
   const isRedundantPower = (character, treeId, level) => {
