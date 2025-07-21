@@ -1,0 +1,98 @@
+{
+  "name": "shadow-accord-test",
+  "version": "0.1.0",
+  "description": "Shadow Accord Character Builder",
+  "author": "Shadow Accord Team",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "lucide-react": "^0.525.0",
+    "papaparse": "^5.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "electron public/electron.js",
+    "electron-dev": "ELECTRON_IS_DEV=true electron public/electron.js",
+    "build-electron": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder --publish=never",
+    "build-mobile": "GENERATE_SOURCEMAP=false npm run build && npx cap copy android",
+    "open-android": "npx cap open android",
+    "android-build": "npm run build-mobile && npx cap build android"
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^37.2.3",
+    "electron-builder": "^26.0.12",
+    "electron-is-dev": "^3.0.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.shadow-accord.character-builder",
+    "productName": "Shadow Accord Character Builder",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "!build/**/*.map",
+      "!build/**/*.md",
+      "!**/node_modules/**/*.d.ts",
+      "!**/node_modules/**/*.map"
+    ],
+    "asarUnpack": [],
+    "compression": "maximum",
+    "npmRebuild": false,
+    "win": {
+      "target": "portable",
+      "icon": "public/logo512.png",
+      "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/logo512.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public/logo512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
