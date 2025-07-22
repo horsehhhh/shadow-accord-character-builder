@@ -59,3 +59,17 @@ jobs:
         name: shadow-accord-debug-apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
+
+    - name: Get APK info
+      run: |
+        APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
+        if [ -f "$APK_PATH" ]; then
+          APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+          echo "✅ APK built successfully!"
+          echo "📱 APK size: $APK_SIZE"
+          echo "📁 APK path: $APK_PATH"
+          echo "🔗 Download from the Actions artifacts above"
+        else
+          echo "❌ APK build failed!"
+          exit 1
+        fi

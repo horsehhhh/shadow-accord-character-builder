@@ -6,7 +6,8 @@ import {
   TrendingUp, Archive,
   Moon, Sun,
   Minus,
-  Home
+  Home,
+  ArrowLeft
 } from 'lucide-react';
 
 // ==========================================
@@ -79,10 +80,54 @@ const ShadowAccordComplete = () => {
   const [exportFormat, setExportFormat] = useState('json');
   const [autoSave, setAutoSave] = useState(true);
   const [lastSaved, setLastSaved] = useState(null);
+
+  // Version and Changelog Data
+  const currentVersion = '0.1.1';
+  const changelog = [
+    {
+      version: '0.1.1',
+      date: '2025-07-21',
+      changes: [
+        'Fixed Medium merit availability for non-wraith factions',
+        'Improved merit filtering logic for "non-" prefix restrictions',
+        'Added Warder of Man shifter tribe and power tree',
+        'Warder of Man powers: Pence from Heaven, Fabricate Armor, Cloak Sight',
+        'Gifted Kinfolk can now access Warder of Man powers',
+        'Removed Bastet Gift power tree (no longer necessary)',
+        'Improved lore UI scaling - increased display height by 50%',
+        'Added "None" option to wraith legion selection',
+        'Added "Enfant" guild option for wraiths',
+        'Fixed sorcerer character creation - now gets 1 free dot instead of 3',
+        'Fixed XP calculation inconsistencies throughout the application',
+        'Removed redundant "Total XP" counter from character sheet header',
+        'Fixed XP display labels - clarified "Available XP" vs "Total Earned"',
+        'Fixed incorrect XP calculations in lore purchasing and other areas',
+        'Corrected character card, sorting, CSV export, and dashboard XP labels',
+        'Improved mobile scaling - better padding and responsive layouts',
+        'Enhanced mobile character management screen with responsive grids',
+        'Added responsive text sizes and improved mobile navigation',
+        'Fixed mobile APK scaling issues with proper container sizing'
+      ]
+    },
+    {
+      version: '0.1.0',
+      date: '2025-07-21',
+      changes: [
+        'Initial release of Shadow Accord Character Builder',
+        'Character creation system for all factions',
+        'Merit system with faction restrictions',
+        'Power learning and advancement system',
+        'XP tracking and management',
+        'Character import/export functionality',
+        'Dark mode and accessibility options',
+        'Auto-save functionality'
+      ]
+    }
+  ];
   const [clearDataConfirmOpen, setClearDataConfirmOpen] = useState(false);
 
   // ========================================
-  // OFFICIAL CSV DATA FROM SHADOW ACCORD RULEBOOK
+  // CSV DATA FROM SHADOW ACCORD RULEBOOK
   // ========================================
   const gameDataCSV = {
     factions: `faction_id,faction_name,energy_type,base_health,base_willpower,base_energy,base_virtue,virtue_type,fundamental_powers
@@ -137,6 +182,7 @@ toreador,Toreador,vampire,clan,,,auspex|celerity|presence
 tremere,Tremere,vampire,clan,,,auspex|dominate|thaumaturgy
 tzimisce,Tzimisce,vampire,clan,,,animalism|auspex|vicissitude
 ventrue,Ventrue,vampire,clan,,,dominate|fortitude|presence
+warder_of_man,Warder of Man,shifter,tribe,,,warder_of_man_gift
 iron_legion,Iron Legion,wraith,legion,,,custom_selection
 skeletal_legion,Skeletal Legion,wraith,legion,,,custom_selection
 grim_legion,Grim Legion,wraith,legion,,,custom_selection
@@ -145,6 +191,7 @@ emerald_legion,Emerald Legion,wraith,legion,,,custom_selection
 silent_legion,Silent Legion,wraith,legion,,,custom_selection
 legion_of_paupers,Legion of Paupers,wraith,legion,,,custom_selection
 legion_of_fate,Legion of Fate,wraith,legion,,,custom_selection
+no_legion,None,wraith,legion,,,custom_selection
 renegades,Renegades,wraith,faction,,,custom_selection
 heretics,Heretics,wraith,faction,,,custom_selection
 no_guild,None,wraith,guild,,,custom_selection
@@ -163,7 +210,8 @@ proctors,Proctors,wraith,guild,,,custom_selection
 puppeteers,Puppeteers,wraith,guild,,,custom_selection
 alchemists,Alchemists,wraith,guild,,,custom_selection
 mnemoi,Mnemoi,wraith,guild,,,custom_selection
-solicitors,Solicitors,wraith,guild,,,custom_selection`,
+solicitors,Solicitors,wraith,guild,,,custom_selection
+enfant,Enfant,wraith,guild,,,custom_selection`,
 
     skills: `skill_id,skill_name,category,description,faction_restrictions
 academics,Academics,OTHER,Literacy - read/write languages; Tutor - teach extra skill; Mentor - teach extra power,
@@ -188,7 +236,6 @@ animal,Animal,human,Beast Mind,Disquiet|Induce Frenzy,Frenzy Control
 argos,Argos,wraith,Cloak,Resilience,Hasty Escape
 auspex,Auspex,vampire,Sense Amaranth|Sense Emotion|Sense Item|Sense Vitae,Telepathy,Cloak Sight
 bagheera_gift,Bagheera Gift,shifter,Detect Taint,Fire Weapon,Daze
-bastet_gift,Bastet Gift,shifter,Detect Taint|Razor Claws,Fire Weapon|Entrancement,Daze|Hasty Escape
 bubasti_gift,Bubasti Gift,shifter,Forgetful Mind,Entrancement,Form of Vapor
 ceilican_gift,Ceilican Gift,shifter,Hallucination|Withstand,Fire Weapon,Hasty Escape
 swara_gift,Swara Gift,shifter,Razor Claws,Mask of a Thousand Faces,Gauntlet Walk
@@ -262,6 +309,7 @@ valeren_healer,Valeren Healer,vampire,Healing Touch,Serenity,Revive
 valeren_warrior,Valeren Warrior,vampire,Sense Max Health,Body Wrack,Aggravated 1
 vicissitude,Vicissitude,vampire,Malleable Visage,Body Wrack,Horrid Form
 visceratika,Visceratika,vampire,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
+warder_of_man_gift,Warder of Man Gift,shifter,Pence from Heaven,Fabricate Armor,Cloak Sight
 warrior,Warrior,human,Taunt,Might,Avoidance|Disarm
 ahl_i_batin,Ahl-i-batin,human,Visions,Mask of a Thousand Faces,Hasty Escape
 craftmason,Craftmason,human,Pence from Heaven,Meditate,Daze
@@ -372,7 +420,7 @@ tribe_fenrir,Fenrir Lore,common,lore_common,,"","Knowledge of the Fenrir tribe, 
 tribe_fianna,Fianna Lore,common,lore_common,,"","Knowledge of the Fianna tribe, their Celtic heritage, and storytelling traditions"
 tribe_shadow_lord,Shadow Lord Lore,common,lore_common,,"","Knowledge of the Shadow Lords tribe, their political machinations, and Eastern European heritage"
 tribe_silver_fang,Silver Fang Lore,common,lore_common,,"","Knowledge of the Silver Fangs tribe, their royal heritage, and leadership struggles"
-warder_of_man,Warder of Man Lore,common,lore_common,,"","Knowledge of the Glass Walker tribe, their urban adaptation, and technology use"
+warder_of_man,Warder of Man Lore,common,lore_common,,"","Knowledge of the Warder of Man tribe, their urban adaptation, and technology use"
 clan_brujah,Brujah Lore,common,lore_common,,"","Knowledge of Clan Brujah, their passion, idealism, and revolutionary nature"
 clan_cappadocian,Cappadocian Lore,common,lore_common,,"","Knowledge of the extinct Clan Cappadocian, their death magic, and mysterious fate"
 clan_gangrel,Gangrel Lore,common,lore_common,,"","Knowledge of Clan Gangrel, their animalistic nature, and independence"
@@ -950,9 +998,37 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       
       const restrictions = merit.faction_restriction.split('|');
       
-      // Check faction and subfaction matches
-      return restrictions.includes(character.faction) || 
-             (character.subfaction && restrictions.includes(character.subfaction));
+      // Handle "non-" prefix restrictions
+      for (const restriction of restrictions) {
+        if (restriction.startsWith('non-')) {
+          const excludedFaction = restriction.substring(4); // Remove "non-" prefix
+          if (character.faction === excludedFaction) {
+            return false; // This faction is excluded
+          }
+        } else {
+          // Normal faction inclusion check
+          if (restriction === character.faction || 
+              (character.subfaction && restriction === character.subfaction)) {
+            return true;
+          }
+        }
+      }
+      
+      // If we have restrictions but none matched positively, check if any "non-" restrictions apply
+      const hasNonRestrictions = restrictions.some(r => r.startsWith('non-'));
+      const hasPositiveRestrictions = restrictions.some(r => !r.startsWith('non-'));
+      
+      // If only "non-" restrictions exist and we haven't been excluded, allow it
+      if (hasNonRestrictions && !hasPositiveRestrictions) {
+        return true;
+      }
+      
+      // If positive restrictions exist but didn't match, deny
+      if (hasPositiveRestrictions) {
+        return false;
+      }
+      
+      return true;
     });
   };
 
@@ -1174,9 +1250,8 @@ Created: ${new Date(character.created).toLocaleDateString()}
 Energy: ${character.stats.energy}/${character.stats.maxEnergy}
 Willpower: ${character.stats.willpower}
 Virtue: ${character.stats.virtue}
-Total XP: ${character.totalXP}
+Available XP: ${character.totalXP}
 XP Spent: ${character.xpSpent}
-Available XP: ${character.totalXP - character.xpSpent}
 Check-ins: ${character.checkInCount}
 
 === SKILLS ===
@@ -1198,15 +1273,15 @@ ${Object.entries(character.merits).map(([meritId, value]) => {
 === NOTES ===
 ${character.notes}
 
-Generated by Shadow Accord Character Builder Phase 8
+Generated by Shadow Accord Character Builder v${currentVersion}
 `;
-  }, [gameData.merits]);
+  }, [gameData.merits, currentVersion]);
 
   const exportCharacter = useCallback((character, format = 'json') => {
     const exportData = {
       character,
       exported: new Date().toISOString(),
-      version: 'Phase 8',
+      version: currentVersion,
       format: format
     };
 
@@ -1219,7 +1294,7 @@ Generated by Shadow Accord Character Builder Phase 8
         mimeType = 'application/json';
         break;
       case 'csv':
-        const csvHeaders = ['Name', 'Player', 'Faction', 'Subfaction', 'Total XP', 'XP Spent'];
+        const csvHeaders = ['Name', 'Player', 'Faction', 'Subfaction', 'Available XP', 'XP Spent'];
         const csvRow = [
           character.name, character.player, character.faction, 
           character.subfaction, character.totalXP, character.xpSpent
@@ -1341,11 +1416,11 @@ Generated by Shadow Accord Character Builder Phase 8
   // Main Menu
   const renderMainMenu = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="container mx-auto p-5">
+      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
         {/* Enhanced Header */}
-        <div className="text-center mb-5">
+        <div className="text-center mb-4 sm:mb-5">
           <div className="mb-2">
-            <h1 className="text-4xl font-bold text-red-400">Shadow Accord Character Builder</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400">Shadow Accord Character Builder</h1>
           </div>
         </div>
 
@@ -1362,12 +1437,12 @@ Generated by Shadow Accord Character Builder Phase 8
             <div className="text-xl font-bold">
               {characters.reduce((sum, char) => sum + char.totalXP, 0)}
             </div>
-            <div className="text-sm text-gray-400">Total XP</div>
+            <div className="text-sm text-gray-400">Available XP</div>
           </div>
         </div>
 
         {/* Main Action Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
           <button
             onClick={() => {
               setNewCharacter(createBlankCharacter());
@@ -1400,6 +1475,14 @@ Generated by Shadow Accord Character Builder Phase 8
             <p className="text-sm text-gray-400">Customize interface options</p>
           </button>
 
+          <button
+            onClick={() => setCurrentMode('changelog')}
+            className={`${themeClasses.card} p-5 hover:shadow-lg transition-all group cursor-pointer`}
+          >
+            <Book className="w-8 h-8 text-purple-400 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <h3 className="text-lg font-bold mb-1">Changelog</h3>
+            <p className="text-sm text-gray-400">View version history</p>
+          </button>
 
         </div>
 
@@ -1429,7 +1512,7 @@ Generated by Shadow Accord Character Builder Phase 8
                   const exportData = {
                     characters,
                     exported: new Date().toISOString(),
-                    version: 'Phase 8'
+                    version: currentVersion
                   };
                   const blob = new Blob([JSON.stringify(exportData, null, 2)], 
                     { type: 'application/json' });
@@ -3746,6 +3829,7 @@ Generated by Shadow Accord Character Builder Phase 8
                                    newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' ? '1 dot' :
                                    newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_gorgon' ? '1 dot' :
                                    newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' ? '1 dot' :
+                                   newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' ? '1 dot' :
                                    newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? '0 dots (only first dot of Potence is free)' : '3 dots'} to assign)
                   </h4>
                   
@@ -3786,6 +3870,7 @@ Generated by Shadow Accord Character Builder Phase 8
                         );
                         const maxDots = newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' ? 1 : 
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' ? 1 :
+                                       newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' ? 1 :
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? 0 : 3;
                         
                         return (
@@ -3880,6 +3965,7 @@ Generated by Shadow Accord Character Builder Phase 8
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' ? 1 :
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_gorgon' ? 1 :
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' ? 1 :
+                                       newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' ? 1 :
                                        newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? 0 : 3;                          return (
                             <div key={treeId} className="border border-gray-600 rounded p-3">
                               <h5 className="font-medium capitalize mb-2">{tree.tree_name}</h5>
@@ -3952,6 +4038,7 @@ Generated by Shadow Accord Character Builder Phase 8
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' ? 1 :
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_gorgon' ? 1 :
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' ? 1 :
+                        newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' ? 1 :
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? 0 : 3}
                   </div>
                 </div>
@@ -4500,10 +4587,10 @@ Generated by Shadow Accord Character Builder Phase 8
 
     return (
       <div className={`min-h-screen ${themeClasses.base}`}>
-        <div className="container mx-auto p-5">
+        <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold">Character Creation</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Character Creation</h2>
             <button
               onClick={() => {
                 setCurrentMode('menu');
@@ -4586,10 +4673,10 @@ Generated by Shadow Accord Character Builder Phase 8
   // Character Management
   const renderCharacterManagement = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="container mx-auto p-5">
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-3xl font-bold">Character Management</h2>
-          <div className="flex items-center space-x-4">
+      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
+          <h2 className="text-2xl sm:text-3xl font-bold">Character Management</h2>
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {characters.length > 0 && (
               <div className="text-right">
                 <div className="text-sm text-gray-400">Total Characters</div>
@@ -4607,8 +4694,8 @@ Generated by Shadow Accord Character Builder Phase 8
         </div>
 
         {/* Search and Filter Controls */}
-        <div className={`${themeClasses.card} p-3 mb-5`}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div className={`${themeClasses.card} p-3 mb-4 sm:mb-5`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
               <label className={themeClasses.label}>Search</label>
               <div className="relative">
@@ -4646,7 +4733,7 @@ Generated by Shadow Accord Character Builder Phase 8
               >
                 <option value="name">Name</option>
                 <option value="faction">Faction</option>
-                <option value="xp">Total XP</option>
+                <option value="xp">Available XP</option>
                 <option value="created">Date Created</option>
                 <option value="modified">Last Modified</option>
               </select>
@@ -4656,9 +4743,9 @@ Generated by Shadow Accord Character Builder Phase 8
         </div>
 
         {/* Character Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
           {filteredAndSortedCharacters.map((character) => (
-            <div key={character.id} className={`${themeClasses.card} p-5 hover:shadow-lg transition-all`}>
+            <div key={character.id} className={`${themeClasses.card} p-3 sm:p-4 lg:p-5 hover:shadow-lg transition-all`}>
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="text-xl font-bold">{character.name || 'Unnamed Character'}</h3>
@@ -4699,7 +4786,7 @@ Generated by Shadow Accord Character Builder Phase 8
                   <span className="capitalize">{formatDisplayText(character.subfaction)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Total XP:</span>
+                  <span>Available XP:</span>
                   <span>{character.totalXP}</span>
                 </div>
                 <div className="flex justify-between">
@@ -4736,20 +4823,16 @@ Generated by Shadow Accord Character Builder Phase 8
 
     return (
       <div className={`min-h-screen ${themeClasses.base}`}>
-        <div className="container mx-auto p-5">
+        <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
           {/* Header */}
-          <div className="flex justify-between items-center mb-5">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
             <div>
-              <h2 className="text-3xl font-bold">{character.name}</h2>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">{character.name}</h2>
               <p className={themeClasses.text}>{character.player} • {character.faction} {character.subfaction}</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="text-right">
                 <div className="text-sm text-gray-400">Available XP</div>
-                <div className="text-lg font-bold">{character.totalXP - character.xpSpent}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-400">Total XP</div>
                 <div className="text-lg font-bold">{character.totalXP}</div>
               </div>
               <div className="flex space-x-2">
@@ -5077,14 +5160,14 @@ Generated by Shadow Accord Character Builder Phase 8
               {/* Enhanced XP Display */}
               <div className={`${themeClasses.card} p-3 md:col-span-2 lg:col-span-3`}>
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-lg">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-2xl font-bold text-white">Experience Points</h3>
-                    <div className="text-right">
-                      <div className="text-4xl font-bold text-white">{character.totalXP}</div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 space-y-2 sm:space-y-0">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Experience Points</h3>
+                    <div className="text-center sm:text-right">
+                      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{character.totalXP}</div>
                       <div className="text-blue-200 text-sm">Available XP</div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-center">
                     <div className="bg-white bg-opacity-20 rounded-lg p-3">
                       <div className="text-2xl font-bold text-white">{character.totalXP + character.xpSpent}</div>
                       <div className="text-blue-200 text-sm">Total Earned</div>
@@ -6240,10 +6323,10 @@ Generated by Shadow Accord Character Builder Phase 8
                 {/* Available Lore for Purchase */}
                 <div>
                   <h4 className="text-lg font-bold mb-2">Available for Purchase</h4>
-                  <div className="grid gap-2 max-h-64 overflow-y-auto">
+                  <div className="grid gap-2 max-h-96 overflow-y-auto">
                     {getAvailableLores(character, true).map((lore) => {
                       const cost = calculateXPCost(character, 'lore', lore.lore_id);
-                      const unspentXP = character.totalXP - character.xpSpent;
+                      const unspentXP = character.totalXP;
                       const canAfford = unspentXP >= cost;
                       const alreadyHas = character.lores?.some(l => l.lore_id === lore.lore_id);
                       
@@ -6601,9 +6684,9 @@ Generated by Shadow Accord Character Builder Phase 8
   // Settings
   const renderSettings = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="container mx-auto p-5">
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-3xl font-bold">Settings & Accessibility</h2>
+      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Settings & Accessibility</h2>
           <button
             onClick={() => setCurrentMode('menu')}
             className={themeClasses.button}
@@ -6830,6 +6913,62 @@ Generated by Shadow Accord Character Builder Phase 8
     reader.readAsText(file);
   }, [characters.length]);
 
+  // Changelog
+  const renderChangelog = () => (
+    <div className={`min-h-screen ${themeClasses.base}`}>
+      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+        {/* Header */}
+        <div className="text-center mb-4 sm:mb-5">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-2">Shadow Accord Character Builder</h1>
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">Changelog</h2>
+          <p className="text-base sm:text-lg text-gray-400">Current Version: {currentVersion}</p>
+        </div>
+
+        {/* Back Button */}
+        <div className="mb-4 sm:mb-5">
+          <button
+            onClick={() => setCurrentMode('menu')}
+            className={`${themeClasses.card} px-4 py-2 hover:shadow-lg transition-all flex items-center gap-2`}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Main Menu
+          </button>
+        </div>
+
+        {/* Changelog Entries */}
+        <div className="space-y-5">
+          {changelog.map((entry, index) => (
+            <div key={index} className={`${themeClasses.card} p-5`}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xl font-bold text-blue-400">Version {entry.version}</h3>
+                <span className="text-gray-400">{new Date(entry.date).toLocaleDateString()}</span>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-semibold text-lg">Changes:</h4>
+                <ul className="space-y-1">
+                  {entry.changes.map((change, changeIndex) => (
+                    <li key={changeIndex} className="flex items-start gap-2">
+                      <span className="text-green-400 mt-1">•</span>
+                      <span>{change}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8 pt-5 border-t border-gray-700">
+          <p className="text-gray-400">
+            Thank you for using Shadow Accord Character Builder!
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   // Main Render Logic
   const renderCurrentMode = () => {
     switch (currentMode) {
@@ -6838,6 +6977,7 @@ Generated by Shadow Accord Character Builder Phase 8
       case 'management': return renderCharacterManagement();
       case 'character': return renderCharacterView();
       case 'settings': return renderSettings();
+      case 'changelog': return renderChangelog();
       default: return renderMainMenu();
     }
   };
