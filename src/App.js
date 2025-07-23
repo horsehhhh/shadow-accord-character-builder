@@ -80,10 +80,137 @@ const ShadowAccordComplete = () => {
   const [exportFormat, setExportFormat] = useState('json');
   const [autoSave, setAutoSave] = useState(true);
   const [lastSaved, setLastSaved] = useState(null);
+  
+  // Faction Change System State
+  const [factionChangeModal, setFactionChangeModal] = useState(false);
+  const [selectedFactionChange, setSelectedFactionChange] = useState(null);
+  const [factionChangeCreationMode, setFactionChangeCreationMode] = useState(false);
+  const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.1.1';
+  const currentVersion = '0.1.6';
   const changelog = [
+    {
+      version: '0.1.6',
+      date: '2025-07-23',
+      changes: [
+        'Enhanced Natus Mandatory Flaw System: Redesigned to match derangement system patterns used by other subfactions',
+        'Added 7 new vampire power trees: Deimos, Thaumaturgy: Rego Aquam, and 5 Dark Thaumaturgy paths',
+        'Implemented automatic Permatainted effects for power advancement from corrupt trees (Death, Demonology, Wyrm gifts, Dark Thaumaturgy, Daimoinon)',
+        'Added automatic derangement requirement for Wyrm Madness gift advancement',
+        'Implemented fundamental Permatainted status for Drone, Gorgon, and Fomori claimed characters',
+        'Updated Tremere clan to have Thaumaturgy: Rego Vitae as innate instead of generic Thaumaturgy',
+        'Fixed Natus flaw requirement validation and UI display issues'
+      ]
+    },
+    {
+      version: '0.1.5',
+      date: '2025-07-22',
+      changes: [
+        'Fixed critical "Assignment to constant variable" error in character creation',
+        'Resolved mutation issues in handleFactionChangeTransformation function',
+        'Fixed const variable mutations in advanceCharacter and reduceCharacter functions',
+        'Corrected immutable state management in character creation power selection',
+        'Fixed faction change completion handler to use proper immutable updates',
+        'Resolved "some is not a function" error in lore system',
+        'Fixed lore data structure inconsistency - converted from object to array format',
+        'Added defensive programming for backward compatibility with existing character lores',
+        'Ensured all character state updates follow React immutability requirements',
+        'Fixed character creation for all factions, especially shifter characters',
+        'Improved error handling and data migration for lore system',
+        'Enhanced character display to handle both old and new lore data formats'
+      ]
+    },
+    {
+      version: '0.1.4',
+      date: '2025-07-22',
+      changes: [
+        'Added Sense Spirit as a fundamental power to Gorgon faction',
+        'Added Sense Spirit as a fundamental power to Claimed Drone characters',
+        'Added Sense Spirit as a fundamental power to Claimed Fomori characters',
+        'Enhanced Claimed Gorgon to receive both Frail and Sense Spirit fundamental powers',
+        'Added free lore system for Ghouls during character creation',
+        'Ghouls automatically receive Vampire Lore for free at character creation',
+        'Added optional clan selection for Ghouls with clan-specific lore rewards',
+        'Ghouls who select a clan receive that clan\'s lore for free (if restrictions are met)',
+        'Added clan restriction warnings for special bloodlines (Giovanni, Lamia)',
+        'Enhanced character creation UI with clan selection step for Ghoul characters',
+        'Added free lore system for Sorcerers with fellowship selection',
+        'Sorcerers who choose a fellowship receive both Mage Lore and fellowship-specific lore for free',
+        'Enhanced fellowship selection UI to explain lore benefits for magical training'
+      ]
+    },
+    {
+      version: '0.1.3',
+      date: '2025-07-22',
+      changes: [
+        'Added comprehensive Faction Change System for supernatural transformation',
+        'Humans can become Vampire, Shifter, Gorgon, Drone, or Fomori',
+        'Any faction (except Wraith) can become Wraith',
+        'Faction changes preserve current energy amount up to new faction maximum',
+        'Vampires gain 3 free powers from innate disciplines after transformation',
+        'Shifters gain 3 free power dots and forced Homid innate after awakening',
+        'Wraiths gain 3 free powers from Arcanoi after death',
+        'Gorgons gain first dot of Gorgon tree for free after transformation',
+        'Drones gain access to Weaver trees (Stasis, Weaver, Onesong) after claiming',
+        'Fomori can select manifestation tree after possession',
+        'All faction changes recorded in advancement history for tracking',
+        'Added faction change modal with detailed transformation information',
+        'Added free power assignment UI for post-transformation benefits',
+        'Faction changes represent major story moments (Embrace, First Change, Death, etc.)',
+        'System maintains character investment while enabling supernatural progression',
+        'Fixed faction change free dots calculation - now properly shows 0/3 for new faction selection',
+        'Faction changes preserve all existing powers while resetting creation dot counter',
+        'Removed misleading XP messages during faction changes (no free XP given for transformations)',
+        'Added separate tracking for creation dots vs purchased powers during faction changes',
+        'Faction change modal now appears properly at root level with enhanced visibility',
+        'Enhanced faction change system to redirect through character creation for proper setup',
+        'Added faction change creation mode with preserved character data (name, player, XP)',
+        'Faction change character creation skips skills section (skills transfer from original character)',
+        'Fixed double application of free dots during faction transformation',
+        'Corrected faction change completion to update existing character instead of creating duplicate',
+        'Added proper free dot tracking with creationDotsUsed counter for faction changes',
+        'Fixed tempFactionChangePowers calculation to prevent unlimited free dot usage',
+        'Enhanced level ratio constraints for shifter faction changes (only applies to new shifter powers)',
+        'Added claimed status option for Faithful characters during character creation',
+        'Faithful can now be claimed by Gorgon or possessed by Fomori Bane during creation',
+        'Dual heritage Faithful gain access to both bounty tree and claimed powers at innate costs',
+        'Improved faction transformation modal with proper z-index and backdrop positioning'
+      ]
+    },
+    {
+      version: '0.1.2',
+      date: '2025-07-22',
+      changes: [
+        'Added Claimed Status System for dual heritage characters',
+        'Gorgon and Fomori can now claim human subfactions (Sorcerer, Ghoul, Gifted Kinfolk, Commoner)',
+        'Characters retain access to both original and claimed supernatural powers',
+        'All powers from both heritages cost innate XP rates (3/6/9) instead of learned rates',
+        'Enhanced character creation flow: select primary subfaction first, then optional claimed status',
+        'Added Fomori power tree selection for claimed Fomori characters',
+        'Gorgon claimed characters automatically receive "Frail" fundamental power',
+        'Added separate power display sections for original and claimed status powers',
+        'Updated character validation to support dual heritage combinations',
+        'Enhanced character review to show both original subfaction and claimed status',
+        'Extended character data structure with claimedStatus, selectedFomoriTree, and claimedInnateTreeIds fields',
+        'Added Sense Spirit as a fundamental power to Gorgon faction',
+        'Added Sense Spirit as a fundamental power to Claimed Drone characters', 
+        'Added Sense Spirit as a fundamental power to Claimed Fomori characters',
+        'Enhanced Claimed Gorgon to receive both Frail and Sense Spirit fundamental powers',
+        'Added free lore system for Ghouls during character creation',
+        'Ghouls automatically receive Vampire Lore for free at character creation',
+        'Added optional clan selection for Ghouls with clan-specific lore rewards',
+        'Ghouls who select a clan receive that clan\'s lore for free (if restrictions are met)',
+        'Added clan restriction warnings for special bloodlines (Giovanni, Lamia)',
+        'Enhanced character creation UI with clan selection step for Ghoul characters',
+        'Added free lore system for Sorcerers with fellowship selection',
+        'Sorcerers who choose a fellowship receive both Mage Lore and fellowship-specific lore for free',
+        'Enhanced fellowship selection UI to explain lore benefits for magical training',
+        'Added "Back to Menu" button on first page of character creation for easy exit',
+        'Improved character creation navigation - "Previous" works for subsequent pages',
+        'Enhanced free lore preview system to show automatic lore assignments during character creation'
+      ]
+    },
     {
       version: '0.1.1',
       date: '2025-07-21',
@@ -179,7 +306,7 @@ silver_fang,Silver Fang,shifter,tribe,,,silver_fang_gift
 sorcerer,Sorcerer,human,special,,Ghoul or Drone active,custom_selection
 swara,Swara,shifter,fera,,,swara_gift
 toreador,Toreador,vampire,clan,,,auspex|celerity|presence
-tremere,Tremere,vampire,clan,,,auspex|dominate|thaumaturgy
+tremere,Tremere,vampire,clan,,,auspex|dominate|thaumaturgy_rego_vitae
 tzimisce,Tzimisce,vampire,clan,,,animalism|auspex|vicissitude
 ventrue,Ventrue,vampire,clan,,,dominate|fortitude|presence
 warder_of_man,Warder of Man,shifter,tribe,,,warder_of_man_gift
@@ -251,6 +378,7 @@ corax_gift,Corax Gift,shifter,Insight,Fire 2,Hasty Escape
 curse,Curse,human,Forgetful Mind,Body Wrack,Paralyze
 daimoinon,Daimoinon,vampire,Sense Desire,Hellborn Investiture,Balefire
 death,Death,human,<Tainted> Silence,Insight,<Tainted> Decay
+deimos,Deimos,vampire,Black Ichor,Dreamshape,Ranged 4 (Bile)
 dementation,Dementation,vampire,Confusion,Visions,Derange|Passion
 demonology,Demonology,human,Sense Demon|Scion of Evil,Umbra Sight,Subjugate
 dominate,Dominate,vampire,Forgetful Mind,Obedience,Conditioning
@@ -302,7 +430,13 @@ silent_strider_gift,Silent Strider Gift,shifter,Silence,Horrid Reality,Gauntlet 
 silver_fang_gift,Silver Fang Gift,shifter,Detect Taint,True Form,Obedience
 spirit,Spirit,human,Resist Gauntlet,Cleanse,Exorcism
 thaumaturgy_creo_ignem,Thaumaturgy: Creo Ignem,vampire,Fire 2,<Fire> Weapon,Fire 4
+thaumaturgy_rego_aquam,Thaumaturgy: Rego Aquam,vampire,Silence,Fabricate Armor,Paralyze
 thaumaturgy_rego_vitae,Thaumaturgy: Rego Vitae,vampire,Sense Vitae|Test Generation|Test Oath,Ranged 2 <Blood>,Aggravated 1
+thaumaturgy_path_of_the_defiler,Path of the Defiler,vampire,Taint,Derange,Balefire
+thaumaturgy_rego_dolor,Rego Dolor (Path of Pain),vampire,Silence,Body Wrack,Horrid Reality
+thaumaturgy_rego_manes,Rego Manes (Path of Spirit),vampire,Scion of Evil|Sense Demon|Sense Spirit,Umbra Sight,Subjugate
+thaumaturgy_rego_pestis,Rego Pestis (Path of Pestilence),vampire,Wither,Venom,Brittle Bones
+thaumaturgy_rego_phobos,Rego Phobos (Path of Fear),vampire,Monsters,Dreamshape|Terror,Leech of Fear
 theurge,Theurge,shifter,Release Spirit|Sense Spirit,Umbra Sight,Umbra Strike
 usury,Usury,wraith,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
 valeren_healer,Valeren Healer,vampire,Healing Touch,Serenity,Revive
@@ -332,7 +466,7 @@ enticer,Enticer,human,Tentacles,<Tainted> Entrancement,Paralyze
 ferectori,Ferectori,human,<Tainted> Snarl,Terror,Gauntlet Walk
 gorehound,Gorehound,human,Fast Healing,<Tainted> Body Wrack,Might
 toad,Toad,human,Ranged 2 <Acid>,Taint|Venom,Form of Vapor
-gorgon,Gorgon,human,Hallucination,Dreamshape,Gauntlet Walk|Umbra Sight
+gorgon,Gorgon,human,Hallucination,Dreamshape,Gauntlet Walk|Sense Spirit|Umbra Sight
 brash,Brash,human,Taunt,Disarm,Avoidance
 brawny,Brawny,human,Shatter,Might,Brutal Strike
 inquisitive,Inquisitive,human,Sense Emotion,Sense Mental,Sense Vitality
@@ -516,6 +650,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     tribe: '',
     guild: '',
     fellowship: null, // For sorcerer fellowship selection
+    selectedClan: null, // For ghoul clan selection
     created: new Date().toISOString(),
     lastModified: new Date().toISOString(),
     checkInCount: 0,
@@ -545,12 +680,17 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     shadowArchetype: '', // For wraith shadow archetype selection
     thornOptions: [], // Available thorn options from shadow archetype
     selectedThorn: '', // Selected thorn option
+    mixedSubfaction: null, // For Gorgon/Fomori mixed heritage (sorcerer, ghoul, kinfolk)
+    claimedStatus: null, // 'gorgon', 'fomori', or null
+    selectedFomoriTree: null, // Which fomori tree if claimed by fomori
+    claimedInnateTreeIds: [], // Additional innate trees from claimed status
     firstMeritFree: false,
     validationErrors: [],
     buildPlans: [],
     teachingsReceived: [],
     teachingsGiven: [],
-    selfNerfs: []
+    selfNerfs: [],
+    tempFactionChangePowers: 0 // Track free powers to assign after faction change
   });
 
   // Handle faction selection with official base stats
@@ -558,7 +698,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     const faction = gameData.factions.find(f => f.faction_id === factionId);
     if (!faction) return character;
 
-    const updatedCharacter = {
+    const baseCharacter = {
       ...character,
       faction: factionId,
       subfaction: '',
@@ -577,11 +717,114 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     };
 
     // Special handling for Wraith and Vampire factions - clear innate trees for custom selection
-    if (factionId === 'wraith' || factionId === 'vampire') {
-      updatedCharacter.innateTreeIds = [];
-    }
+    const updatedCharacter = (factionId === 'wraith' || factionId === 'vampire') ? {
+      ...baseCharacter,
+      innateTreeIds: []
+    } : baseCharacter;
 
     return updatedCharacter;
+  };
+
+  // Assign free lore during character creation based on faction and subfaction
+  const assignFreeLore = (character) => {
+    const freeLoreIds = [];
+    
+    // Assign faction lore if available
+    const factionLoreId = `general_${character.faction}`;
+    const factionLore = gameData.lores.find(lore => lore.lore_id === factionLoreId);
+    if (factionLore) {
+      freeLoreIds.push(factionLoreId);
+    }
+    
+    // Assign subfaction-specific lore
+    if (character.subfaction) {
+      // Check for tribal lore (shifter tribes)
+      const tribalLoreId = `tribe_${character.subfaction}`;
+      const tribalLore = gameData.lores.find(lore => lore.lore_id === tribalLoreId);
+      if (tribalLore) {
+        freeLoreIds.push(tribalLoreId);
+      }
+      
+      // Check for clan lore (vampire clans)
+      const clanLoreId = `clan_${character.subfaction}`;
+      const clanLore = gameData.lores.find(lore => lore.lore_id === clanLoreId);
+      if (clanLore) {
+        freeLoreIds.push(clanLoreId);
+      }
+      
+      // Check for other specific subfaction lores
+      const subfactionLoreId = `${character.subfaction}_lore`;
+      const subfactionLore = gameData.lores.find(lore => lore.lore_id === subfactionLoreId);
+      if (subfactionLore) {
+        freeLoreIds.push(subfactionLoreId);
+      }
+      
+      // Special cases for specific subfactions
+      if (character.subfaction === 'sorcerer') {
+        // Sorcerers get lore for their fellowship if they have one, plus Mage Lore
+        if (character.fellowship) {
+          const fellowshipLoreId = `${character.fellowship}_lore`;
+          const fellowshipLore = gameData.lores.find(lore => lore.lore_id === fellowshipLoreId);
+          if (fellowshipLore) {
+            freeLoreIds.push(fellowshipLoreId);
+          }
+          
+          // Also give Mage Lore when a fellowship is selected
+          freeLoreIds.push('general_mage');
+        }
+      }
+      
+      // Handle claimed status lore
+      if (character.claimedStatus) {
+        if (character.claimedStatus === 'fomori') {
+          freeLoreIds.push('fomori_lore');
+        } else if (character.claimedStatus === 'gorgon') {
+          freeLoreIds.push('gorgons_lore');
+        }
+      }
+      
+      // Handle specific human subfactions
+      if (character.faction === 'human') {
+        if (character.subfaction === 'claimed_drone') {
+          freeLoreIds.push('drones_lore');
+        } else if (character.subfaction === 'claimed_gorgon') {
+          freeLoreIds.push('gorgons_lore');
+        } else if (character.subfaction === 'claimed_fomori') {
+          freeLoreIds.push('fomori_lore');
+        } else if (character.subfaction === 'faithful') {
+          freeLoreIds.push('messianic_voices');
+        } else if (character.subfaction === 'ghoul') {
+          // Ghouls get vampire lore for free
+          freeLoreIds.push('general_vampire');
+          
+          // If a clan is selected, also give clan lore for free
+          if (character.selectedClan) {
+            const clanLoreId = `clan_${character.selectedClan}`;
+            const clanLore = gameData.lores.find(lore => lore.lore_id === clanLoreId);
+            if (clanLore) {
+              freeLoreIds.push(clanLoreId);
+            }
+          }
+        }
+      }
+    }
+    
+    // Handle shifter breed/auspice (they get tribal lore from subfaction already)
+    // No additional lore needed for breed/auspice as tribal lore covers the culture
+    
+    // Convert existing lores array and add new free lores, avoiding duplicates
+    const existingLores = character.lores || [];
+    const existingLoreIds = existingLores.map(lore => lore.lore_id);
+    
+    // Add only new lores that don't already exist
+    const newLores = freeLoreIds
+      .filter(loreId => !existingLoreIds.includes(loreId))
+      .map(loreId => ({ lore_id: loreId }));
+    
+    return {
+      ...character,
+      lores: [...existingLores, ...newLores]
+    };
   };    // Handle subfaction selection with innate trees
   const handleSubfactionChange = (character, subfactionId) => {
     const subfaction = gameData.subfactions.find(sf => sf.subfaction_id === subfactionId);
@@ -608,22 +851,41 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         innateTreeIds.push(existingTribalTree);
       }
     } else if (subfactionId === 'claimed_drone') {
-      // Special handling for Claimed Drone: get all three Weaver trees as innates plus Regeneration 3
+      // Special handling for Claimed Drone: get all three Weaver trees as innates plus Regeneration 3 and Sense Spirit
       innateTreeIds = ['stasis', 'weaver', 'onesong'];
-      // Add Regeneration 3 as fundamental power if not already present
+      // Add Regeneration 3 and Sense Spirit as fundamental powers if not already present
       const baseFundamentalPowers = character.fundamentalPowers || [];
       const hasRegeneration = baseFundamentalPowers.some(power => power.startsWith('Regeneration'));
+      const hasSenseSpirit = baseFundamentalPowers.some(power => power.includes('Sense Spirit'));
+      
+      let newFundamentalPowers = [...baseFundamentalPowers];
       if (!hasRegeneration) {
-        fundamentalPowers = [...baseFundamentalPowers, 'Regeneration 3'];
-      } else {
-        fundamentalPowers = baseFundamentalPowers;
+        newFundamentalPowers.push('Regeneration 3');
       }
+      if (!hasSenseSpirit) {
+        newFundamentalPowers.push('Sense Spirit');
+      }
+      fundamentalPowers = newFundamentalPowers;
     } else if (subfactionId === 'claimed_gorgon') {
-      // Special handling for Claimed Gorgon: Add Frail as fundamental power
+      // Special handling for Claimed Gorgon: Add Frail and Sense Spirit as fundamental powers
       const baseFundamentalPowers = character.fundamentalPowers || [];
       const hasFrail = baseFundamentalPowers.some(power => power.toLowerCase().includes('frail'));
+      const hasSenseSpirit = baseFundamentalPowers.some(power => power.includes('Sense Spirit'));
+      
+      let newFundamentalPowers = [...baseFundamentalPowers];
       if (!hasFrail) {
-        fundamentalPowers = [...baseFundamentalPowers, 'Frail'];
+        newFundamentalPowers.push('Frail');
+      }
+      if (!hasSenseSpirit) {
+        newFundamentalPowers.push('Sense Spirit');
+      }
+      fundamentalPowers = newFundamentalPowers;
+    } else if (subfactionId === 'claimed_fomori') {
+      // Special handling for Claimed Fomori: Add Sense Spirit as fundamental power
+      const baseFundamentalPowers = character.fundamentalPowers || [];
+      const hasSenseSpirit = baseFundamentalPowers.some(power => power.includes('Sense Spirit'));
+      if (!hasSenseSpirit) {
+        fundamentalPowers = [...baseFundamentalPowers, 'Sense Spirit'];
       } else {
         fundamentalPowers = baseFundamentalPowers;
       }
@@ -669,9 +931,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     const updatedCharacter = { ...character, breed: breedId };
     
     // Update innate trees based on breed, auspice, and tribe
-    updateShifterInnateTreeIds(updatedCharacter);
-    
-    return updatedCharacter;
+    return updateShifterInnateTreeIds(updatedCharacter);
   };
 
   // Handle shifter auspice selection
@@ -679,9 +939,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     const updatedCharacter = { ...character, auspice: auspiceId };
     
     // Update innate trees based on breed, auspice, and tribe
-    updateShifterInnateTreeIds(updatedCharacter);
-    
-    return updatedCharacter;
+    return updateShifterInnateTreeIds(updatedCharacter);
   };
 
   // Update shifter innate tree IDs based on breed, auspice, and tribal selection
@@ -709,7 +967,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       }
     }
     
-    character.innateTreeIds = innateTreeIds;
+    return { ...character, innateTreeIds };
   };
 
   // Check if breed is available for the selected tribe
@@ -723,6 +981,171 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     }
     
     return true;
+  };
+
+  // =========================
+  // FACTION CHANGE SYSTEM
+  // =========================
+  
+  // Get valid faction changes for a character
+  const getValidFactionChanges = (character) => {
+    const changes = [];
+    
+    // Humans can become anything except wraith (wraith is handled separately)
+    if (character.faction === 'human') {
+      changes.push(
+        { id: 'vampire', name: 'Vampire', description: 'Embrace into undeath. Gain 3 free powers from innate disciplines.' },
+        { id: 'shifter', name: 'Shifter', description: 'Awaken as a shapeshifter. Gain 3 free power dots + Homid innate.' },
+        { id: 'gorgon', name: 'Gorgon', description: 'Transform into a dream entity. Gain first dot of Gorgon tree free.' },
+        { id: 'drone', name: 'Claimed Drone', description: 'Become bound to the Pattern Web. Gain access to all Weaver trees.' },
+        { id: 'fomori', name: 'Claimed Fomori', description: 'Become possessed by a Bane spirit. Choose your manifestation.' }
+      );
+    }
+    
+    // All factions except wraith can become wraith
+    if (character.faction !== 'wraith') {
+      changes.push({
+        id: 'wraith',
+        name: 'Wraith',
+        description: 'Die and return as a ghost. Choose 3 innate Arcanoi + Shadow Archetype. Gain 3 free powers.'
+      });
+    }
+    
+    return changes;
+  };
+
+  // Faction change handler with useCallback
+  const handleFactionChangeClick = useCallback((change) => {
+    console.log('handleFactionChangeClick called with:', change);
+    setSelectedFactionChange(change);
+    setFactionChangeModal(true);
+  }, []);
+
+  // Handle faction change transformation
+  const handleFactionChangeTransformation = (character, newFactionId) => {
+    console.log('handleFactionChangeTransformation called with:', newFactionId);
+    console.log('Available factions:', gameData.factions?.map(f => f.faction_id));
+    
+    // Store original faction info and create new character object
+    const newCharacter = { 
+      ...character,
+      originalFaction: character.faction,
+      originalSubfaction: character.subfaction
+    };
+    
+    // Update basic faction info
+    const newFaction = gameData.factions.find(f => f.faction_id === newFactionId);
+    
+    if (!newFaction) {
+      console.error('Faction not found:', newFactionId);
+      console.error('Available factions:', gameData.factions);
+      return newCharacter; // Return unchanged character if faction not found
+    }
+    
+    console.log('Found faction:', newFaction);
+    
+    // Preserve current energy amount, update max to new faction's base
+    const currentEnergy = character.stats.energy;
+    const newMaxEnergy = parseInt(newFaction.base_energy);
+    
+    // Base character updates
+    let updatedCharacter = {
+      ...newCharacter,
+      faction: newFactionId,
+      subfaction: '', // Will be set based on new faction
+      stats: {
+        ...newCharacter.stats,
+        energy: Math.min(currentEnergy, newMaxEnergy),
+        maxEnergy: newMaxEnergy,
+        energyType: newFaction.energy_type,
+        virtue: parseInt(newFaction.base_virtue),
+        virtueType: newFaction.virtue_type
+      },
+      fundamentalPowers: newFaction.fundamental_powers ? 
+        newFaction.fundamental_powers.split('|') : [],
+      innateTreeIds: [],
+      tempFactionChangePowers: 0, // Track free powers to assign
+      powers: {}, // Clear all existing powers for faction change
+      lastModified: new Date().toISOString()
+    };
+    
+    // Set faction-specific benefits
+    switch (newFactionId) {
+      case 'vampire':
+        updatedCharacter = {
+          ...updatedCharacter,
+          subfaction: 'caitiff', // Default to Caitiff for flexibility
+          tempFactionChangePowers: 3 // 3 free powers
+        };
+        break;
+        
+      case 'shifter':
+        updatedCharacter = {
+          ...updatedCharacter,
+          innateTreeIds: ['homid'], // Force Homid
+          tempFactionChangePowers: 3, // 3 free power dots
+          breed: 'homid' // Force homid breed
+          // Will need to select tribe and auspice
+        };
+        break;
+        
+      case 'wraith':
+        updatedCharacter = {
+          ...updatedCharacter,
+          tempFactionChangePowers: 3 // 3 free powers
+          // Will need to select 3 arcanoi and shadow archetype
+        };
+        break;
+        
+      case 'gorgon':
+        updatedCharacter = {
+          ...updatedCharacter,
+          subfaction: 'claimed_gorgon',
+          innateTreeIds: ['gorgon'],
+          powers: {
+            gorgon: { 1: true }
+          },
+          fundamentalPowers: [...updatedCharacter.fundamentalPowers, 'Frail']
+        };
+        break;
+        
+      case 'drone':
+        updatedCharacter = {
+          ...updatedCharacter,
+          subfaction: 'claimed_drone',
+          innateTreeIds: ['stasis', 'weaver', 'onesong'],
+          fundamentalPowers: [...updatedCharacter.fundamentalPowers, 'Regeneration 3']
+        };
+        break;
+        
+      case 'fomori':
+        updatedCharacter = {
+          ...updatedCharacter,
+          subfaction: 'claimed_fomori'
+          // Will need to select fomori tree
+        };
+        break;
+      default:
+        // No special faction changes needed for other factions
+        break;
+    }
+    
+    // Add faction change to advancement history
+    const finalCharacter = {
+      ...updatedCharacter,
+      advancementHistory: [
+        ...(updatedCharacter.advancementHistory || []),
+        {
+          type: 'faction_change',
+          fromFaction: character.faction,
+          toFaction: newFactionId,
+          timestamp: new Date().toISOString(),
+          cost: 0
+        }
+      ]
+    };
+    
+    return finalCharacter;
   };
 
   // =========================
@@ -792,6 +1215,35 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         isInnate = false; // Fellowship powers always use learned pricing
       }
       
+      // For characters with claimed status, their claimed trees are also innate
+      if (character.claimedStatus && character.claimedInnateTreeIds && character.claimedInnateTreeIds.includes(itemId)) {
+        isInnate = true; // Claimed powers use innate pricing
+      }
+      
+      // For mixed subfaction powers: treat as innate (original supernatural heritage)
+      if (character.mixedSubfaction) {
+        if (character.mixedSubfaction === 'sorcerer') {
+          const sorcererTrees = ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'];
+          if (sorcererTrees.includes(itemId)) {
+            isInnate = true; // Mixed sorcerer powers use innate pricing (original heritage)
+          }
+        }
+        if (character.mixedSubfaction === 'ghoul') {
+          // Find all vampire power trees
+          const vampireTrees = gameData.powerTrees.filter(tree => tree.faction === 'vampire').map(tree => tree.tree_id);
+          if (vampireTrees.includes(itemId)) {
+            isInnate = true; // Mixed ghoul powers use innate pricing (original heritage)
+          }
+        }
+        if (character.mixedSubfaction === 'kinfolk') {
+          // Find all shifter power trees
+          const shifterTrees = gameData.powerTrees.filter(tree => tree.faction === 'shifter').map(tree => tree.tree_id);
+          if (shifterTrees.includes(itemId)) {
+            isInnate = true; // Mixed kinfolk powers use innate pricing (original heritage)
+          }
+        }
+      }
+      
       // For Gifted Kinfolk: only their actual innate trees get innate pricing
       // Other shifter powers they can learn use learned pricing (6/9/12 XP)
       // This ensures only their chosen innate trees are cheap, not all shifter powers
@@ -813,7 +1265,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     // Stat costs
     const costData = gameData.xpCosts.find(x => x.item_type === type);
     return costData ? parseInt(costData.base_cost) : 0;
-  }, [gameData.merits, gameData.xpCosts, gameData.lores]);
+  }, [gameData.merits, gameData.xpCosts, gameData.lores, gameData.powerTrees]);
 
   // Check for redundant powers (free advancement)
   const isRedundantPower = (character, treeId, level) => {
@@ -865,7 +1317,10 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       case 'virtue':
         return character.stats.virtue > 1; // Can't reduce below 1
       case 'lore':
-        return character.lores?.some(lore => lore.lore_id === itemId);
+        // Defensive programming: ensure lores is an array
+        const loresArray = Array.isArray(character.lores) ? character.lores : 
+          character.lores ? Object.keys(character.lores).map(loreId => ({ lore_id: loreId })) : [];
+        return loresArray.some(lore => lore.lore_id === itemId);
       default:
         return false;
     }
@@ -1066,25 +1521,34 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     }
 
     const updatedCharacter = { ...character };
-    updatedCharacter.totalXP -= cost;
-    updatedCharacter.xpSpent += cost;
-    updatedCharacter.lastModified = new Date().toISOString();
+    const newTotalXP = updatedCharacter.totalXP - cost;
+    const newXpSpent = updatedCharacter.xpSpent + cost;
+    const newLastModified = new Date().toISOString();
 
-    // Record advancement
-    updatedCharacter.advancementHistory.push({
-      checkIn: character.checkInCount,
-      type,
-      itemId,
-      level,
-      cost,
-      timestamp: new Date().toISOString(),
-      redundant: cost === 0
-    });
+    // Create base character update object
+    let characterUpdate = {
+      ...updatedCharacter,
+      totalXP: newTotalXP,
+      xpSpent: newXpSpent,
+      lastModified: newLastModified,
+      advancementHistory: [
+        ...updatedCharacter.advancementHistory,
+        {
+          checkIn: character.checkInCount,
+          type,
+          itemId,
+          level,
+          cost,
+          timestamp: newLastModified,
+          redundant: cost === 0
+        }
+      ]
+    };
 
     // Record XP spending in XP history (if cost > 0)
     if (cost > 0) {
       const xpEntry = {
-        timestamp: new Date().toISOString(),
+        timestamp: newLastModified,
         type: 'loss',
         amount: cost,
         reason: `Purchased ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`,
@@ -1092,53 +1556,290 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         newTotal: character.totalXP - cost
       };
       
-      updatedCharacter.xpHistory = [...(updatedCharacter.xpHistory || []), xpEntry];
+      characterUpdate = {
+        ...characterUpdate,
+        xpHistory: [...(characterUpdate.xpHistory || []), xpEntry]
+      };
     }
 
     // Apply advancement
     switch (type) {
       case 'skill':
-        updatedCharacter.skills[itemId] = level;
+        characterUpdate = {
+          ...characterUpdate,
+          skills: {
+            ...characterUpdate.skills,
+            [itemId]: level
+          }
+        };
         break;
       case 'power':
-        if (!updatedCharacter.powers[itemId]) {
-          updatedCharacter.powers[itemId] = {};
+        // Check for Dementation tree Malkavian derangement requirement
+        if (itemId === 'dementation') {
+          const hasMalkavianDerangement = characterUpdate.selfNerfs?.some(nerf => 
+            nerf.type === 'derangement' && nerf.source === 'malkavian'
+          );
+          
+          if (!hasMalkavianDerangement) {
+            const derangementList = [
+              'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+              'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+              'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+            ];
+            
+            const selectedDerangement = prompt(
+              `Learning Dementation requires a Malkavian derangement. Choose one:\n\n` +
+              derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+              '\n\nEnter the number (1-12) of your chosen derangement:'
+            );
+            
+            const derangementIndex = parseInt(selectedDerangement) - 1;
+            if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+              const chosenDerangement = derangementList[derangementIndex];
+              
+              // Add the Malkavian derangement
+              const newDerangement = {
+                id: Date.now(),
+                name: `Deranged - ${chosenDerangement}`,
+                description: `Character has a Deranged flaw from their connection to Malkavian madness, specifically manifesting as ${chosenDerangement}.`,
+                type: 'derangement',
+                category: 'Deranged',
+                source: 'malkavian'
+              };
+              
+              characterUpdate = {
+                ...characterUpdate,
+                selfNerfs: [...(characterUpdate.selfNerfs || []), newDerangement]
+              };
+            } else {
+              alert('Invalid selection. Dementation advancement cancelled.');
+              return character;
+            }
+          }
         }
-        updatedCharacter.powers[itemId][level] = true;
+        
+        // Check for trees that cause Permatainted
+        const permataintedTrees = [
+          'death', 'demonology', // Sorcerer trees
+          'madness_wyrm', 'strength', 'corruption', // Wyrm gifts  
+          'thaumaturgy_path_of_the_defiler', 'thaumaturgy_rego_manes', // Dark Thaumaturgy
+          'daimoinon' // Baali vampire tree
+        ];
+        
+        if (permataintedTrees.includes(itemId)) {
+          // Check if character is already Permatainted
+          const isAlreadyPermatainted = characterUpdate.selfNerfs?.some(nerf => 
+            nerf.name === 'Permatainted'
+          );
+          
+          if (!isAlreadyPermatainted) {
+            // Add Permatainted flaw
+            const permataintedFlaw = {
+              id: Date.now(),
+              name: 'Permatainted',
+              description: `Character has become Permatainted from learning powers from the ${itemId} tree.`,
+              type: 'flaw',
+              category: 'Permatainted',
+              source: itemId
+            };
+            
+            characterUpdate = {
+              ...characterUpdate,
+              selfNerfs: [...(characterUpdate.selfNerfs || []), permataintedFlaw]
+            };
+          }
+        }
+        
+        // Check for Wyrm Madness gift derangement requirement
+        if (itemId === 'madness_wyrm') {
+          // Check if character already has a derangement from madness_wyrm
+          const hasWyrmMadnessDerangement = characterUpdate.selfNerfs?.some(nerf => 
+            nerf.type === 'derangement' && nerf.source === 'madness_wyrm'
+          );
+          
+          if (!hasWyrmMadnessDerangement) {
+            const derangementList = [
+              'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+              'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+              'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+            ];
+            
+            const selectedDerangement = prompt(
+              `Learning Madness (Wyrm) gift inflicts additional psychological damage. Choose a derangement:\n\n` +
+              derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+              '\n\nEnter the number (1-12) of your chosen derangement:'
+            );
+            
+            const derangementIndex = parseInt(selectedDerangement) - 1;
+            if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+              const chosenDerangement = derangementList[derangementIndex];
+              
+              // Add the Wyrm Madness derangement
+              const newDerangement = {
+                id: Date.now(),
+                name: `Deranged - ${chosenDerangement}`,
+                description: `Character has a Deranged flaw from the Madness (Wyrm) gift, manifesting as ${chosenDerangement}.`,
+                type: 'derangement',
+                category: 'Deranged',
+                source: 'madness_wyrm'
+              };
+              
+              characterUpdate = {
+                ...characterUpdate,
+                selfNerfs: [...(characterUpdate.selfNerfs || []), newDerangement]
+              };
+            } else {
+              alert('Invalid selection. Madness (Wyrm) advancement cancelled.');
+              return character;
+            }
+          }
+        }
+        
+        // Check for wraith shadow control trees that cause conditional Permatainted
+        const wraith_shadow_trees = ['contaminate', 'hive_mind', 'maleficence'];
+        if (characterUpdate.faction === 'wraith' && wraith_shadow_trees.includes(itemId)) {
+          // Check if character is already Permatainted
+          const isAlreadyPermatainted = characterUpdate.selfNerfs?.some(nerf => 
+            nerf.name === 'Permatainted'
+          );
+          
+          if (!isAlreadyPermatainted) {
+            // Add conditional Permatainted flaw for wraiths
+            const permataintedFlaw = {
+              id: Date.now(),
+              name: 'Permatainted',
+              description: `Character becomes Permatainted while their Shadow is in control due to learning powers from the ${itemId} tree.`,
+              type: 'flaw',
+              category: 'Permatainted (Conditional)',
+              source: itemId
+            };
+            
+            characterUpdate = {
+              ...characterUpdate,
+              selfNerfs: [...(characterUpdate.selfNerfs || []), permataintedFlaw]
+            };
+          }
+        }
+        
+        // Check for Fomori tree mutation requirement
+        const fomoriTrees = ['enticer', 'ferectori', 'gorehound', 'toad'];
+        if (fomoriTrees.includes(itemId)) {
+          const isInnateTree = characterUpdate.innateTreeIds?.includes(itemId) || 
+                               characterUpdate.claimedInnateTreeIds?.includes(itemId);
+          const isFirstPowerInTree = !characterUpdate.powers[itemId] || Object.keys(characterUpdate.powers[itemId]).length === 0;
+          
+          // TOAD tree always requires mutation when first learned
+          // Other Fomori trees require mutation if not innate
+          const needsMutation = (itemId === 'toad' && isFirstPowerInTree) || 
+                               (!isInnateTree && isFirstPowerInTree);
+          
+          if (needsMutation) {
+            const mutationPrompt = prompt(
+              `Learning from ${itemId === 'toad' ? 'the TOAD tree' : `the ${itemId.charAt(0).toUpperCase() + itemId.slice(1)} tree (non-innate)`} requires a Mutation.\n\n` +
+              'Describe your mutation (physical alteration caused by Bane influence):'
+            );
+            
+            if (mutationPrompt && mutationPrompt.trim()) {
+              const chosenMutation = mutationPrompt.trim();
+              
+              // Add the mutation
+              const newMutation = {
+                id: Date.now(),
+                name: 'Mutation',
+                description: chosenMutation,
+                type: 'mutation',
+                category: 'Mutation - Describe your own physical alteration',
+                source: itemId === 'toad' ? 'toad_tree' : 'fomori_tree'
+              };
+              
+              characterUpdate = {
+                ...characterUpdate,
+                selfNerfs: [...(characterUpdate.selfNerfs || []), newMutation]
+              };
+            } else {
+              alert('Mutation description required. Power advancement cancelled.');
+              return character;
+            }
+          }
+        }
+        
+        characterUpdate = {
+          ...characterUpdate,
+          powers: {
+            ...characterUpdate.powers,
+            [itemId]: {
+              ...(characterUpdate.powers[itemId] || {}),
+              [level]: true
+            }
+          }
+        };
         break;
       case 'merit':
         // Handle stackable merits (track quantity)
         const merit = gameData.merits.find(m => m.merit_id === itemId);
         if (merit && merit.can_purchase_multiple === 'true') {
           // For stackable merits, increment the quantity
-          updatedCharacter.merits[itemId] = (updatedCharacter.merits[itemId] || 0) + 1;
+          characterUpdate = {
+            ...characterUpdate,
+            merits: {
+              ...characterUpdate.merits,
+              [itemId]: (characterUpdate.merits[itemId] || 0) + 1
+            }
+          };
         } else {
           // For non-stackable merits, just mark as owned
-          updatedCharacter.merits[itemId] = true;
+          characterUpdate = {
+            ...characterUpdate,
+            merits: {
+              ...characterUpdate.merits,
+              [itemId]: true
+            }
+          };
         }
         break;
       case 'energy':
-        updatedCharacter.stats.energy += 1;
-        updatedCharacter.stats.maxEnergy += 1;
+        characterUpdate = {
+          ...characterUpdate,
+          stats: {
+            ...characterUpdate.stats,
+            energy: characterUpdate.stats.energy + 1,
+            maxEnergy: characterUpdate.stats.maxEnergy + 1
+          }
+        };
         break;
       case 'willpower':
-        updatedCharacter.stats.willpower += 1;
+        characterUpdate = {
+          ...characterUpdate,
+          stats: {
+            ...characterUpdate.stats,
+            willpower: characterUpdate.stats.willpower + 1
+          }
+        };
         break;
       case 'virtue':
-        updatedCharacter.stats.virtue += 1;
+        characterUpdate = {
+          ...characterUpdate,
+          stats: {
+            ...characterUpdate.stats,
+            virtue: characterUpdate.stats.virtue + 1
+          }
+        };
         break;
       case 'lore':
-        if (!updatedCharacter.lores) {
-          updatedCharacter.lores = [];
-        }
-        updatedCharacter.lores.push({ lore_id: itemId });
+        characterUpdate = {
+          ...characterUpdate,
+          lores: [
+            ...(characterUpdate.lores || []),
+            { lore_id: itemId }
+          ]
+        };
         break;
       default:
         console.warn(`Unknown advancement type: ${type}`);
         break;
     }
 
-    return updatedCharacter;
+    return characterUpdate;
   }, [gameData]);
 
   // Function to reduce/remove character attributes with XP refund
@@ -1154,71 +1855,137 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     // Calculate refund amount
     const refund = calculateReductionRefund(character, type, itemId, level);
     
-    const updatedCharacter = { ...character };
-    updatedCharacter.totalXP += refund;
-    updatedCharacter.xpSpent -= refund;
-    updatedCharacter.lastModified = new Date().toISOString();
+    const newTotalXP = character.totalXP + refund;
+    const newXpSpent = character.xpSpent - refund;
+    const newLastModified = new Date().toISOString();
+
+    let characterUpdate = {
+      ...character,
+      totalXP: newTotalXP,
+      xpSpent: newXpSpent,
+      lastModified: newLastModified
+    };
 
     // Record XP refund in XP history (if refund > 0)
     if (refund > 0) {
       const xpEntry = {
-        timestamp: new Date().toISOString(),
+        timestamp: newLastModified,
         type: 'gain',
         amount: refund,
         reason: `Removed ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`,
         previousTotal: character.totalXP,
-        newTotal: character.totalXP + refund
+        newTotal: newTotalXP
       };
       
-      updatedCharacter.xpHistory = [...(updatedCharacter.xpHistory || []), xpEntry];
+      characterUpdate = {
+        ...characterUpdate,
+        xpHistory: [...(characterUpdate.xpHistory || []), xpEntry]
+      };
     }
 
     // Apply reduction
     switch (type) {
       case 'skill':
         if (level === 0) {
-          delete updatedCharacter.skills[itemId];
+          const { [itemId]: removed, ...remainingSkills } = characterUpdate.skills;
+          characterUpdate = {
+            ...characterUpdate,
+            skills: remainingSkills
+          };
         } else {
-          updatedCharacter.skills[itemId] = level;
+          characterUpdate = {
+            ...characterUpdate,
+            skills: {
+              ...characterUpdate.skills,
+              [itemId]: level
+            }
+          };
         }
         break;
       case 'power':
-        delete updatedCharacter.powers[itemId][level];
-        if (Object.keys(updatedCharacter.powers[itemId]).length === 0) {
-          delete updatedCharacter.powers[itemId];
+        const { [level]: removedLevel, ...remainingLevels } = characterUpdate.powers[itemId] || {};
+        if (Object.keys(remainingLevels).length === 0) {
+          const { [itemId]: removedPower, ...remainingPowers } = characterUpdate.powers;
+          characterUpdate = {
+            ...characterUpdate,
+            powers: remainingPowers
+          };
+        } else {
+          characterUpdate = {
+            ...characterUpdate,
+            powers: {
+              ...characterUpdate.powers,
+              [itemId]: remainingLevels
+            }
+          };
         }
         break;
       case 'merit':
         const merit = gameData.merits.find(m => m.merit_id === itemId);
         if (merit && merit.can_purchase_multiple === 'true') {
-          if (updatedCharacter.merits[itemId] > 1) {
-            updatedCharacter.merits[itemId] -= 1;
+          if ((characterUpdate.merits[itemId] || 0) > 1) {
+            characterUpdate = {
+              ...characterUpdate,
+              merits: {
+                ...characterUpdate.merits,
+                [itemId]: characterUpdate.merits[itemId] - 1
+              }
+            };
           } else {
-            delete updatedCharacter.merits[itemId];
+            const { [itemId]: removedMerit, ...remainingMerits } = characterUpdate.merits;
+            characterUpdate = {
+              ...characterUpdate,
+              merits: remainingMerits
+            };
           }
         } else {
-          delete updatedCharacter.merits[itemId];
+          const { [itemId]: removedMerit, ...remainingMerits } = characterUpdate.merits;
+          characterUpdate = {
+            ...characterUpdate,
+            merits: remainingMerits
+          };
         }
         break;
       case 'energy':
-        if (updatedCharacter.stats.energy > 1) {
-          updatedCharacter.stats.energy -= 1;
-          updatedCharacter.stats.maxEnergy -= 1;
+        if (characterUpdate.stats.energy > 1) {
+          characterUpdate = {
+            ...characterUpdate,
+            stats: {
+              ...characterUpdate.stats,
+              energy: characterUpdate.stats.energy - 1,
+              maxEnergy: characterUpdate.stats.maxEnergy - 1
+            }
+          };
         }
         break;
       case 'willpower':
-        if (updatedCharacter.stats.willpower > 1) {
-          updatedCharacter.stats.willpower -= 1;
+        if (characterUpdate.stats.willpower > 1) {
+          characterUpdate = {
+            ...characterUpdate,
+            stats: {
+              ...characterUpdate.stats,
+              willpower: characterUpdate.stats.willpower - 1
+            }
+          };
         }
         break;
       case 'virtue':
-        if (updatedCharacter.stats.virtue > 1) {
-          updatedCharacter.stats.virtue -= 1;
+        if (characterUpdate.stats.virtue > 1) {
+          characterUpdate = {
+            ...characterUpdate,
+            stats: {
+              ...characterUpdate.stats,
+              virtue: characterUpdate.stats.virtue - 1
+            }
+          };
         }
         break;
       case 'lore':
-        if (updatedCharacter.lores) {
-          updatedCharacter.lores = updatedCharacter.lores.filter(lore => lore.lore_id !== itemId);
+        if (characterUpdate.lores) {
+          characterUpdate = {
+            ...characterUpdate,
+            lores: characterUpdate.lores.filter(lore => lore.lore_id !== itemId)
+          };
         }
         break;
       default:
@@ -1226,7 +1993,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         break;
     }
 
-    return updatedCharacter;
+    return characterUpdate;
   }, [gameData, calculateReductionRefund]);
 
   // ==========================
@@ -1416,7 +2183,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
   // Main Menu
   const renderMainMenu = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+      <div className="w-full max-w-4xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
         {/* Enhanced Header */}
         <div className="text-center mb-4 sm:mb-5">
           <div className="mb-2">
@@ -1549,7 +2316,14 @@ Generated by Shadow Accord Character Builder v${currentVersion}
 
   // Character Creation
   const renderCharacterCreation = () => {
-    if (!newCharacter) return null;
+    console.log('renderCharacterCreation called');
+    console.log('newCharacter:', newCharacter);
+    console.log('factionChangeCreationMode:', factionChangeCreationMode);
+    
+    if (!newCharacter) {
+      console.log('No newCharacter, returning null');
+      return null;
+    }
 
     const renderCreationStep = () => {
       switch (creationStep) {
@@ -1751,6 +2525,31 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     )}
                     {subfaction.dormancy_rules && (
                       <p className="text-sm text-red-400 mb-2">Dormancy: {subfaction.dormancy_rules}</p>
+                    )}
+                    
+                    {/* Special explanatory text for old Claimed subfactions */}
+                    {subfaction.subfaction_id === 'claimed_gorgon' && (
+                      <div className="mt-2 p-2 bg-purple-900 bg-opacity-30 rounded border border-purple-700">
+                        <p className="text-xs text-purple-200 mb-1">
+                          <strong>🐍 Legacy Option:</strong> This creates a pure Gorgon character.
+                        </p>
+                        <p className="text-xs text-purple-300">
+                          💡 <strong>Want dual heritage?</strong> Choose Sorcerer, Ghoul, Kinfolk, or Commoner first, 
+                          then select "Claimed by Gorgon" in the next step for characters like "Former Sorcerer claimed by Gorgon."
+                        </p>
+                      </div>
+                    )}
+                    
+                    {subfaction.subfaction_id === 'claimed_fomori' && (
+                      <div className="mt-2 p-2 bg-red-900 bg-opacity-30 rounded border border-red-700">
+                        <p className="text-xs text-red-200 mb-1">
+                          <strong>👹 Legacy Option:</strong> This creates a pure Fomori character.
+                        </p>
+                        <p className="text-xs text-red-300">
+                          💡 <strong>Want dual heritage?</strong> Choose Sorcerer, Ghoul, Kinfolk, or Commoner first, 
+                          then select "Claimed by Fomori" in the next step for characters like "Former Ghoul possessed by Fomori Bane."
+                        </p>
+                      </div>
                     )}
                   </button>
                 ))}
@@ -2085,17 +2884,69 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                               key={tree.tree_id}
                               onClick={() => {
                                 if (isSelected) {
-                                  // Deselect tree
+                                  // Deselect tree and remove associated derangement if it's madness or ruin
+                                  let updatedSelfNerfs = newCharacter.selfNerfs;
+                                  if (tree.tree_id === 'madness') {
+                                    updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                      nerf.source !== 'madness_tree'
+                                    );
+                                  } else if (tree.tree_id === 'ruin') {
+                                    updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                      nerf.source !== 'ruin_tree'
+                                    );
+                                  }
+                                  
                                   setNewCharacter({
                                     ...newCharacter,
-                                    innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id)
+                                    innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id),
+                                    selfNerfs: updatedSelfNerfs
                                   });
                                 } else if (canSelect) {
-                                  // Select tree
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id]
-                                  });
+                                  // Select tree - if madness or ruin, require derangement selection
+                                  if (tree.tree_id === 'madness' || tree.tree_id === 'ruin') {
+                                    const derangementList = [
+                                      'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                      'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                      'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                                    ];
+                                    
+                                    const pathName = tree.tree_id === 'madness' ? 'Madness' : 'Ruin';
+                                    const selectedDerangement = prompt(
+                                      `The ${pathName} path inflicts psychological damage. Choose a derangement:\n\n` +
+                                      derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+                                      '\n\nEnter the number (1-12) of your chosen derangement:'
+                                    );
+                                    
+                                    const derangementIndex = parseInt(selectedDerangement) - 1;
+                                    if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+                                      const chosenDerangement = derangementList[derangementIndex];
+                                      
+                                      // Add the tree and the derangement
+                                      const newDerangement = {
+                                        id: Date.now(),
+                                        name: `Deranged - ${chosenDerangement}`,
+                                        description: `Character has the Deranged flaw from practicing the ${pathName} path, specifically manifesting as ${chosenDerangement}.`,
+                                        type: 'derangement',
+                                        category: 'Deranged',
+                                        source: `${tree.tree_id}_tree`
+                                      };
+                                      
+                                      setNewCharacter({
+                                        ...newCharacter,
+                                        innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id],
+                                        selfNerfs: [...newCharacter.selfNerfs, newDerangement]
+                                      });
+                                    } else {
+                                      alert('Invalid selection. Please try again and choose a number from 1-12.');
+                                      return;
+                                    }
+                                  } else {
+                                    // Regular tree selection
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id]
+                                    });
+                                  }
                                 }
                               }}
                               className={`p-3 rounded-lg border-2 transition-all text-left relative ${
@@ -2199,6 +3050,14 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     <h4 className="text-xl font-bold mb-2">Select Fellowship (Optional)</h4>
                     <p className="text-gray-400 mb-2">Choose a sorcerer fellowship for additional specialized abilities, or select "No Fellowship" to remain independent. Fellowships provide access to advanced magical traditions.</p>
                     
+                    <div className="p-3 bg-green-600 bg-opacity-20 rounded-lg border border-green-500 mb-3">
+                      <p className="text-sm text-green-300">
+                        💡 <strong>Fellowship Benefits:</strong> If you select a fellowship, you automatically receive both 
+                        Mage Lore and your fellowship's specific lore for free. This represents your training in both 
+                        general magical theory and your fellowship's specialized techniques.
+                      </p>
+                    </div>
+                    
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
                       {/* No Fellowship Option */}
                       <button
@@ -2289,11 +3148,116 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 </div>
               )}
               
-              {/* Black Spiral Dancer Wyrm Gift Selection */}
+              {/* Black Spiral Dancer Mandatory Derangement & Wyrm Gift Selection */}
               {newCharacter.faction === 'shifter' && newCharacter.subfaction === 'black_spiral_dancer' && (
-                <div className={`${themeClasses.card} p-5 mt-5`}>
-                  <h4 className="text-xl font-bold mb-2">Select Wyrm Gift</h4>
-                  <p className="text-gray-400 mb-2">As a Black Spiral Dancer, choose one Wyrm gift that represents your corruption by the Wyrm. This will be your innate power tree.</p>
+                <div className="space-y-6 mt-5">
+                  {/* Mandatory Derangement for Black Spiral Dancers */}
+                  <div className={`${themeClasses.card} p-5`}>
+                    <h4 className="text-xl font-bold mb-2 text-red-400">⚠️ Mandatory Derangement Selection</h4>
+                    <p className="text-gray-400 mb-3">
+                      As a Black Spiral Dancer, you must select one derangement that represents the psychological corruption 
+                      and madness inflicted by the Wyrm. This is a mandatory character limitation.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {[
+                        'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                        'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                        'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                      ].map(derangement => {
+                        const isSelected = newCharacter.selfNerfs.some(nerf => 
+                          nerf.name === `Deranged - ${derangement}` && nerf.source === 'black_spiral_dancer'
+                        );
+                        
+                        return (
+                          <button
+                            key={derangement}
+                            onClick={() => {
+                              if (isSelected) {
+                                // Remove the derangement
+                                setNewCharacter({
+                                  ...newCharacter,
+                                  selfNerfs: newCharacter.selfNerfs.filter(nerf => 
+                                    !(nerf.name === `Deranged - ${derangement}` && nerf.source === 'black_spiral_dancer')
+                                  )
+                                });
+                              } else {
+                                // Remove any existing Black Spiral Dancer derangement first (only one allowed)
+                                const filteredNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                  nerf.source !== 'black_spiral_dancer'
+                                );
+                                
+                                // Add the new derangement
+                                const newNerf = {
+                                  id: Date.now(),
+                                  name: `Deranged - ${derangement}`,
+                                  description: `Character has the Deranged flaw from Wyrm corruption as a Black Spiral Dancer, specifically manifesting as ${derangement}.`,
+                                  type: 'derangement',
+                                  category: 'Deranged',
+                                  source: 'black_spiral_dancer'
+                                };
+                                
+                                setNewCharacter({
+                                  ...newCharacter,
+                                  selfNerfs: [...filteredNerfs, newNerf]
+                                });
+                              }
+                            }}
+                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                              isSelected
+                                ? 'border-red-500 bg-red-500 bg-opacity-20'
+                                : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-bold text-lg">{derangement}</h5>
+                              {isSelected && (
+                                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">✓</span>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Selected Derangement:</span>
+                        <span className={`text-sm font-medium ${
+                          newCharacter.selfNerfs.some(nerf => nerf.source === 'black_spiral_dancer') ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          {newCharacter.selfNerfs.find(nerf => nerf.source === 'black_spiral_dancer')?.name.replace('Deranged - ', '') || 'None'}
+                        </span>
+                      </div>
+                      
+                      {!newCharacter.selfNerfs.some(nerf => nerf.source === 'black_spiral_dancer') && (
+                        <p className="text-sm text-red-400 mt-2">
+                          ⚠️ You must select a derangement to continue. This is mandatory for Black Spiral Dancers.
+                        </p>
+                      )}
+                      
+                      {newCharacter.selfNerfs.some(nerf => nerf.source === 'black_spiral_dancer') && (
+                        <div className="mt-2">
+                          <span className="px-2 py-1 bg-red-600 text-red-100 rounded text-sm">
+                            {newCharacter.selfNerfs.find(nerf => nerf.source === 'black_spiral_dancer')?.name.replace('Deranged - ', '')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                      <p className="text-sm text-red-300">
+                        🐺 <strong>Wyrm Corruption:</strong> Black Spiral Dancers are wholly corrupted by the Wyrm. This derangement represents the mental trauma and madness inflicted by your tribal corruption.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Wyrm Gift Selection */}
+                  <div className={`${themeClasses.card} p-5`}>
+                    <h4 className="text-xl font-bold mb-2">Select Wyrm Gift</h4>
+                    <p className="text-gray-400 mb-2">As a Black Spiral Dancer, choose one Wyrm gift that represents your corruption by the Wyrm. This will be your innate power tree.</p>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
                     {gameData.powerTrees
@@ -2307,17 +3271,75 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                             onClick={() => {
                               const wyrmGifts = ['corruption', 'cunning', 'defiling', 'fear', 'madness_wyrm', 'strength'];
                               if (isSelected) {
+                                // Remove derangement if deselecting madness_wyrm
+                                let updatedSelfNerfs = newCharacter.selfNerfs;
+                                if (tree.tree_id === 'madness_wyrm') {
+                                  updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                    nerf.source !== 'madness_wyrm_gift'
+                                  );
+                                }
+                                
                                 setNewCharacter({
                                   ...newCharacter,
-                                  innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id)
+                                  innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id),
+                                  selfNerfs: updatedSelfNerfs
                                 });
                               } else {
                                 // Remove any other Wyrm gifts and add this one
                                 const filteredTreeIds = newCharacter.innateTreeIds.filter(id => !wyrmGifts.includes(id));
-                                setNewCharacter({
-                                  ...newCharacter,
-                                  innateTreeIds: [...filteredTreeIds, tree.tree_id]
-                                });
+                                
+                                // If selecting madness_wyrm, require additional derangement
+                                if (tree.tree_id === 'madness_wyrm') {
+                                  const derangementList = [
+                                    'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                    'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                    'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                                  ];
+                                  
+                                  const selectedDerangement = prompt(
+                                    `The Madness (Wyrm) gift inflicts additional psychological damage beyond your tribal corruption. Choose a second derangement:\n\n` +
+                                    derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+                                    '\n\nEnter the number (1-12) of your chosen derangement, or click Cancel to select this gift without additional derangement:'
+                                  );
+                                  
+                                  if (selectedDerangement === null) {
+                                    // User clicked Cancel - just add the tree without additional derangement
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      innateTreeIds: [...filteredTreeIds, tree.tree_id]
+                                    });
+                                  } else {
+                                    const derangementIndex = parseInt(selectedDerangement) - 1;
+                                    if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+                                      const chosenDerangement = derangementList[derangementIndex];
+                                      
+                                      // Add the tree and the additional derangement
+                                      const newDerangement = {
+                                        id: Date.now(),
+                                        name: `Deranged - ${chosenDerangement}`,
+                                        description: `Character has an additional Deranged flaw from the Madness (Wyrm) gift beyond their tribal corruption, specifically manifesting as ${chosenDerangement}.`,
+                                        type: 'derangement',
+                                        category: 'Deranged',
+                                        source: 'madness_wyrm_gift'
+                                      };
+                                      
+                                      setNewCharacter({
+                                        ...newCharacter,
+                                        innateTreeIds: [...filteredTreeIds, tree.tree_id],
+                                        selfNerfs: [...newCharacter.selfNerfs, newDerangement]
+                                      });
+                                    } else {
+                                      alert('Invalid selection. Please try again and choose a number from 1-12, or click Cancel.');
+                                      return;
+                                    }
+                                  }
+                                } else {
+                                  // Regular tree selection
+                                  setNewCharacter({
+                                    ...newCharacter,
+                                    innateTreeIds: [...filteredTreeIds, tree.tree_id]
+                                  });
+                                }
                               }
                             }}
                             className={`p-3 rounded-lg border-2 transition-all text-left relative ${
@@ -2404,14 +3426,121 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       🐺 <strong>Wyrm Corruption:</strong> Black Spiral Dancers are wholly corrupted by the Wyrm. Your chosen gift represents the primary manifestation of this corruption in your character.
                     </p>
                   </div>
+                  </div>
                 </div>
               )}
               
-              {/* Fallen Fera Wyrm Gift Selection */}
+              {/* Fallen Fera Mandatory Derangement & Wyrm Gift Selection */}
               {newCharacter.faction === 'shifter' && newCharacter.subfaction === 'fallen_fera' && (
-                <div className={`${themeClasses.card} p-5 mt-5`}>
-                  <h4 className="text-xl font-bold mb-2">Select Wyrm Gift</h4>
-                  <p className="text-gray-400 mb-2">As a Fallen Fera, choose one Wyrm gift that represents how the Wyrm has corrupted your kind. This will be your innate power tree.</p>
+                <div className="space-y-6 mt-5">
+                  {/* Mandatory Derangement for Fallen Fera */}
+                  <div className={`${themeClasses.card} p-5`}>
+                    <h4 className="text-xl font-bold mb-2 text-red-400">⚠️ Mandatory Derangement Selection</h4>
+                    <p className="text-gray-400 mb-3">
+                      As a Fallen Fera, you must select one derangement that represents the psychological corruption 
+                      and trauma inflicted by the Wyrm on your kind. This is a mandatory character limitation.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {[
+                        'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                        'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                        'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                      ].map(derangement => {
+                        const isSelected = newCharacter.selfNerfs.some(nerf => 
+                          nerf.name === `Deranged - ${derangement}` && nerf.source === 'fallen_fera'
+                        );
+                        
+                        return (
+                          <button
+                            key={derangement}
+                            onClick={() => {
+                              if (isSelected) {
+                                // Remove the derangement
+                                setNewCharacter({
+                                  ...newCharacter,
+                                  selfNerfs: newCharacter.selfNerfs.filter(nerf => 
+                                    !(nerf.name === `Deranged - ${derangement}` && nerf.source === 'fallen_fera')
+                                  )
+                                });
+                              } else {
+                                // Remove any existing Fallen Fera derangement first (only one allowed)
+                                const filteredNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                  nerf.source !== 'fallen_fera'
+                                );
+                                
+                                // Add the new derangement
+                                const newNerf = {
+                                  id: Date.now(),
+                                  name: `Deranged - ${derangement}`,
+                                  description: `Character has the Deranged flaw from Wyrm corruption as a Fallen Fera, specifically manifesting as ${derangement}.`,
+                                  type: 'derangement',
+                                  category: 'Deranged',
+                                  source: 'fallen_fera'
+                                };
+                                
+                                setNewCharacter({
+                                  ...newCharacter,
+                                  selfNerfs: [...filteredNerfs, newNerf]
+                                });
+                              }
+                            }}
+                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                              isSelected
+                                ? 'border-red-500 bg-red-500 bg-opacity-20'
+                                : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-bold text-lg">{derangement}</h5>
+                              {isSelected && (
+                                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">✓</span>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Selected Derangement:</span>
+                        <span className={`text-sm font-medium ${
+                          newCharacter.selfNerfs.some(nerf => nerf.source === 'fallen_fera') ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          {newCharacter.selfNerfs.find(nerf => nerf.source === 'fallen_fera')?.name.replace('Deranged - ', '') || 'None'}
+                        </span>
+                      </div>
+                      
+                      {!newCharacter.selfNerfs.some(nerf => nerf.source === 'fallen_fera') && (
+                        <p className="text-sm text-red-400 mt-2">
+                          ⚠️ You must select a derangement to continue. This is mandatory for Fallen Fera.
+                        </p>
+                      )}
+                      
+                      {newCharacter.selfNerfs.some(nerf => nerf.source === 'fallen_fera') && (
+                        <div className="mt-2">
+                          <span className="px-2 py-1 bg-red-600 text-red-100 rounded text-sm">
+                            {newCharacter.selfNerfs.find(nerf => nerf.source === 'fallen_fera')?.name.replace('Deranged - ', '')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                      <p className="text-sm text-red-300">
+                        🌑 <strong>Fallen Corruption:</strong> The Wyrm's influence has not only corrupted your natural abilities 
+                        but also left deep psychological scars. This derangement represents the mental trauma of your fall.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Wyrm Gift Selection */}
+                  <div className={`${themeClasses.card} p-5`}>
+                    <h4 className="text-xl font-bold mb-2">Select Wyrm Gift</h4>
+                    <p className="text-gray-400 mb-2">As a Fallen Fera, choose one Wyrm gift that represents how the Wyrm has corrupted your kind. This will be your innate power tree.</p>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
                     {gameData.powerTrees
@@ -2425,17 +3554,75 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                             onClick={() => {
                               const wyrmGifts = ['corruption', 'cunning', 'defiling', 'fear', 'madness_wyrm', 'strength'];
                               if (isSelected) {
+                                // Remove derangement if deselecting madness_wyrm
+                                let updatedSelfNerfs = newCharacter.selfNerfs;
+                                if (tree.tree_id === 'madness_wyrm') {
+                                  updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                    nerf.source !== 'madness_wyrm_gift'
+                                  );
+                                }
+                                
                                 setNewCharacter({
                                   ...newCharacter,
-                                  innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id)
+                                  innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id),
+                                  selfNerfs: updatedSelfNerfs
                                 });
                               } else {
                                 // Remove any other Wyrm gifts and add this one
                                 const filteredTreeIds = newCharacter.innateTreeIds.filter(id => !wyrmGifts.includes(id));
-                                setNewCharacter({
-                                  ...newCharacter,
-                                  innateTreeIds: [...filteredTreeIds, tree.tree_id]
-                                });
+                                
+                                // If selecting madness_wyrm, require additional derangement
+                                if (tree.tree_id === 'madness_wyrm') {
+                                  const derangementList = [
+                                    'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                    'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                    'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                                  ];
+                                  
+                                  const selectedDerangement = prompt(
+                                    `The Madness (Wyrm) gift inflicts additional psychological damage beyond your natural corruption. Choose a second derangement:\n\n` +
+                                    derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+                                    '\n\nEnter the number (1-12) of your chosen derangement, or click Cancel to select this gift without additional derangement:'
+                                  );
+                                  
+                                  if (selectedDerangement === null) {
+                                    // User clicked Cancel - just add the tree without additional derangement
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      innateTreeIds: [...filteredTreeIds, tree.tree_id]
+                                    });
+                                  } else {
+                                    const derangementIndex = parseInt(selectedDerangement) - 1;
+                                    if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+                                      const chosenDerangement = derangementList[derangementIndex];
+                                      
+                                      // Add the tree and the additional derangement
+                                      const newDerangement = {
+                                        id: Date.now(),
+                                        name: `Deranged - ${chosenDerangement}`,
+                                        description: `Character has an additional Deranged flaw from the Madness (Wyrm) gift beyond their natural corruption, specifically manifesting as ${chosenDerangement}.`,
+                                        type: 'derangement',
+                                        category: 'Deranged',
+                                        source: 'madness_wyrm_gift'
+                                      };
+                                      
+                                      setNewCharacter({
+                                        ...newCharacter,
+                                        innateTreeIds: [...filteredTreeIds, tree.tree_id],
+                                        selfNerfs: [...newCharacter.selfNerfs, newDerangement]
+                                      });
+                                    } else {
+                                      alert('Invalid selection. Please try again and choose a number from 1-12, or click Cancel.');
+                                      return;
+                                    }
+                                  }
+                                } else {
+                                  // Regular tree selection
+                                  setNewCharacter({
+                                    ...newCharacter,
+                                    innateTreeIds: [...filteredTreeIds, tree.tree_id]
+                                  });
+                                }
                               }
                             }}
                             className={`p-3 rounded-lg border-2 transition-all text-left relative ${
@@ -2521,6 +3708,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     <p className="text-sm text-red-300">
                       🌑 <strong>Fallen Nature:</strong> Fallen Fera are fera who have been corrupted by the Wyrm. Your chosen gift represents the specific way the Wyrm has twisted your natural abilities.
                     </p>
+                  </div>
                   </div>
                 </div>
               )}
@@ -2635,6 +3823,269 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         })}
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Natus Mandatory Flaw Selection */}
+              {newCharacter.faction === 'shifter' && newCharacter.breed === 'natus' && !factionChangeCreationMode && (
+                <div className="space-y-6 mt-5">
+                  {/* Mandatory Flaw for Natus */}
+                  <div className={`${themeClasses.card} p-5`}>
+                    <h4 className="text-xl font-bold mb-2 text-red-400">⚠️ Mandatory Flaw Selection</h4>
+                    <p className="text-gray-400 mb-3">
+                      As a Natus, you must select one flaw that represents the physical and mental toll of your supernatural nature. 
+                      This is a mandatory character limitation.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {[
+                        'Deranged', 'Fragile', 'Hemophilia', 'Horns', 'Lame', 'Mute',
+                        'No Claws', 'Puny', 'Restricted Form', 'Tail',
+                        'Withered Arm', 'Weak Musculature'
+                      ].map(flaw => {
+                        const isSelected = newCharacter.selfNerfs.some(nerf => 
+                          nerf.name === flaw && nerf.source === 'natus'
+                        ) || (flaw === 'Deranged' && newCharacter.selfNerfs.some(nerf => 
+                          nerf.name?.startsWith('Deranged - ') && nerf.source === 'natus'
+                        ));
+                        
+                        return (
+                          <button
+                            key={flaw}
+                            onClick={() => {
+                              if (isSelected) {
+                                // Remove the flaw
+                                setNewCharacter({
+                                  ...newCharacter,
+                                  selfNerfs: newCharacter.selfNerfs.filter(nerf => 
+                                    !(nerf.source === 'natus' && (nerf.name === flaw || (flaw === 'Deranged' && nerf.name?.startsWith('Deranged - '))))
+                                  )
+                                });
+                              } else {
+                                // Remove any existing Natus flaw first (only one allowed)
+                                const filteredNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                  nerf.source !== 'natus'
+                                );
+                                
+                                if (flaw === 'Deranged') {
+                                  const derangementList = [
+                                    'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                    'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                    'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                                  ];
+                                  
+                                  const selectedDerangement = prompt(
+                                    `The Deranged flaw requires specifying a type of mental affliction. Choose one:\n\n` +
+                                    derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+                                    '\n\nEnter the number (1-12) of your chosen derangement:'
+                                  );
+                                  
+                                  const derangementIndex = parseInt(selectedDerangement) - 1;
+                                  if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+                                    const chosenDerangement = derangementList[derangementIndex];
+                                    
+                                    // Add the deranged flaw
+                                    const newFlaw = {
+                                      id: Date.now(),
+                                      name: `Deranged - ${chosenDerangement}`,
+                                      description: `Character has the Deranged flaw from their Natus nature, specifically manifesting as ${chosenDerangement}.`,
+                                      type: 'flaw',
+                                      category: 'Deranged',
+                                      source: 'natus'
+                                    };
+                                    
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      selfNerfs: [...filteredNerfs, newFlaw]
+                                    });
+                                  } else {
+                                    alert('Invalid selection. Please try again and choose a number from 1-12.');
+                                    return;
+                                  }
+                                } else {
+                                  // Add the regular flaw
+                                  const newFlaw = {
+                                    id: Date.now(),
+                                    name: flaw,
+                                    description: `Character has the ${flaw} flaw from their Natus nature.`,
+                                    type: 'flaw',
+                                    category: flaw,
+                                    source: 'natus'
+                                  };
+                                  
+                                  setNewCharacter({
+                                    ...newCharacter,
+                                    selfNerfs: [...filteredNerfs, newFlaw]
+                                  });
+                                }
+                              }
+                            }}
+                            className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                              isSelected
+                                ? 'border-red-500 bg-red-500 bg-opacity-20'
+                                : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-bold text-lg">{flaw}</h5>
+                              {isSelected && (
+                                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">✓</span>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-300">Selected Flaw:</span>
+                        <span className={`text-sm font-medium ${
+                          newCharacter.selfNerfs.some(nerf => nerf.source === 'natus') ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          {newCharacter.selfNerfs.find(nerf => nerf.source === 'natus')?.name || 'None'}
+                        </span>
+                      </div>
+                      
+                      {!newCharacter.selfNerfs.some(nerf => nerf.source === 'natus') && (
+                        <p className="text-sm text-red-400 mt-2">
+                          ⚠️ You must select a flaw to continue. This is mandatory for Natus characters.
+                        </p>
+                      )}
+                      
+                      {newCharacter.selfNerfs.some(nerf => nerf.source === 'natus') && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-300">
+                            {newCharacter.selfNerfs.find(nerf => nerf.source === 'natus')?.description}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                      <p className="text-sm text-red-300">
+                        🧬 <strong>Supernatural Toll:</strong> Natus characters bear the physical and mental burden of their unnatural existence. This flaw represents the price of your supernatural nature.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Malkavian Derangement Selection */}
+              {newCharacter.faction === 'vampire' && newCharacter.subfaction === 'malkavian' && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2">Select Malkavian Derangement</h4>
+                  <p className="text-gray-400 mb-2">The curse of Malkav affects all members of the clan. Choose one derangement that reflects your character's particular madness.</p>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {[
+                      'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                      'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                      'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                    ].map(derangement => {
+                      const isSelected = newCharacter.selfNerfs.some(nerf => 
+                        nerf.name === `Deranged - ${derangement}` && nerf.source === 'malkavian'
+                      );
+                      
+                      return (
+                        <button
+                          key={derangement}
+                          onClick={() => {
+                            if (isSelected) {
+                              // Remove this derangement
+                              setNewCharacter({
+                                ...newCharacter,
+                                selfNerfs: newCharacter.selfNerfs.filter(nerf => 
+                                  !(nerf.name === `Deranged - ${derangement}` && nerf.source === 'malkavian')
+                                )
+                              });
+                            } else {
+                              // Remove any other Malkavian derangement and add this one
+                              const filteredNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                nerf.source !== 'malkavian'
+                              );
+                              
+                              const newDerangement = {
+                                id: Date.now(),
+                                name: `Deranged - ${derangement}`,
+                                description: `Character has a Deranged flaw from their connection to Malkavian madness, specifically manifesting as ${derangement}.`,
+                                type: 'derangement',
+                                category: 'Deranged',
+                                source: 'malkavian'
+                              };
+                              
+                              setNewCharacter({
+                                ...newCharacter,
+                                selfNerfs: [...filteredNerfs, newDerangement]
+                              });
+                            }
+                          }}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            isSelected
+                              ? 'border-red-500 bg-red-500 bg-opacity-20'
+                              : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-bold text-lg">{derangement}</h5>
+                            {isSelected && (
+                              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm">✓</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="text-sm text-gray-300">
+                            {derangement === 'Amnesia' && 'You have trouble remembering past events.'}
+                            {derangement === 'Aphasia' && 'You are unable to speak coherently.'}
+                            {derangement === 'Melancholia' && 'You are extremely depressed and difficult to motivate.'}
+                            {derangement === 'Delusional' && 'You believe in a reality that simply doesn\'t exist.'}
+                            {derangement === 'Masochism' && 'You drive others to cause you pain.'}
+                            {derangement === 'Megalomania' && 'You must seek to control things.'}
+                            {derangement === 'Multiple Personality Disorder' && 'You have several distinct personalities, only one of which manifests at any given time.'}
+                            {derangement === 'Obsessive Compulsion' && 'You have a specific order that things must be kept in. If it is out of place, you will replace it.'}
+                            {derangement === 'Paranoia' && 'You consider everything a threat.'}
+                            {derangement === 'Regression' && 'Your mind has reverted to a childlike state to protect itself from the world.'}
+                            {derangement === 'Schizophrenia' && 'You hear voices and follow their instructions.'}
+                            {derangement === 'Synesthesia' && 'You are in a permanent hallucinatory state.'}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Selected Derangement:</span>
+                      <span className={`text-sm font-medium ${
+                        newCharacter.selfNerfs.some(nerf => nerf.source === 'malkavian') ? 'text-red-400' : 'text-gray-400'
+                      }`}>
+                        {newCharacter.selfNerfs.find(nerf => nerf.source === 'malkavian')?.name.replace('Deranged - ', '') || 'None'}
+                      </span>
+                    </div>
+                    
+                    {!newCharacter.selfNerfs.some(nerf => nerf.source === 'malkavian') && (
+                      <p className="text-sm text-red-400 mt-2">
+                        ⚠️ You must select a derangement to continue. This is mandatory for Malkavians.
+                      </p>
+                    )}
+                    
+                    {newCharacter.selfNerfs.some(nerf => nerf.source === 'malkavian') && (
+                      <div className="mt-2">
+                        <span className="px-2 py-1 bg-red-600 text-red-100 rounded text-sm">
+                          {newCharacter.selfNerfs.find(nerf => nerf.source === 'malkavian')?.name.replace('Deranged - ', '')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                    <p className="text-sm text-red-300">
+                      🧠 <strong>Curse of Malkav:</strong> All Malkavians are touched by madness as part of their vampiric nature. This derangement represents the specific way insanity manifests in your character. It affects roleplay and may have mechanical consequences.
+                    </p>
                   </div>
                 </div>
               )}
@@ -3018,10 +4469,24 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                               </div>
                             )}
                             
-                            {tree.tree_id === 'toad' && (
+                          {tree.tree_id === 'toad' && (
+                            <div className="mt-2 p-2 bg-yellow-600 bg-opacity-20 rounded border border-yellow-500">
+                              <p className="text-xs text-yellow-300">
+                                ⚠️ <strong>Mutation:</strong> Learning any power from this tree also grants at least one Mutation.
+                              </p>
+                            </div>
+                          )}
+                          
+                          {['enticer', 'ferectoi', 'gorehound'].includes(tree.tree_id) && (
+                            <div className="mt-2 p-2 bg-yellow-600 bg-opacity-20 rounded border border-yellow-500">
+                              <p className="text-xs text-yellow-300">
+                                ⚠️ <strong>Mutation:</strong> Learning powers from this tree (if not innate) grants Mutations.
+                              </p>
+                            </div>
+                          )}                            {['enticer', 'ferectori', 'gorehound'].includes(tree.tree_id) && (
                               <div className="mt-2 p-2 bg-yellow-600 bg-opacity-20 rounded border border-yellow-500">
                                 <p className="text-xs text-yellow-300">
-                                  ⚠️ <strong>Mutation:</strong> Learning any power from this tree also grants at least one Mutation.
+                                  ⚠️ <strong>Mutation:</strong> Learning powers from this tree (if not innate) grants Mutations.
                                 </p>
                               </div>
                             )}
@@ -3183,6 +4648,362 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
                     <p className="text-sm text-red-300">
                       💔 <strong>Innate Frailty:</strong> Claimed Gorgons also possess Frail as an innate power, representing their fragile connection between dream and reality.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Clan Selection for Ghouls */}
+              {newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2">Optional: Clan Selection</h4>
+                  <p className="text-gray-400 mb-3">
+                    As a ghoul, you may choose to be associated with a specific vampire clan. This grants you additional 
+                    knowledge about that clan but may come with restrictions if the clan has special requirements.
+                  </p>
+                  
+                  <div className="grid md:grid-cols-3 gap-2 mb-3">
+                    {/* None option */}
+                    <button
+                      onClick={() => setNewCharacter({...newCharacter, selectedClan: null})}
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        !newCharacter.selectedClan
+                          ? 'border-blue-500 bg-blue-500 bg-opacity-20'
+                          : 'border-gray-600 hover:border-gray-400'
+                      }`}
+                    >
+                      <h5 className="font-bold">No Clan</h5>
+                      <p className="text-sm text-gray-400">Independent ghoul</p>
+                    </button>
+                    
+                    {/* Clan options */}
+                    {gameData.subfactions
+                      .filter(sub => sub.faction_id === 'vampire' && sub.type === 'clan')
+                      .map(clan => (
+                        <button
+                          key={clan.subfaction_id}
+                          onClick={() => setNewCharacter({...newCharacter, selectedClan: clan.subfaction_id})}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            newCharacter.selectedClan === clan.subfaction_id
+                              ? 'border-blue-500 bg-blue-500 bg-opacity-20'
+                              : 'border-gray-600 hover:border-gray-400'
+                          }`}
+                        >
+                          <h5 className="font-bold">{clan.subfaction_name}</h5>
+                          {clan.restrictions && (
+                            <p className="text-sm text-yellow-400">{clan.restrictions}</p>
+                          )}
+                        </button>
+                      ))}
+                  </div>
+                  
+                  <div className="p-3 bg-green-600 bg-opacity-20 rounded-lg border border-green-500">
+                    <p className="text-sm text-green-300">
+                      💡 <strong>Benefits:</strong> You automatically receive Vampire Lore for free. If you select a clan, 
+                      you also receive that clan's lore for free. These represent the knowledge you'd naturally gain 
+                      from your vampiric master and their lineage.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Claimed Status Selection - appears after selecting certain human subfactions */}
+              {newCharacter.faction === 'human' && 
+               ['sorcerer', 'ghoul', 'kinfolk', 'commoner', 'faithful'].includes(newCharacter.subfaction) && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2">Optional: Claimed Status</h4>
+                  <p className="text-gray-400 mb-3">
+                    Has your character been claimed or transformed by otherworldly supernatural forces? This creates dual heritage 
+                    characters who retain their original nature while gaining additional supernatural abilities. <strong>This is entirely optional.</strong>
+                  </p>
+                  <div className="mb-4 p-3 bg-gray-700 bg-opacity-50 rounded-lg border-l-4 border-blue-500">
+                    <p className="text-sm text-gray-300">
+                      <strong>How it works:</strong> You select your primary subfaction first (Sorcerer, Ghoul, etc.), then optionally add 
+                      a claimed status. Your character gains access to <strong>both</strong> power sets at innate costs, creating unique 
+                      combinations like "Former Sorcerer claimed by Gorgon" or "Ghoul possessed by Fomori Bane."
+                    </p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-3">
+                    {/* No Claimed Status Option */}
+                    <button
+                      onClick={() => {
+                        setNewCharacter({
+                          ...newCharacter,
+                          claimedStatus: null,
+                          claimedInnateTreeIds: [],
+                          selectedFomoriTree: null
+                        });
+                      }}
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        !newCharacter.claimedStatus
+                          ? 'border-blue-500 bg-blue-500 bg-opacity-20'
+                          : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-lg">No Claimed Status</h5>
+                        {!newCharacter.claimedStatus && (
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm">✓</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-300">
+                        Remain as a pure {formatDisplayText(newCharacter.subfaction)} without additional supernatural influences.
+                      </p>
+                    </button>
+
+                    {/* Claimed by Gorgon Option */}
+                    <button
+                      onClick={() => {
+                        setNewCharacter({
+                          ...newCharacter,
+                          claimedStatus: 'gorgon',
+                          claimedInnateTreeIds: ['gorgon'], // Automatically add gorgon tree
+                          selectedFomoriTree: null
+                        });
+                      }}
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        newCharacter.claimedStatus === 'gorgon'
+                          ? 'border-purple-500 bg-purple-500 bg-opacity-20'
+                          : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-lg">🐍 Claimed by Gorgon</h5>
+                        {newCharacter.claimedStatus === 'gorgon' && (
+                          <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm">✓</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mb-2 p-2 bg-purple-900 bg-opacity-30 rounded border border-purple-700">
+                        <p className="text-xs text-purple-200">
+                          <strong>📋 Character Type:</strong> Former {formatDisplayText(newCharacter.subfaction)} claimed by Gorgon
+                        </p>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">
+                        <strong>Ancient Curse:</strong> Your character has been touched by the ancient power of the Gorgons, 
+                        gaining supernatural abilities but also carrying their curse of fragility.
+                      </p>
+                      <div className="text-xs text-purple-200 bg-purple-900 bg-opacity-30 p-2 rounded mb-2">
+                        <strong>Powers Gained:</strong> Gorgon tree at innate costs (3/6/9 XP)<br/>
+                        • <strong>Level 1:</strong> Hallucination - Create false sensory experiences<br/>
+                        • <strong>Level 2:</strong> Dreamshape - Manipulate dreams and nightmares<br/>
+                        • <strong>Level 3:</strong> Gauntlet Walk/Umbra Sight - Move between worlds<br/>
+                        <strong>Fundamental Power:</strong> Frail (automatic)
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        Perfect for characters who were cursed, touched by ancient magic, or encountered Gorgon artifacts.
+                      </p>
+                      <div className="mt-2 p-2 bg-blue-800 bg-opacity-30 rounded border border-blue-600">
+                        <p className="text-xs text-blue-200">
+                          💡 <strong>Dual Heritage:</strong> You keep all your {formatDisplayText(newCharacter.subfaction)} abilities AND gain Gorgon powers, both at innate costs.
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Claimed by Fomori Option */}
+                    <button
+                      onClick={() => {
+                        setNewCharacter({
+                          ...newCharacter,
+                          claimedStatus: 'fomori',
+                          claimedInnateTreeIds: [], // Will be selected in next step
+                          selectedFomoriTree: null
+                        });
+                      }}
+                      className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        newCharacter.claimedStatus === 'fomori'
+                          ? 'border-red-500 bg-red-500 bg-opacity-20'
+                          : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-lg">👹 Claimed by Fomori</h5>
+                        {newCharacter.claimedStatus === 'fomori' && (
+                          <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm">✓</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mb-2 p-2 bg-red-900 bg-opacity-30 rounded border border-red-700">
+                        <p className="text-xs text-red-200">
+                          <strong>📋 Character Type:</strong> Former {formatDisplayText(newCharacter.subfaction)} possessed by Fomori Bane
+                        </p>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">
+                        <strong>Bane Possession:</strong> Your character has been possessed by a Wyrm spirit (Bane), 
+                        gaining supernatural powers but potentially losing some of their humanity in the process.
+                      </p>
+                      <div className="text-xs text-red-200 bg-red-900 bg-opacity-30 p-2 rounded mb-2">
+                        <strong>Choose Your Bane Type:</strong> Select which spirit possesses you<br/>
+                        • <strong>Enticer:</strong> Temptation and corruption powers<br/>
+                        • <strong>Ferectori:</strong> Fear and intimidation abilities<br/>
+                        • <strong>Gorehound:</strong> Violence and brutality powers<br/>
+                        • <strong>Toad:</strong> Poison and transformation abilities<br/>
+                        <em>All trees cost innate rates (3/6/9 XP)</em>
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        Perfect for characters who were corrupted, made deals with dark forces, or fell to the Wyrm's influence.
+                      </p>
+                      <div className="mt-2 p-2 bg-blue-800 bg-opacity-30 rounded border border-blue-600">
+                        <p className="text-xs text-blue-200">
+                          💡 <strong>Dual Heritage:</strong> You keep all your {formatDisplayText(newCharacter.subfaction)} abilities AND gain your selected Bane powers, both at innate costs.
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Selected Claimed Status:</span>
+                      <span className={`text-sm font-medium ${
+                        newCharacter.claimedStatus ? 'text-blue-400' : 'text-gray-400'
+                      }`}>
+                        {newCharacter.claimedStatus ? 
+                          newCharacter.claimedStatus.charAt(0).toUpperCase() + newCharacter.claimedStatus.slice(1) : 'None'
+                        }
+                      </span>
+                    </div>
+                    
+                    {newCharacter.claimedStatus && (
+                      <div className="mt-2">
+                        <span className={`px-2 py-1 rounded text-sm capitalize ${
+                          newCharacter.claimedStatus === 'gorgon' ? 'bg-purple-600 text-purple-100' : 'bg-red-600 text-red-100'
+                        }`}>
+                          Claimed by {newCharacter.claimedStatus}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-blue-600 bg-opacity-20 rounded-lg border border-blue-500">
+                    <p className="text-sm text-blue-300">
+                      💡 <strong>Dual Heritage:</strong> If you select a claimed status, you'll have access to both your original 
+                      subfaction powers AND the claimed powers, both at innate costs. This makes for very versatile but complex characters.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Fomori Tree Selection - only if claimed by fomori */}
+              {newCharacter.faction === 'human' && newCharacter.claimedStatus === 'fomori' && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2">Select Fomori Bane Manifestation</h4>
+                  <p className="text-gray-400 mb-3">
+                    Choose which type of Bane spirit has possessed your character. Each Bane grants different supernatural abilities 
+                    reflecting their nature and domain of corruption.
+                  </p>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-3">
+                    {gameData.powerTrees
+                      .filter(tree => ['enticer', 'ferectori', 'gorehound', 'toad'].includes(tree.tree_id))
+                      .map(tree => {
+                        const isSelected = newCharacter.selectedFomoriTree === tree.tree_id;
+                        
+                        // Define descriptions for each Bane type
+                        const baneDescriptions = {
+                          enticer: "Masters of temptation and seduction, Enticing Banes corrupt through desire and manipulation.",
+                          ferectori: "Fear incarnate, Ferectori Banes spread terror and intimidation wherever they go.",
+                          gorehound: "Violent and brutal, Gorehound Banes revel in carnage and physical destruction.",
+                          toad: "Toxic and mutating, Toad Banes corrupt through poison and grotesque transformation."
+                        };
+                        
+                        return (
+                          <button
+                            key={tree.tree_id}
+                            onClick={() => {
+                              setNewCharacter({
+                                ...newCharacter,
+                                selectedFomoriTree: tree.tree_id,
+                                claimedInnateTreeIds: [tree.tree_id]
+                              });
+                            }}
+                            className={`p-3 rounded-lg border-2 transition-all text-left ${
+                              isSelected
+                                ? 'border-red-500 bg-red-500 bg-opacity-20'
+                                : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
+                              {isSelected && (
+                                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">✓</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <p className="text-xs text-gray-300 mb-3 italic">
+                              {baneDescriptions[tree.tree_id]}
+                            </p>
+                            
+                            {tree.level1_powers && (
+                              <div className="mt-2">
+                                <p className="text-sm text-gray-400 mb-1">Level 1:</p>
+                                <p className="text-sm">{tree.level1_powers}</p>
+                              </div>
+                            )}
+                            
+                            {tree.level2_powers && (
+                              <div className="mt-2">
+                                <p className="text-sm text-gray-400 mb-1">Level 2:</p>
+                                <p className="text-sm">{tree.level2_powers}</p>
+                              </div>
+                            )}
+                            
+                            {tree.level3_powers && (
+                              <div className="mt-2">
+                                <p className="text-sm text-gray-400 mb-1">Level 3:</p>
+                                <p className="text-sm">{tree.level3_powers}</p>
+                              </div>
+                            )}
+                            
+                            {tree.tree_id === 'toad' && (
+                              <div className="mt-2 p-2 bg-yellow-600 bg-opacity-20 rounded border border-yellow-500">
+                                <p className="text-xs text-yellow-300">
+                                  ⚠️ <strong>Mutation:</strong> Learning any power from this tree grants mutations.
+                                </p>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Selected Bane:</span>
+                      <span className={`text-sm font-medium ${
+                        newCharacter.selectedFomoriTree ? 'text-red-400' : 'text-gray-400'
+                      }`}>
+                        {newCharacter.selectedFomoriTree ? 
+                          gameData.powerTrees.find(t => t.tree_id === newCharacter.selectedFomoriTree)?.tree_name || 'Unknown' : 'None'
+                        }
+                      </span>
+                    </div>
+                    
+                    {!newCharacter.selectedFomoriTree && (
+                      <p className="text-sm text-yellow-400 mt-2">
+                        Please select a Bane manifestation to continue.
+                      </p>
+                    )}
+                    
+                    {newCharacter.selectedFomoriTree && (
+                      <div className="mt-2">
+                        <span className="px-2 py-1 bg-red-600 text-red-100 rounded text-sm capitalize">
+                          {gameData.powerTrees.find(t => t.tree_id === newCharacter.selectedFomoriTree)?.tree_name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                    <p className="text-sm text-red-300">
+                      � <strong>Bane Possession:</strong> The selected Bane manifestation will be added to your innate power trees, 
+                      allowing you to learn its powers at innate costs (3/6/9 XP) alongside your original {formatDisplayText(newCharacter.subfaction)} abilities.
                     </p>
                   </div>
                 </div>
@@ -3746,79 +5567,193 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   </div>
                 </div>
               )}
+
+              {/* Mandatory Derangement Selection for Claimed Characters */}
+              {(newCharacter.subfaction?.includes('claimed') || newCharacter.claimedStatus) && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2 text-red-400">⚠️ Mandatory Derangement Selection</h4>
+                  <p className="text-gray-400 mb-3">
+                    As a claimed character, you must select one derangement that represents the psychological trauma 
+                    of your supernatural possession/transformation. This is a mandatory character limitation.
+                  </p>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {[
+                      'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                      'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                      'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                    ].map(derangement => {
+                      const isSelected = newCharacter.selfNerfs.some(nerf => 
+                        nerf.name === `Deranged - ${derangement}` || nerf.name === derangement
+                      );
+                      
+                      return (
+                        <button
+                          key={derangement}
+                          onClick={() => {
+                            if (isSelected) {
+                              // Remove the derangement
+                              setNewCharacter({
+                                ...newCharacter,
+                                selfNerfs: newCharacter.selfNerfs.filter(nerf => 
+                                  nerf.name !== `Deranged - ${derangement}` && nerf.name !== derangement
+                                )
+                              });
+                            } else {
+                              // Remove any existing derangement first (only one allowed)
+                              const derangementList = [
+                                'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                              ];
+                              const filteredNerfs = newCharacter.selfNerfs.filter(nerf => 
+                                !derangementList.includes(nerf.name.replace('Deranged - ', ''))
+                              );
+                              
+                              // Add the new derangement
+                              const newNerf = {
+                                id: Date.now(),
+                                name: `Deranged - ${derangement}`,
+                                description: `Character has the Deranged flaw, specifically manifesting as ${derangement}.`,
+                                type: 'derangement',
+                                category: 'Deranged'
+                              };
+                              
+                              setNewCharacter({
+                                ...newCharacter,
+                                selfNerfs: [...filteredNerfs, newNerf]
+                              });
+                            }
+                          }}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            isSelected
+                              ? 'border-red-500 bg-red-500 bg-opacity-20'
+                              : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-bold text-lg">{derangement}</h5>
+                            {isSelected && (
+                              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm">✓</span>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Selected Derangement:</span>
+                      <span className={`text-sm font-medium ${
+                        newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement') ? 'text-red-400' : 'text-gray-400'
+                      }`}>
+                        {newCharacter.selfNerfs.find(nerf => nerf.type === 'derangement')?.name.replace('Deranged - ', '') || 'None'}
+                      </span>
+                    </div>
+                    
+                    {!newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement') && (
+                      <p className="text-sm text-red-400 mt-2">
+                        ⚠️ You must select a derangement to continue. This is mandatory for claimed characters.
+                      </p>
+                    )}
+                    
+                    {newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement') && (
+                      <div className="mt-2">
+                        <span className="px-2 py-1 bg-red-600 text-red-100 rounded text-sm">
+                          {newCharacter.selfNerfs.find(nerf => nerf.type === 'derangement')?.name.replace('Deranged - ', '')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                    <p className="text-sm text-red-300">
+                      🧠 <strong>Psychological Trauma:</strong> Being claimed by supernatural forces leaves lasting psychological 
+                      damage. This derangement represents how your mind copes with the supernatural transformation and possession.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           );
 
         case 2: // Skills & Powers
           return (
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold mb-2">Assign Skills & Powers</h3>
+              <h3 className="text-2xl font-bold mb-2">
+                {factionChangeCreationMode ? 'Assign Powers' : 'Assign Skills & Powers'}
+              </h3>
               
-              <div className="grid md:grid-cols-2 gap-5">
-                {/* Skills Section */}
-                <div className={`${themeClasses.card} p-3`}>
-                  <h4 className="font-bold mb-2">Skills (3 dots to assign)</h4>
-                  <div className="space-y-2">
-                    {gameData.skills.map(skill => {
-                      const currentLevel = newCharacter.skills[skill.skill_id] || 0;
-                      const canIncrease = currentLevel < 3 && 
-                        Object.values(newCharacter.skills).reduce((sum, lvl) => sum + lvl, 0) < 3;
-                      
-                      return (
-                        <div key={skill.skill_id} className="flex items-center justify-between">
-                          <div>
-                            <span className="font-medium capitalize">{skill.skill_name}</span>
-                            {skill.faction_restrictions && (
-                              <span className="text-xs text-yellow-400 ml-2">
-                                ({skill.faction_restrictions} only)
-                              </span>
-                            )}
+              <div className={factionChangeCreationMode ? 'space-y-6' : 'grid md:grid-cols-2 gap-5'}>
+                {/* Skills Section - Only show for new character creation */}
+                {!factionChangeCreationMode && (
+                  <div className={`${themeClasses.card} p-3`}>
+                    <h4 className="font-bold mb-2">Skills (3 dots to assign)</h4>
+                    <div className="space-y-2">
+                      {gameData.skills.map(skill => {
+                        const currentLevel = newCharacter.skills[skill.skill_id] || 0;
+                        const canIncrease = currentLevel < 3 && 
+                          Object.values(newCharacter.skills).reduce((sum, lvl) => sum + lvl, 0) < 3;
+                        
+                        return (
+                          <div key={skill.skill_id} className="flex items-center justify-between">
+                            <div>
+                              <span className="font-medium capitalize">{skill.skill_name}</span>
+                              {skill.faction_restrictions && (
+                                <span className="text-xs text-yellow-400 ml-2">
+                                  ({skill.faction_restrictions} only)
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  if (currentLevel > 0) {
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      skills: {
+                                        ...newCharacter.skills,
+                                        [skill.skill_id]: currentLevel - 1
+                                      }
+                                    });
+                                  }
+                                }}
+                                className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600"
+                                disabled={currentLevel === 0}
+                              >
+                                -
+                              </button>
+                              <span className="w-8 text-center">{currentLevel}</span>
+                              <button
+                                onClick={() => {
+                                  if (canIncrease) {
+                                    setNewCharacter({
+                                      ...newCharacter,
+                                      skills: {
+                                        ...newCharacter.skills,
+                                        [skill.skill_id]: currentLevel + 1
+                                      }
+                                    });
+                                  }
+                                }}
+                                className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600"
+                                disabled={!canIncrease}
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                if (currentLevel > 0) {
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    skills: {
-                                      ...newCharacter.skills,
-                                      [skill.skill_id]: currentLevel - 1
-                                    }
-                                  });
-                                }
-                              }}
-                              className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600"
-                              disabled={currentLevel === 0}
-                            >
-                              -
-                            </button>
-                            <span className="w-8 text-center">{currentLevel}</span>
-                            <button
-                              onClick={() => {
-                                if (canIncrease) {
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    skills: {
-                                      ...newCharacter.skills,
-                                      [skill.skill_id]: currentLevel + 1
-                                    }
-                                  });
-                                }
-                              }}
-                              className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600"
-                              disabled={!canIncrease}
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                    <div className="mt-3 text-sm text-center">
+                      Dots Used: {Object.values(newCharacter.skills).reduce((sum, lvl) => sum + lvl, 0)} / 3
+                    </div>
                   </div>
-                  <div className="mt-3 text-sm text-center">
-                    Dots Used: {Object.values(newCharacter.skills).reduce((sum, lvl) => sum + lvl, 0)} / 3
-                  </div>
-                </div>
+                )}
 
                 {/* Powers Section */}
                 <div className={`${themeClasses.card} p-3`}>
@@ -3847,15 +5782,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                           </span>
                         </div>
                         <div className="text-xs text-gray-400">
-                          Level 3 ≤ Level 2 ≤ Level 1 (Current total: {Object.values(newCharacter.powers).reduce(
-                            (sum, treeLevels) => sum + Object.keys(treeLevels).length, 0
-                          )} / {newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' ? 1 : 
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' ? 1 :
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_drone' ? 1 :
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' ? 1 :
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_gorgon' ? 1 :
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' ? 1 :
-                              newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? 0 : 3})
+                          Level 3 ≤ Level 2 ≤ Level 1
                         </div>
                       </div>
 
@@ -3865,7 +5792,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         if (!tree) return null;
                         
                         const currentLevels = newCharacter.powers[treeId] || {};
-                        const totalDots = Object.values(newCharacter.powers).reduce(
+                        const totalDots = factionChangeCreationMode ? (newCharacter.creationDotsUsed || 0) : Object.values(newCharacter.powers).reduce(
                           (sum, treeLevels) => sum + Object.keys(treeLevels).length, 0
                         );
                         const maxDots = newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' ? 1 : 
@@ -3884,8 +5811,23 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                 const powerText = level === 1 ? tree.level1_powers : 
                                                 level === 2 ? tree.level2_powers : tree.level3_powers;
                                 
-                                // Check if this power can be added based on level ratios
-                                const canAddByRatio = canAddShifterPower(newCharacter.powers, level);
+                                // For faction changes, we need different constraint logic
+                                let canAddByRatio = true;
+                                if (factionChangeCreationMode && newCharacter.faction === 'shifter') {
+                                  // During shifter faction changes, only check ratios for shifter trees
+                                  // Get only shifter-specific powers for ratio checking
+                                  const shifterTreeIds = newCharacter.innateTreeIds || [];
+                                  const shifterPowers = {};
+                                  shifterTreeIds.forEach(treeId => {
+                                    if (newCharacter.powers[treeId]) {
+                                      shifterPowers[treeId] = newCharacter.powers[treeId];
+                                    }
+                                  });
+                                  canAddByRatio = canAddShifterPower(shifterPowers, level);
+                                } else if (newCharacter.faction === 'shifter') {
+                                  // Normal shifter character creation - apply full ratio constraints
+                                  canAddByRatio = canAddShifterPower(newCharacter.powers, level);
+                                }
                                 const canAdd = !hasLevel && totalDots < maxDots && canAddByRatio;
                                 
                                 return (
@@ -3904,10 +5846,16 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                             if (Object.keys(newPowers[treeId]).length === 0) {
                                               delete newPowers[treeId];
                                             }
-                                            setNewCharacter({ ...newCharacter, powers: newPowers });
+                                            const baseCharacterUpdate = { ...newCharacter, powers: newPowers };
+                                            // Update creation dots counter for faction changes
+                                            const updatedCharacter = factionChangeCreationMode ? {
+                                              ...baseCharacterUpdate,
+                                              creationDotsUsed: Math.max(0, (baseCharacterUpdate.creationDotsUsed || 0) - 1)
+                                            } : baseCharacterUpdate;
+                                            setNewCharacter(updatedCharacter);
                                           } else if (canAdd) {
                                             // Add power
-                                            setNewCharacter({
+                                            const baseCharacterUpdate = {
                                               ...newCharacter,
                                               powers: {
                                                 ...newCharacter.powers,
@@ -3916,7 +5864,13 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                                   [level]: true
                                                 }
                                               }
-                                            });
+                                            };
+                                            // Update creation dots counter for faction changes
+                                            const updatedCharacter = factionChangeCreationMode ? {
+                                              ...baseCharacterUpdate,
+                                              creationDotsUsed: (baseCharacterUpdate.creationDotsUsed || 0) + 1
+                                            } : baseCharacterUpdate;
+                                            setNewCharacter(updatedCharacter);
                                           }
                                         }}
                                         className={`px-3 py-1 rounded text-sm ${
@@ -3934,7 +5888,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                     <div className="text-xs text-gray-300">
                                       {powerText || 'Powers vary by tree'}
                                     </div>
-                                    {!canAdd && !hasLevel && (
+                                    {!canAdd && !hasLevel && !canAddByRatio && (
                                       <div className="text-xs text-yellow-400 mt-1">
                                         Would violate level ratio constraints
                                       </div>
@@ -3956,7 +5910,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                           if (!tree) return null;
                           
                           const currentLevels = newCharacter.powers[treeId] || {};
-                          const totalDots = Object.values(newCharacter.powers).reduce(
+                          const totalDots = factionChangeCreationMode ? (newCharacter.creationDotsUsed || 0) : Object.values(newCharacter.powers).reduce(
                             (sum, treeLevels) => sum + Object.keys(treeLevels).length, 0
                           );
                         const maxDots = newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' ? 1 : 
@@ -3988,9 +5942,15 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                             if (Object.keys(newPowers[treeId]).length === 0) {
                                               delete newPowers[treeId];
                                             }
-                                            setNewCharacter({ ...newCharacter, powers: newPowers });
+                                            const baseCharacterUpdate = { ...newCharacter, powers: newPowers };
+                                            // Update creation dots counter for faction changes
+                                            const updatedCharacter = factionChangeCreationMode ? {
+                                              ...baseCharacterUpdate,
+                                              creationDotsUsed: Math.max(0, (baseCharacterUpdate.creationDotsUsed || 0) - 1)
+                                            } : baseCharacterUpdate;
+                                            setNewCharacter(updatedCharacter);
                                           } else if (canAdd) {
-                                            setNewCharacter({
+                                            const baseCharacterUpdate = {
                                               ...newCharacter,
                                               powers: {
                                                 ...newCharacter.powers,
@@ -3999,7 +5959,13 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                                   [level]: true
                                                 }
                                               }
-                                            });
+                                            };
+                                            // Update creation dots counter for faction changes
+                                            const updatedCharacter = factionChangeCreationMode ? {
+                                              ...baseCharacterUpdate,
+                                              creationDotsUsed: (baseCharacterUpdate.creationDotsUsed || 0) + 1
+                                            } : baseCharacterUpdate;
+                                            setNewCharacter(updatedCharacter);
                                           }
                                         }}
                                         className={`px-3 py-1 rounded text-sm ${
@@ -4030,7 +5996,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   )}
                   
                   <div className="mt-3 text-sm text-center">
-                    Dots Used: {Object.values(newCharacter.powers).reduce(
+                    Dots Used: {factionChangeCreationMode ? (newCharacter.creationDotsUsed || 0) : Object.values(newCharacter.powers).reduce(
                       (sum, treeLevels) => sum + Object.keys(treeLevels).length, 0
                     )} / {newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' ? 1 : 
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' ? 1 :
@@ -4042,6 +6008,89 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' ? 0 : 3}
                   </div>
                 </div>
+
+                {/* Add Claimed Status Free Powers Section */}
+                {newCharacter.claimedStatus === 'gorgon' && (
+                  <div className={`${themeClasses.card} p-3`}>
+                    <h4 className="font-bold mb-2">🐍 Claimed Gorgon Free Power (Automatic)</h4>
+                    <p className="text-gray-400 mb-3">
+                      As a character claimed by Gorgon, you automatically receive the first dot of the Gorgon tree for free. 
+                      This represents your initial connection to dream reality.
+                    </p>
+                    
+                    <div className="p-3 rounded-lg border-2 border-purple-500 bg-purple-500 bg-opacity-20">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-lg">Gorgon Tree</h5>
+                        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded border border-purple-400 bg-purple-400 bg-opacity-20">
+                        <div className="flex items-center mb-2">
+                          <div className="w-4 h-4 rounded-full mr-2 bg-purple-500" />
+                          <span className="font-medium">Level 1 - FREE</span>
+                        </div>
+                        <div className="text-sm text-gray-300">
+                          Hallucination
+                        </div>
+                        <p className="text-xs text-purple-300 mt-1 italic">
+                          Automatically granted - your first manifestation of dream power
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 p-3 bg-purple-600 bg-opacity-20 rounded-lg border border-purple-500">
+                      <p className="text-sm text-purple-300">
+                        🎁 <strong>Free Power:</strong> This first dot is granted automatically and doesn't count against your creation dot limit. 
+                        You can purchase additional levels of Gorgon powers during advancement.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Add Claimed Fomori Free Power Section */}
+                {newCharacter.claimedStatus === 'fomori' && newCharacter.selectedFomoriTree && (
+                  <div className={`${themeClasses.card} p-3`}>
+                    <h4 className="font-bold mb-2">👹 Claimed Fomori Free Power (Automatic)</h4>
+                    <p className="text-gray-400 mb-3">
+                      As a character possessed by a {formatDisplayText(newCharacter.selectedFomoriTree)} Bane, you automatically receive the first dot 
+                      of that manifestation tree for free. This represents your initial corruption by the Wyrm spirit.
+                    </p>
+                    
+                    <div className="p-3 rounded-lg border-2 border-red-500 bg-red-500 bg-opacity-20">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-lg capitalize">{formatDisplayText(newCharacter.selectedFomoriTree)} Tree</h5>
+                        <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 rounded border border-red-400 bg-red-400 bg-opacity-20">
+                        <div className="flex items-center mb-2">
+                          <div className="w-4 h-4 rounded-full mr-2 bg-red-500" />
+                          <span className="font-medium">Level 1 - FREE</span>
+                        </div>
+                        <div className="text-sm text-gray-300">
+                          {(() => {
+                            const tree = gameData.powerTrees.find(t => t.tree_id === newCharacter.selectedFomoriTree);
+                            return tree?.level1_powers || 'Powers vary by tree';
+                          })()}
+                        </div>
+                        <p className="text-xs text-red-300 mt-1 italic">
+                          Automatically granted - your first manifestation of Bane corruption
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                      <p className="text-sm text-red-300">
+                        🎁 <strong>Free Power:</strong> This first dot is granted automatically and doesn't count against your creation dot limit. 
+                        You can purchase additional levels of Bane powers during advancement.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -4214,42 +6263,49 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               </div>
             );
           } else {
-            // For non-human factions, show XP summary
+            // For non-human factions, show completion message
             return (
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold mb-2">Character Complete</h3>
                 
                 <div className={`${themeClasses.card} p-5 text-center`}>
                   <div className="mb-5">
-                    <h4 className="text-2xl font-bold text-green-400 mb-2">🎉 Character Creation Complete!</h4>
+                    <h4 className="text-2xl font-bold text-green-400 mb-2">
+                      {factionChangeCreationMode ? '🔄 Faction Transformation Ready!' : '🎉 Character Creation Complete!'}
+                    </h4>
                     <p className="text-lg text-gray-300">Your character has been successfully created with all starting abilities.</p>
                   </div>
                   
-                  <div className={`${themeClasses.card} p-3 bg-blue-500 bg-opacity-20 border border-blue-400`}>
-                    <h5 className="text-xl font-bold text-blue-300 mb-2">Starting Experience Points</h5>
-                    <div className="text-center">
-                      <span className="text-3xl font-bold text-blue-400">27 XP</span>
-                      <p className="text-blue-200 mt-2">
-                        Your new character starts with 27 free experience points that can be spent in the Character Manager after creation.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-5 text-gray-400">
-                    <p className="mb-2">Use your starting XP to:</p>
-                    <ul className="text-left max-w-md mx-auto space-y-1">
-                      <li>• Increase skills beyond starting levels</li>
-                      <li>• Purchase additional power dots</li>
-                      <li>• Buy merits and advantages</li>
-                      <li>• Enhance your character's capabilities</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="mt-5 p-3 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
-                    <p className="text-yellow-300 text-sm">
-                      💡 <strong>Tip:</strong> You can access the Character Manager after creating your character to spend your 27 starting XP and continue developing your character.
-                    </p>
-                  </div>
+                  {/* Only show XP info for new character creation, not faction changes */}
+                  {!factionChangeCreationMode && (
+                    <>
+                      <div className={`${themeClasses.card} p-3 bg-blue-500 bg-opacity-20 border border-blue-400`}>
+                        <h5 className="text-xl font-bold text-blue-300 mb-2">Starting Experience Points</h5>
+                        <div className="text-center">
+                          <span className="text-3xl font-bold text-blue-400">27 XP</span>
+                          <p className="text-blue-200 mt-2">
+                            Your new character starts with 27 free experience points that can be spent in the Character Manager after creation.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-5 text-gray-400">
+                        <p className="mb-2">Use your starting XP to:</p>
+                        <ul className="text-left max-w-md mx-auto space-y-1">
+                          <li>• Increase skills beyond starting levels</li>
+                          <li>• Purchase additional power dots</li>
+                          <li>• Buy merits and advantages</li>
+                          <li>• Enhance your character's capabilities</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="mt-5 p-3 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
+                        <p className="text-yellow-300 text-sm">
+                          💡 <strong>Tip:</strong> You can access the Character Manager after creating your character to spend your 27 starting XP and continue developing your character.
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             );
@@ -4321,8 +6377,37 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         <span className="capitalize">{formatDisplayText(newCharacter.guild)}</span>
                       </div>
                     )}
+                    {newCharacter.claimedStatus && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Claimed Status:</span>
+                        <span className="capitalize">{newCharacter.claimedStatus}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Claimed Status Summary */}
+                {newCharacter.claimedStatus && (
+                  <div className={`${themeClasses.card} p-3`}>
+                    <h4 className="font-bold mb-2">Claimed Status</h4>
+                    <div className="text-sm">
+                      <div className="flex justify-between mb-2">
+                        <span className="capitalize">Claimed by {newCharacter.claimedStatus}</span>
+                        <span className={newCharacter.claimedStatus === 'gorgon' ? 'text-purple-400' : 'text-red-400'}>✓</span>
+                      </div>
+                      {newCharacter.claimedStatus === 'fomori' && newCharacter.selectedFomoriTree && (
+                        <div className="text-xs text-gray-400">
+                          <strong>Bane Manifestation:</strong> {gameData.powerTrees.find(t => t.tree_id === newCharacter.selectedFomoriTree)?.tree_name}
+                        </div>
+                      )}
+                      {newCharacter.claimedStatus === 'gorgon' && (
+                        <div className="text-xs text-gray-400">
+                          <strong>Additional Powers:</strong> Gorgon tree + Frail fundamental power
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Stats */}
                 <div className={`${themeClasses.card} p-3`}>
@@ -4413,6 +6498,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     )}
                   </div>
                 )}
+
 
                 {/* Shadow Archetype for Wraiths */}
                 {newCharacter.faction === 'wraith' && newCharacter.shadowArchetype && (
@@ -4537,6 +6623,39 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   </div>
                 )}
 
+                {/* Free Lore Preview - Only show for new character creation */}
+                {!factionChangeCreationMode && (() => {
+                  // Calculate what free lore will be assigned
+                  const previewCharacter = assignFreeLore(newCharacter);
+                  const freeLores = previewCharacter.lores;
+                  const freeLoreEntries = Object.entries(freeLores || {}).filter(([_, count]) => count > 0);
+                  
+                  return freeLoreEntries.length > 0 && (
+                    <div className={`${themeClasses.card} p-3 md:col-span-2`}>
+                      <h4 className="font-bold mb-2">🎁 Free Lore (Automatic)</h4>
+                      <p className="text-gray-400 text-sm mb-3">
+                        Based on your faction and subfaction choices, you'll automatically receive these lore pieces at character creation:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {freeLoreEntries.map(([loreId, count]) => {
+                          const lore = gameData.lores.find(l => l.lore_id === loreId);
+                          return (
+                            <span key={loreId} className="px-3 py-1 bg-green-600 rounded text-sm">
+                              {lore?.lore_name || loreId} {count > 1 ? `(x${count})` : ''}
+                            </span>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-2 p-2 bg-green-600 bg-opacity-20 rounded-lg border border-green-500">
+                        <p className="text-xs text-green-300">
+                          💡 <strong>Character Knowledge:</strong> These represent the basic knowledge your character would 
+                          naturally have about their own supernatural nature and community. No XP cost required!
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Merits */}
                 {Object.entries(newCharacter.merits).length > 0 && (
                   <div className={`${themeClasses.card} p-3 md:col-span-2`}>
@@ -4560,21 +6679,184 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               <div className="flex justify-center">
                 <button
                   onClick={() => {
-                    const finalCharacter = {
+                    let finalCharacter = {
                       ...newCharacter,
                       id: Date.now() + Math.random(),
                       created: new Date().toISOString(),
                       lastModified: new Date().toISOString()
                     };
-                    setCharacters([...characters, finalCharacter]);
-                    setCurrentMode('menu');
+                    
+                    // Handle energy preservation for faction changes
+                    if (factionChangeCreationMode && newCharacter.preservedEnergy !== undefined) {
+                      const newMaxEnergy = finalCharacter.stats.maxEnergy;
+                      finalCharacter = {
+                        ...finalCharacter,
+                        stats: {
+                          ...finalCharacter.stats,
+                          energy: Math.min(newCharacter.preservedEnergy, newMaxEnergy)
+                        }
+                      };
+                    }
+                    
+                    // Handle fundamental powers for claimed status
+                    if (finalCharacter.claimedStatus === 'gorgon') {
+                      const currentFundamentals = finalCharacter.fundamentalPowers || [];
+                      const hasFrail = currentFundamentals.some(power => power.toLowerCase().includes('frail'));
+                      const hasSenseSpirit = currentFundamentals.some(power => power.toLowerCase().includes('sense spirit'));
+                      const newFundamentals = [...currentFundamentals];
+                      
+                      if (!hasFrail) {
+                        newFundamentals.push('Frail');
+                      }
+                      if (!hasSenseSpirit) {
+                        newFundamentals.push('Sense Spirit');
+                      }
+                      
+                      finalCharacter = {
+                        ...finalCharacter,
+                        fundamentalPowers: newFundamentals
+                      };
+                      
+                      // Add free first dot of Gorgon tree
+                      const currentPowers = finalCharacter.powers || {};
+                      if (!currentPowers.gorgon || !currentPowers.gorgon[1]) {
+                        finalCharacter = {
+                          ...finalCharacter,
+                          powers: {
+                            ...currentPowers,
+                            gorgon: {
+                              ...(currentPowers.gorgon || {}),
+                              1: true
+                            }
+                          }
+                        };
+                      }
+                    }
+                    
+                    // Handle fundamental Permatainted status for claimed characters
+                    const shouldBePermatainted = finalCharacter.subfaction === 'claimed_drone' || 
+                                                finalCharacter.subfaction === 'claimed_gorgon' ||
+                                                finalCharacter.subfaction === 'claimed_fomori' ||
+                                                finalCharacter.claimedStatus === 'gorgon' || 
+                                                finalCharacter.claimedStatus === 'fomori';
+                    
+                    if (shouldBePermatainted) {
+                      const isAlreadyPermatainted = finalCharacter.selfNerfs?.some(nerf => 
+                        nerf.name === 'Permatainted'
+                      );
+                      
+                      if (!isAlreadyPermatainted) {
+                        let permataintedSource = '';
+                        let permataintedDescription = '';
+                        
+                        if (finalCharacter.subfaction === 'claimed_drone') {
+                          permataintedSource = 'drone_status';
+                          permataintedDescription = 'Character is fundamentally Permatainted due to their Drone status and connection to the Weaver.';
+                        } else if (finalCharacter.subfaction === 'claimed_gorgon' || finalCharacter.claimedStatus === 'gorgon') {
+                          permataintedSource = 'gorgon_status';
+                          permataintedDescription = 'Character is fundamentally Permatainted due to their Gorgon claimed status.';
+                        } else if (finalCharacter.subfaction === 'claimed_fomori' || finalCharacter.claimedStatus === 'fomori') {
+                          permataintedSource = 'fomori_status';
+                          permataintedDescription = 'Character is fundamentally Permatainted due to their Fomori claimed status and Wyrm corruption.';
+                        }
+                        
+                        const permataintedFlaw = {
+                          id: Date.now(),
+                          name: 'Permatainted',
+                          description: permataintedDescription,
+                          type: 'flaw',
+                          category: 'Permatainted (Fundamental)',
+                          source: permataintedSource
+                        };
+                        
+                        finalCharacter = {
+                          ...finalCharacter,
+                          selfNerfs: [...(finalCharacter.selfNerfs || []), permataintedFlaw]
+                        };
+                      }
+                    }
+                    
+                    // Handle Natus flaw requirement at character creation
+                    if (finalCharacter.faction === 'shifter' && finalCharacter.breed === 'natus' && !factionChangeCreationMode) {
+                      const hasNatusFlaw = finalCharacter.selfNerfs?.some(nerf => nerf.source === 'natus') || false;
+                      if (!hasNatusFlaw) {
+                        alert('Natus characters must have a mandatory flaw at character creation. Please select a flaw from the Mandatory Flaw Selection section before completing character creation.');
+                        return;
+                      }
+                    }
+                    
+                    // Handle Claimed Fomori free power
+                    if (finalCharacter.claimedStatus === 'fomori' && finalCharacter.selectedFomoriTree) {
+                      const currentPowers = finalCharacter.powers || {};
+                      const treeId = finalCharacter.selectedFomoriTree;
+                      if (!currentPowers[treeId] || !currentPowers[treeId][1]) {
+                        finalCharacter = {
+                          ...finalCharacter,
+                          powers: {
+                            ...currentPowers,
+                            [treeId]: {
+                              ...(currentPowers[treeId] || {}),
+                              1: true
+                            }
+                          }
+                        };
+                      }
+                    }
+                    
+                    // Assign free lore for new character creation (not faction changes)
+                    if (!factionChangeCreationMode) {
+                      finalCharacter = assignFreeLore(finalCharacter);
+                    }
+                    
+                    // Handle faction change completion - adjust remaining free powers BEFORE saving
+                    if (factionChangeCreationMode) {
+                      const dotsUsedInCreation = finalCharacter.creationDotsUsed || 0;
+                      finalCharacter = {
+                        ...finalCharacter,
+                        tempFactionChangePowers: Math.max(0, (finalCharacter.tempFactionChangePowers || 0) - dotsUsedInCreation)
+                      };
+                      
+                      // Update the existing character instead of creating a new one
+                      const newCharacters = [...characters];
+                      newCharacters[currentCharacterIndex] = finalCharacter;
+                      setCharacters(newCharacters);
+                    } else {
+                      // Normal character creation - add new character
+                      setCharacters([...characters, finalCharacter]);
+                    }
+                    
+                    if (factionChangeCreationMode) {
+                      setFactionChangeCreationMode(false);
+                      setOriginalCharacterForFactionChange(null);
+                      setCurrentMode('character');
+                      // Stay on the same character index since we updated existing character
+                      
+                      // Show success message for faction change
+                      const successMessage = `✅ FACTION TRANSFORMATION COMPLETE!
+
+${finalCharacter.name} has been successfully transformed into ${formatDisplayText(finalCharacter.faction)}!
+
+What's Next:
+• Review your new faction abilities and fundamental powers
+• Check your updated energy and stats
+• Your transformation has been recorded in character history
+• Update your character's story and background
+
+Your character is ready to play!`;
+                      
+                      alert(successMessage);
+                    } else {
+                      // Normal character creation
+                      setCurrentMode('menu');
+                    }
+                    
                     setNewCharacter(null);
                     setCreationStep(0);
                   }}
                   className={`${themeClasses.button} px-8 py-3 text-lg`}
                   disabled={!newCharacter.name}
                 >
-                  Create Character
+                  {factionChangeCreationMode ? 'Complete Transformation' : 'Create Character'}
                 </button>
               </div>
             </div>
@@ -4587,13 +6869,23 @@ Generated by Shadow Accord Character Builder v${currentVersion}
 
     return (
       <div className={`min-h-screen ${themeClasses.base}`}>
-        <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+        <div className="w-full max-w-6xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Character Creation</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+              {factionChangeCreationMode ? '🔄 Faction Transformation Setup' : 'Character Creation'}
+            </h2>
             <button
               onClick={() => {
-                setCurrentMode('menu');
+                if (factionChangeCreationMode) {
+                  // Return to character view for faction changes
+                  setFactionChangeCreationMode(false);
+                  setOriginalCharacterForFactionChange(null);
+                  setCurrentMode('character');
+                } else {
+                  // Normal creation cancellation
+                  setCurrentMode('menu');
+                }
                 setNewCharacter(null);
                 setCreationStep(0);
               }}
@@ -4603,6 +6895,26 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               Cancel
             </button>
           </div>
+
+          {/* Faction Change Notice */}
+          {factionChangeCreationMode && (
+            <div className="mb-6 p-4 bg-purple-600 bg-opacity-20 rounded-lg border border-purple-500">
+              <h3 className="text-lg font-bold text-purple-300 mb-2">🔄 Supernatural Transformation in Progress</h3>
+              <div className="text-sm text-gray-300">
+                <p className="mb-2">
+                  <strong>{originalCharacterForFactionChange?.name || newCharacter?.name}</strong> is undergoing transformation from{' '}
+                  <span className="text-orange-400">{formatDisplayText(originalCharacterForFactionChange?.originalFaction || 'Unknown')}</span> to{' '}
+                  <span className="text-purple-400">{formatDisplayText(newCharacter?.faction || 'Unknown')}</span>
+                </p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Your character's name, player, and XP are preserved</li>
+                  <li>• You need to select new clan/tribe/court and supernatural abilities</li>
+                  <li>• Current energy amount will be preserved (up to new faction maximum)</li>
+                  <li>• Original faction info will be recorded in character history</li>
+                </ul>
+              </div>
+            </div>
+          )}
 
           {/* Progress Bar */}
           <div className="mb-6">
@@ -4634,12 +6946,21 @@ Generated by Shadow Accord Character Builder v${currentVersion}
           {/* Navigation */}
           <div className="flex justify-between mt-5">
             <button
-              onClick={() => setCreationStep(Math.max(0, creationStep - 1))}
+              onClick={() => {
+                if (creationStep === 0) {
+                  // Go back to main menu from first page
+                  setCurrentMode('menu');
+                  setNewCharacter(null);
+                  setCreationStep(0);
+                } else {
+                  // Go to previous step
+                  setCreationStep(Math.max(0, creationStep - 1));
+                }
+              }}
               className={themeClasses.button}
-              disabled={creationStep === 0}
             >
               <ChevronLeft className="w-4 h-4 mr-2 inline" />
-              Previous
+              {creationStep === 0 ? 'Back to Menu' : 'Previous'}
             </button>
             
             {creationStep < 4 && (
@@ -4649,7 +6970,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 disabled={
                   (creationStep === 0 && !newCharacter.faction) ||
                   (creationStep === 1 && newCharacter.faction !== 'wraith' && newCharacter.faction !== 'human' && !newCharacter.subfaction) ||
-                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction !== 'sorcerer' && newCharacter.subfaction !== 'faithful' && newCharacter.subfaction !== 'claimed_drone' && newCharacter.subfaction !== 'claimed_fomori' && newCharacter.subfaction !== 'claimed_gorgon' && newCharacter.subfaction !== 'commoner' && !newCharacter.subfaction) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction !== 'sorcerer' && newCharacter.subfaction !== 'faithful' && newCharacter.subfaction !== 'claimed_drone' && newCharacter.subfaction !== 'claimed_fomori' && newCharacter.subfaction !== 'claimed_gorgon' && newCharacter.subfaction !== 'commoner' && newCharacter.subfaction !== 'ghoul' && newCharacter.subfaction !== 'kinfolk' && !newCharacter.subfaction) ||
                   (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.subfaction || !newCharacter.guild)) ||
                   (creationStep === 1 && newCharacter.faction === 'vampire' && newCharacter.subfaction === 'caitiff' && newCharacter.innateTreeIds.length !== 3) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && newCharacter.innateTreeIds.length !== 2) ||
@@ -4657,7 +6978,16 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_drone' && newCharacter.innateTreeIds.length !== 3) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' && newCharacter.innateTreeIds.length !== 1) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_gorgon' && newCharacter.innateTreeIds.length !== 1) ||
-                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' && newCharacter.innateTreeIds.length !== 1)
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'commoner' && newCharacter.innateTreeIds.length !== 1) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'ghoul' && newCharacter.innateTreeIds.length === 0) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'kinfolk' && newCharacter.innateTreeIds.length === 0) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.claimedStatus === 'fomori' && !newCharacter.selectedFomoriTree) ||
+                  (creationStep === 1 && (newCharacter.subfaction?.includes('claimed') || newCharacter.claimedStatus) && !newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement')) ||
+                  (creationStep === 1 && newCharacter.faction === 'shifter' && newCharacter.subfaction === 'black_spiral_dancer' && !newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement' && nerf.source === 'black_spiral_dancer')) ||
+                  (creationStep === 1 && newCharacter.faction === 'shifter' && newCharacter.subfaction === 'fallen_fera' && !newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement' && nerf.source === 'fallen_fera')) ||
+                  (creationStep === 1 && newCharacter.faction === 'shifter' && newCharacter.breed === 'natus' && !newCharacter.selfNerfs.some(nerf => nerf.source === 'natus')) ||
+                  (creationStep === 1 && newCharacter.faction === 'vampire' && newCharacter.subfaction === 'malkavian' && !newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement' && nerf.source === 'malkavian')) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && (newCharacter.innateTreeIds.includes('madness') || newCharacter.innateTreeIds.includes('ruin')) && !newCharacter.selfNerfs.some(nerf => nerf.type === 'derangement' && (nerf.source === 'madness_tree' || nerf.source === 'ruin_tree')))
                 }
               >
                 Next
@@ -4673,7 +7003,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
   // Character Management
   const renderCharacterManagement = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+      <div className="w-full max-w-6xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
           <h2 className="text-2xl sm:text-3xl font-bold">Character Management</h2>
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -4821,9 +7151,212 @@ Generated by Shadow Accord Character Builder v${currentVersion}
     const character = characters[currentCharacterIndex];
     if (!character) return null;
 
+    // Self Nerf Form Component
+    const SelfNerfForm = ({ character, onUpdate }) => {
+      const [selectedType, setSelectedType] = useState(null);
+      const [showDerangementSubmenu, setShowDerangementSubmenu] = useState(false);
+
+      const selfNerfCategories = {
+        derangement: [
+          'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+          'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+          'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+        ],
+        flaw: [
+          'Deranged', 'Fragile', 'Hemophilia', 'Horns', 'Lame', 'Mute',
+          'No Claws', 'Puny', 'Restricted Form (Shifter Only)', 'Tail',
+          'Withered Arm', 'Weak Musculature (Shifter Only)'
+        ],
+        mutation: [
+          'Mutation - Describe your own physical alteration'
+        ],
+        permataint: [
+          'Permataint'
+        ]
+      };
+
+      const addSelfNerf = (type, category, derangementName = null) => {
+        let name = category;
+        let description = `Character has the ${category.toLowerCase()} ${type}.`;
+        
+        // Special handling for Deranged flaw
+        if (category === 'Deranged' && derangementName) {
+          name = `Deranged - ${derangementName}`;
+          description = `Character has the Deranged flaw, specifically manifesting as ${derangementName}.`;
+        }
+        
+        // Special handling for Mutation
+        if (type === 'mutation') {
+          const mutationDescription = prompt(
+            'Describe your mutation (physical alteration from supernatural forces):\n\n' +
+            'Examples: Extra eyes, chitinous shell, acidic blood, additional limb, etc.'
+          );
+          
+          if (!mutationDescription || !mutationDescription.trim()) {
+            alert('Mutation description is required.');
+            return;
+          }
+          
+          name = 'Mutation';
+          description = mutationDescription.trim();
+        }
+
+        const selfNerfToAdd = {
+          type: type,
+          category: category,
+          name: name,
+          description: description,
+          id: Date.now() + Math.random(),
+          dateAdded: new Date().toISOString()
+        };
+
+        const updatedCharacter = {
+          ...character,
+          selfNerfs: [...(character.selfNerfs || []), selfNerfToAdd]
+        };
+
+        onUpdate(updatedCharacter);
+        
+        // Reset selections
+        setSelectedType(null);
+        setShowDerangementSubmenu(false);
+        
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} "${name}" added successfully!`);
+      };
+
+      const handleFlawClick = (flaw) => {
+        if (flaw === 'Deranged') {
+          setShowDerangementSubmenu(true);
+        } else {
+          addSelfNerf('flaw', flaw);
+        }
+      };
+
+      return (
+        <div className="space-y-6">
+          {/* Type Selection */}
+          {!selectedType && (
+            <div>
+              <h4 className="text-lg font-bold mb-3 text-gray-300">Select Limitation Type</h4>
+              <div className="grid md:grid-cols-4 gap-4">
+                <button
+                  onClick={() => setSelectedType('derangement')}
+                  className="p-4 rounded-lg border-2 border-blue-500 bg-blue-500 bg-opacity-10 hover:bg-blue-500 hover:bg-opacity-20 transition-all text-center hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">🧠</div>
+                  <h5 className="font-bold text-blue-300">Derangements</h5>
+                  <p className="text-sm text-gray-400 mt-1">Mental alterations from supernatural forces</p>
+                </button>
+                
+                <button
+                  onClick={() => setSelectedType('flaw')}
+                  className="p-4 rounded-lg border-2 border-red-500 bg-red-500 bg-opacity-10 hover:bg-red-500 hover:bg-opacity-20 transition-all text-center hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">⚡</div>
+                  <h5 className="font-bold text-red-300">Flaws</h5>
+                  <p className="text-sm text-gray-400 mt-1">Physical alterations to your body</p>
+                </button>
+                
+                <button
+                  onClick={() => setSelectedType('mutation')}
+                  className="p-4 rounded-lg border-2 border-yellow-500 bg-yellow-500 bg-opacity-10 hover:bg-yellow-500 hover:bg-yellow-500 hover:bg-opacity-20 transition-all text-center hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">🧬</div>
+                  <h5 className="font-bold text-yellow-300">Mutations</h5>
+                  <p className="text-sm text-gray-400 mt-1">Bane-induced physical changes</p>
+                </button>
+                
+                <button
+                  onClick={() => setSelectedType('permataint')}
+                  className="p-4 rounded-lg border-2 border-purple-500 bg-purple-500 bg-opacity-10 hover:bg-purple-500 hover:bg-opacity-20 transition-all text-center hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">🔮</div>
+                  <h5 className="font-bold text-purple-300">Permataint</h5>
+                  <p className="text-sm text-gray-400 mt-1">Lasting supernatural corruption</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Category Selection */}
+          {selectedType && !showDerangementSubmenu && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-bold text-gray-300">
+                  Select {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
+                </h4>
+                <button
+                  onClick={() => setSelectedType(null)}
+                  className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
+                >
+                  ← Back
+                </button>
+              </div>
+              
+              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {selfNerfCategories[selectedType]?.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => selectedType === 'flaw' ? handleFlawClick(category) : addSelfNerf(selectedType, category)}
+                    className={`p-3 rounded-lg border-2 transition-all text-left hover:scale-105 ${
+                      selectedType === 'derangement' 
+                        ? 'border-blue-500 bg-blue-500 bg-opacity-10 hover:bg-blue-500 hover:bg-opacity-20'
+                        : selectedType === 'flaw'
+                        ? 'border-red-500 bg-red-500 bg-opacity-10 hover:bg-red-500 hover:bg-opacity-20'
+                        : selectedType === 'mutation'
+                        ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 hover:bg-yellow-500 hover:bg-opacity-20'
+                        : 'border-purple-500 bg-purple-500 bg-opacity-10 hover:bg-purple-500 hover:bg-purple-500 hover:bg-opacity-20'
+                    }`}
+                  >
+                    <div className={`font-bold text-sm ${
+                      selectedType === 'derangement' ? 'text-blue-300' :
+                      selectedType === 'flaw' ? 'text-red-300' : 
+                      selectedType === 'mutation' ? 'text-yellow-300' : 'text-purple-300'
+                    }`}>
+                      {category}
+                    </div>
+                    {category === 'Deranged' && (
+                      <div className="text-xs text-gray-400 mt-1">Click to select derangement →</div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Derangement Submenu for Deranged Flaw */}
+          {showDerangementSubmenu && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-bold text-gray-300">Select Derangement for Deranged Flaw</h4>
+                <button
+                  onClick={() => setShowDerangementSubmenu(false)}
+                  className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm"
+                >
+                  ← Back to Flaws
+                </button>
+              </div>
+              
+              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {selfNerfCategories.derangement.map(derangement => (
+                  <button
+                    key={derangement}
+                    onClick={() => addSelfNerf('flaw', 'Deranged', derangement)}
+                    className="p-3 rounded-lg border-2 border-orange-500 bg-orange-500 bg-opacity-10 hover:bg-orange-500 hover:bg-opacity-20 transition-all text-left hover:scale-105"
+                  >
+                    <div className="font-bold text-sm text-orange-300">{derangement}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
     return (
       <div className={`min-h-screen ${themeClasses.base}`}>
-        <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+        <div className="w-full max-w-6xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
             <div>
@@ -4984,21 +7517,25 @@ Generated by Shadow Accord Character Builder v${currentVersion}
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex space-x-1 mb-5 border-b border-gray-700">
-            {['overview', 'advancement', 'powers', 'lore', 'history', 'xp-tracking', 'notes'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 font-medium capitalize transition-colors ${
-                  activeTab === tab
-                    ? 'text-blue-400 border-b-2 border-blue-400'
-                    : 'text-gray-400 hover:text-gray-200'
-                }`}
-              >
-                {tab === 'xp-tracking' ? 'XP Tracking' : tab}
-              </button>
-            ))}
+          {/* Tabs - Scrollable on mobile */}
+          <div className="overflow-x-auto mb-5 border-b border-gray-700">
+            <div className="flex space-x-1 min-w-max">
+              {['overview', 'advancement', 'powers', 'lore', 'history', 'xp-tracking', 'notes', 'faction-change', 'self-nerf'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-3 py-2 text-sm sm:text-base font-medium capitalize transition-colors whitespace-nowrap ${
+                    activeTab === tab
+                      ? 'text-blue-400 border-b-2 border-blue-400'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  {tab === 'xp-tracking' ? 'XP Tracking' : 
+                   tab === 'faction-change' ? 'Faction Change' : 
+                   tab === 'self-nerf' ? 'Self Nerf' : tab}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Tab Content */}
@@ -5148,6 +7685,33 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       <span key={power} className="px-3 py-1 bg-purple-600 rounded text-sm">
                         {power}
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Derangements, Flaws, Mutations, & Permataint */}
+              {character.selfNerfs && character.selfNerfs.length > 0 && (
+                <div className={`${themeClasses.card} p-3`}>
+                  <h3 className="text-xl font-bold mb-2">Derangements, Flaws, Mutations, & Permataint</h3>
+                  <div className="space-y-2">
+                    {character.selfNerfs.map((selfNerf, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-red-900 bg-opacity-20 rounded border border-red-500">
+                        <div className="flex items-center">
+                          <span className={`px-2 py-1 text-xs rounded-full mr-3 ${
+                            selfNerf.type === 'derangement' ? 'bg-blue-600 text-blue-100' :
+                            selfNerf.type === 'flaw' ? 'bg-red-600 text-red-100' :
+                            selfNerf.type === 'mutation' ? 'bg-yellow-600 text-yellow-100' :
+                            'bg-purple-600 text-purple-100'
+                          }`}>
+                            {selfNerf.type}
+                          </span>
+                          <div>
+                            <div className="font-medium text-red-300">{selfNerf.name}</div>
+                            <div className="text-xs text-gray-400">{selfNerf.category}</div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -5991,14 +8555,14 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     {character.faction === 'human' && character.subfaction === 'claimed_fomori' && (
                       <div className="mb-2 p-3 bg-red-600 bg-opacity-20 rounded-lg">
                         <div className="text-red-300 text-sm">
-                          👹 <strong>Claimed Fomori:</strong> Bane possession restricts you to Wyrm manifestations only. Your innate tree ({character.innateTreeIds.length > 0 ? gameData.powerTrees.find(t => t.tree_id === character.innateTreeIds[0])?.tree_name || 'None' : 'None'}) costs 3/6/9 XP, other Bane trees cost 6/9/12 XP.
+                          👹 <strong>Claimed Fomori:</strong> Bane possession grants access to your chosen Bane manifestation ({character.innateTreeIds.length > 0 ? gameData.powerTrees.find(t => t.tree_id === character.innateTreeIds[0])?.tree_name || 'None' : 'None'}) at innate costs (3/6/9 XP), other Bane trees cost 6/9/12 XP. {character.mixedSubfaction ? `Your original ${character.mixedSubfaction === 'kinfolk' ? 'Gifted Kinfolk' : character.mixedSubfaction} heritage also remains at innate costs.` : 'If you had prior supernatural heritage, that would also remain at innate costs.'}
                         </div>
                       </div>
                     )}
                     {character.faction === 'human' && character.subfaction === 'claimed_gorgon' && (
                       <div className="mb-2 p-3 bg-purple-600 bg-opacity-20 rounded-lg">
                         <div className="text-purple-300 text-sm">
-                          👁️ <strong>Claimed Gorgon:</strong> Dream reality binding restricts you to the Gorgon manifestation only. All powers cost 3/6/9 XP.
+                          👁️ <strong>Claimed Gorgon:</strong> Dream reality binding grants access to Gorgon manifestation at innate costs (3/6/9 XP). {character.mixedSubfaction ? `Your original ${character.mixedSubfaction === 'kinfolk' ? 'Gifted Kinfolk' : character.mixedSubfaction} heritage also remains at innate costs.` : 'If you had prior supernatural heritage, that would also remain at innate costs.'}
                         </div>
                       </div>
                     )}
@@ -6184,6 +8748,263 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                             </div>
                           );
                         })}
+
+                  {/* Claimed Status Powers */}
+                  {character.claimedStatus && character.claimedInnateTreeIds && character.claimedInnateTreeIds.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-purple-400 mb-2 mt-6">
+                        Claimed {character.claimedStatus.charAt(0).toUpperCase() + character.claimedStatus.slice(1)} Powers (Innate: 3/6/9 XP)
+                      </h4>
+                      <div className="mb-3 p-3 bg-purple-600 bg-opacity-20 rounded-lg">
+                        <div className="text-purple-300 text-sm">
+                          🔗 <strong>Dual Heritage:</strong> Your {character.claimedStatus} claimed status grants access to these power trees at innate costs.
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {character.claimedInnateTreeIds.map(treeId => {
+                          const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
+                          if (!tree) return null;
+                          
+                          const currentLevels = character.powers[treeId] || {};
+                          const hasAnyLevel = Object.keys(currentLevels).length > 0;
+                          
+                          return (
+                            <div 
+                              key={treeId} 
+                              className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                                hasAnyLevel
+                                  ? 'border-purple-500 bg-purple-500 bg-opacity-20 shadow-lg'
+                                  : 'border-purple-400 bg-purple-400 bg-opacity-10 hover:border-purple-300 hover:bg-purple-400 hover:bg-opacity-20 hover:shadow-md'
+                              }`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="flex items-center mb-2">
+                                    <h5 className="font-bold text-lg capitalize">{formatDisplayText(tree.tree_name)}</h5>
+                                    {hasAnyLevel && (
+                                      <div className="ml-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-sm">✓</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="space-y-3">
+                                    {[1, 2, 3].map(level => {
+                                      const hasLevel = currentLevels[level];
+                                      const powers = tree[`level${level}_powers`]?.split('|') || [];
+                                      const cost = calculateXPCost(character, 'power', treeId, level);
+                                      const canAfford = character.totalXP >= cost;
+                                      const canLearnLevel = canLearnPower(character, treeId, level);
+                                      const canAdvanceNow = canAfford && canLearnLevel;
+                                      const isRedundant = isRedundantPower(character, treeId, level);
+                                      
+                                      return (
+                                        <div key={level} className={`p-3 rounded border ${
+                                          hasLevel 
+                                            ? 'border-purple-400 bg-purple-400 bg-opacity-20' 
+                                            : canAdvanceNow
+                                              ? 'border-purple-300 bg-purple-300 bg-opacity-10 hover:bg-purple-300 hover:bg-opacity-20'
+                                              : 'border-gray-600 bg-gray-700 bg-opacity-30 opacity-50'
+                                        }`}>
+                                          <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center">
+                                              <div className={`w-4 h-4 rounded-full mr-2 ${
+                                                hasLevel ? 'bg-purple-500' : canAdvanceNow ? 'bg-purple-300' : 'bg-gray-600'
+                                              }`} />
+                                              <span className="font-medium">Level {level}</span>
+                                              <span className={`ml-2 text-sm ${
+                                                isRedundant ? 'text-yellow-400' : cost === 0 ? 'text-green-400' : 'text-gray-400'
+                                              }`}>
+                                                ({isRedundant ? 'FREE' : cost === 0 ? 'FREE' : `${cost} XP`})
+                                              </span>
+                                            </div>
+                                            {!hasLevel && (
+                                              <button
+                                                onClick={() => {
+                                                  const updated = advanceCharacter(character, {
+                                                    type: 'power',
+                                                    itemId: treeId,
+                                                    level: level,
+                                                    cost: isRedundant ? 0 : cost,
+                                                    redundant: isRedundant
+                                                  });
+                                                  const newCharacters = [...characters];
+                                                  newCharacters[currentCharacterIndex] = updated;
+                                                  setCharacters(newCharacters);
+                                                }}
+                                                className={`px-4 py-2 rounded font-medium text-sm transition-all ${
+                                                  canAdvanceNow
+                                                    ? isRedundant 
+                                                      ? 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-md hover:shadow-lg' 
+                                                      : 'bg-purple-600 hover:bg-purple-500 text-white shadow-md hover:shadow-lg'
+                                                    : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                                }`}
+                                                disabled={!canAdvanceNow}
+                                              >
+                                                {canAdvanceNow ? 'Learn' : canAfford ? 'Limit Reached' : 'Cannot Afford'}
+                                              </button>
+                                            )}
+                                          </div>
+                                          <div className="text-sm text-gray-300">
+                                            {powers.join(', ')}
+                                          </div>
+                                          {isRedundant && (
+                                            <div className="mt-2 text-xs text-yellow-400 italic">
+                                              ⚡ Redundant power - free due to existing knowledge!
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Original Heritage Powers (Mixed Subfaction) */}
+                  {character.mixedSubfaction && (
+                    <div>
+                      <h4 className="font-medium text-orange-400 mb-2 mt-6">
+                        Original Heritage Powers ({character.mixedSubfaction === 'kinfolk' ? 'Former Gifted Kinfolk' : 'Former ' + character.mixedSubfaction.charAt(0).toUpperCase() + character.mixedSubfaction.slice(1)} - Innate: 3/6/9 XP)
+                      </h4>
+                      <div className="mb-3 p-3 bg-orange-600 bg-opacity-20 rounded-lg">
+                        <div className="text-orange-300 text-sm">
+                          🔗 <strong>Dual Heritage:</strong> Your original supernatural nature remains accessible at innate costs. You were a {character.mixedSubfaction === 'kinfolk' ? 'Gifted Kinfolk' : character.mixedSubfaction} before being {character.subfaction === 'claimed_gorgon' ? 'claimed by dream entities' : 'possessed by a Bane spirit'}.
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {gameData.powerTrees
+                          .filter(tree => {
+                            // Filter based on mixed subfaction type
+                            if (character.mixedSubfaction === 'sorcerer') {
+                              return tree.faction === 'human' && 
+                                ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
+                            }
+                            if (character.mixedSubfaction === 'ghoul') {
+                              return tree.faction === 'vampire';
+                            }
+                            if (character.mixedSubfaction === 'kinfolk') {
+                              return tree.faction === 'shifter';
+                            }
+                            return false;
+                          })
+                          .filter(tree => {
+                            // Only show trees that have available levels to purchase
+                            const currentLevels = character.powers[tree.tree_id] || {};
+                            const hasLevel1 = currentLevels[1];
+                            const hasLevel2 = currentLevels[2];
+                            const hasLevel3 = currentLevels[3];
+                            
+                            // Show if any level is missing
+                            return !hasLevel1 || !hasLevel2 || !hasLevel3;
+                          })
+                          .map(tree => {
+                            const currentLevels = character.powers[tree.tree_id] || {};
+                            const hasAnyLevel = Object.keys(currentLevels).length > 0;
+                            
+                            return (
+                              <div 
+                                key={tree.tree_id} 
+                                className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                                  hasAnyLevel
+                                    ? 'border-orange-500 bg-orange-500 bg-opacity-20 shadow-lg'
+                                    : 'border-orange-400 bg-orange-400 bg-opacity-10 hover:border-orange-300 hover:bg-orange-400 hover:bg-opacity-20 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center mb-2">
+                                      <h5 className="font-bold text-lg capitalize">{formatDisplayText(tree.tree_name)}</h5>
+                                      {hasAnyLevel && (
+                                        <div className="ml-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                                          <span className="text-white text-sm">✓</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                      {[1, 2, 3].map(level => {
+                                        const hasLevel = currentLevels[level];
+                                        const powers = tree[`level${level}_powers`]?.split('|') || [];
+                                        const cost = calculateXPCost(character, 'power', tree.tree_id, level);
+                                        const canAfford = character.totalXP >= cost;
+                                        const canLearnLevel = canLearnPower(character, tree.tree_id, level);
+                                        const canAdvanceNow = canAfford && canLearnLevel;
+                                        const isRedundant = isRedundantPower(character, tree.tree_id, level);
+                                        
+                                        return (
+                                          <div key={level} className={`p-3 rounded border ${
+                                            hasLevel 
+                                              ? 'border-orange-400 bg-orange-400 bg-opacity-20' 
+                                              : canAdvanceNow
+                                                ? 'border-orange-300 bg-orange-300 bg-opacity-10 hover:bg-orange-300 hover:bg-opacity-20'
+                                                : 'border-gray-600 bg-gray-700 bg-opacity-30 opacity-50'
+                                          }`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                              <div className="flex items-center">
+                                                <div className={`w-4 h-4 rounded-full mr-2 ${
+                                                  hasLevel ? 'bg-orange-500' : canAdvanceNow ? 'bg-orange-300' : 'bg-gray-600'
+                                                }`} />
+                                                <span className="font-medium">Level {level}</span>
+                                                <span className={`ml-2 text-sm ${
+                                                  isRedundant ? 'text-yellow-400' : cost === 0 ? 'text-green-400' : 'text-gray-400'
+                                                }`}>
+                                                  ({isRedundant ? 'FREE' : cost === 0 ? 'FREE' : `${cost} XP`})
+                                                </span>
+                                              </div>
+                                              {!hasLevel && (
+                                                <button
+                                                  onClick={() => {
+                                                    const updated = advanceCharacter(character, {
+                                                      type: 'power',
+                                                      itemId: tree.tree_id,
+                                                      level: level,
+                                                      cost: isRedundant ? 0 : cost,
+                                                      redundant: isRedundant
+                                                    });
+                                                    const newCharacters = [...characters];
+                                                    newCharacters[currentCharacterIndex] = updated;
+                                                    setCharacters(newCharacters);
+                                                  }}
+                                                  className={`px-4 py-2 rounded font-medium text-sm transition-all ${
+                                                    canAdvanceNow
+                                                      ? isRedundant 
+                                                        ? 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-md hover:shadow-lg' 
+                                                        : 'bg-orange-600 hover:bg-orange-500 text-white shadow-md hover:shadow-lg'
+                                                      : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                                  }`}
+                                                  disabled={!canAdvanceNow}
+                                                >
+                                                  {canAdvanceNow ? 'Learn' : canAfford ? 'Limit Reached' : 'Cannot Afford'}
+                                                </button>
+                                              )}
+                                            </div>
+                                            <div className="text-sm text-gray-300">
+                                              {powers.join(', ')}
+                                            </div>
+                                            {isRedundant && (
+                                              <div className="mt-2 text-xs text-yellow-400 italic">
+                                                ⚡ Redundant power - free due to existing knowledge!
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+
                       {gameData.powerTrees
                         .filter(tree => {
                           // Special handling for Gifted Kinfolk - they can learn shifter powers, NOT sorcerer
@@ -6244,16 +9065,19 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               )}
 
               {/* Self-Nerfs */}
-              {character.selfNerfs.length > 0 && (
+              {character.selfNerfs && character.selfNerfs.length > 0 && (
                 <div className="mt-5">
                   <h4 className="font-bold text-orange-400 mb-2">Self-Nerf History</h4>
                   <div className="space-y-2">
                     {character.selfNerfs.map((nerf, index) => (
                       <div key={index} className="p-3 bg-orange-900 bg-opacity-30 rounded">
-                        <div className="font-medium">{nerf.type} reduced by {nerf.amount}</div>
-                        <div className="text-sm text-gray-400">Reason: {nerf.reason}</div>
+                        <div className="font-medium capitalize">{nerf.type}: {nerf.name}</div>
+                        <div className="text-sm text-gray-400">{nerf.description}</div>
+                        {nerf.gameEffect && (
+                          <div className="text-sm text-orange-300">Effect: {nerf.gameEffect}</div>
+                        )}
                         <div className="text-xs text-gray-500 mt-1">
-                          {new Date(nerf.timestamp).toLocaleDateString()}
+                          Added: {new Date(nerf.dateAdded).toLocaleDateString()}
                         </div>
                       </div>
                     ))}
@@ -6269,13 +9093,18 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 <h3 className="text-xl font-bold mb-2">Available Lore</h3>
                 
                 {/* Current Lore */}
-                {character.lores && character.lores.length > 0 && (
-                  <div className="mb-5">
-                    <h4 className="text-lg font-bold mb-2 text-green-400">Current Lore</h4>
-                    <div className="grid gap-2">
-                      {character.lores.map((lore, index) => {
-                        const loreData = gameData.lores.find(l => l.lore_id === lore.lore_id);
-                        if (!loreData) return null;
+                {(() => {
+                  // Defensive programming: handle both array and object formats
+                  const loresArray = Array.isArray(character.lores) ? character.lores : 
+                    character.lores ? Object.keys(character.lores).map(loreId => ({ lore_id: loreId })) : [];
+                  
+                  return loresArray.length > 0 && (
+                    <div className="mb-5">
+                      <h4 className="text-lg font-bold mb-2 text-green-400">Current Lore</h4>
+                      <div className="grid gap-2">
+                        {loresArray.map((lore, index) => {
+                          const loreData = gameData.lores.find(l => l.lore_id === lore.lore_id);
+                          if (!loreData) return null;
                         
                         const canRemove = canReduce(character, 'lore', lore.lore_id);
                         const refund = canRemove ? calculateReductionRefund(character, 'lore', lore.lore_id) : 0;
@@ -6318,7 +9147,8 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       })}
                     </div>
                   </div>
-                )}
+                  );
+                })()}
 
                 {/* Available Lore for Purchase */}
                 <div>
@@ -6328,7 +9158,10 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       const cost = calculateXPCost(character, 'lore', lore.lore_id);
                       const unspentXP = character.totalXP;
                       const canAfford = unspentXP >= cost;
-                      const alreadyHas = character.lores?.some(l => l.lore_id === lore.lore_id);
+                      // Defensive programming: ensure lores is an array
+                      const loresArray = Array.isArray(character.lores) ? character.lores : 
+                        character.lores ? Object.keys(character.lores).map(loreId => ({ lore_id: loreId })) : [];
+                      const alreadyHas = loresArray.some(l => l.lore_id === lore.lore_id);
                       
                       if (alreadyHas) return null;
                       
@@ -6674,6 +9507,336 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               </div>
             </div>
           )}
+
+          {activeTab === 'faction-change' && (
+            <div className="space-y-5">
+              {/* Faction Change Header */}
+              <div className={`${themeClasses.card} p-5`}>
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold mb-3 text-purple-400">🔄 Supernatural Transformation</h2>
+                  <p className="text-lg text-gray-300 mb-4">
+                    Transform your character into a different supernatural type through major story events
+                  </p>
+                  <div className="text-sm text-gray-400">
+                    Represents Embrace, First Change, Death & Return, Supernatural Claiming, or Possession
+                  </div>
+                </div>
+              </div>
+
+              {/* Available Faction Changes */}
+              {getValidFactionChanges(character).length > 0 ? (
+                <div className={`${themeClasses.card} p-5`}>
+                  <h3 className="text-2xl font-bold mb-4 text-purple-300">Available Transformations</h3>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {getValidFactionChanges(character).map(change => (
+                      <button
+                        key={change.id}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleFactionChangeClick(change);
+                        }}
+                        className="p-4 rounded-lg border-2 border-purple-500 bg-purple-500 bg-opacity-10 hover:bg-purple-500 hover:bg-opacity-20 transition-all text-left hover:scale-105 hover:shadow-lg active:scale-95 active:bg-purple-600 active:bg-opacity-30"
+                      >
+                        <h4 className="font-bold text-xl text-purple-300 mb-2">{change.name}</h4>
+                        <p className="text-gray-300 text-sm leading-relaxed">{change.description}</p>
+                        <div className="mt-2 text-xs text-purple-400">Click to transform</div>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 p-4 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
+                    <h4 className="font-bold mb-2 text-yellow-300">⚠️ Important Information</h4>
+                    <ul className="space-y-1 text-sm text-yellow-200">
+                      <li>• Faction changes are permanent and cannot be undone</li>
+                      <li>• Your current energy amount is preserved (up to new faction maximum)</li>
+                      <li>• You gain new faction fundamental powers and abilities</li>
+                      <li>• Some original abilities may be modified or lost</li>
+                      <li>• Original faction information is recorded in character history</li>
+                      <li>• Consider the story implications for your character</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className={`${themeClasses.card} p-5 text-center`}>
+                  <div className="text-gray-400 text-xl mb-3">No Faction Changes Available</div>
+                  <div className="text-gray-500">
+                    {character.faction === 'wraith' 
+                      ? 'Wraiths have already undergone their final transformation and cannot change factions further.'
+                      : 'Your character does not have any valid supernatural transformation options at this time.'
+                    }
+                  </div>
+                </div>
+              )}
+
+              {/* Free Faction Change Powers Assignment */}
+              {character.tempFactionChangePowers > 0 && (
+                <div className={`${themeClasses.card} p-5`}>
+                  <h3 className="text-2xl font-bold mb-4 text-green-400">
+                    🎁 Free Transformation Powers ({character.tempFactionChangePowers} remaining)
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    You have {character.tempFactionChangePowers} free power dots to assign from your new faction's innate abilities.
+                    These represent the supernatural gifts gained from your transformation.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {character.innateTreeIds.map(treeId => {
+                      const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
+                      if (!tree) return null;
+                      
+                      return (
+                        <div key={treeId} className="border-2 border-green-500 rounded-lg p-4 bg-green-500 bg-opacity-5">
+                          <h4 className="font-bold text-xl capitalize mb-3 text-green-300">
+                            {formatDisplayText(tree.tree_name)}
+                          </h4>
+                          
+                          <div className="space-y-3">
+                            {[1, 2, 3].map(level => {
+                              const hasLevel = character.powers[treeId]?.[level];
+                              const powers = tree[`level${level}_powers`]?.split('|') || [];
+                              
+                              return (
+                                <div key={level} className={`p-3 rounded-lg border ${
+                                  hasLevel 
+                                    ? 'border-green-400 bg-green-400 bg-opacity-20' 
+                                    : 'border-gray-600 bg-gray-800 bg-opacity-30'
+                                }`}>
+                                  <div className="flex justify-between items-center">
+                                    <div className="flex-1">
+                                      <div className="flex items-center mb-2">
+                                        <span className="font-bold text-lg">Level {level}</span>
+                                        {hasLevel && (
+                                          <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                                            ✓ Acquired
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-gray-300">{powers.join(', ')}</div>
+                                    </div>
+                                    {!hasLevel && character.tempFactionChangePowers > 0 && (
+                                      <button
+                                        onClick={() => {
+                                          const updated = {
+                                            ...character,
+                                            powers: {
+                                              ...character.powers,
+                                              [treeId]: {
+                                                ...character.powers[treeId],
+                                                [level]: true
+                                              }
+                                            },
+                                            tempFactionChangePowers: character.tempFactionChangePowers - 1
+                                          };
+                                          
+                                          const newCharacters = [...characters];
+                                          newCharacters[currentCharacterIndex] = updated;
+                                          setCharacters(newCharacters);
+                                        }}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                                      >
+                                        Select (FREE)
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {character.tempFactionChangePowers > 0 && (
+                    <div className="mt-4 p-3 bg-blue-600 bg-opacity-20 rounded-lg">
+                      <p className="text-blue-300 text-sm">
+                        💡 <strong>Tip:</strong> These free powers represent your character's natural adaptation to their new supernatural nature. 
+                        Choose wisely as they cannot be changed later!
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Character History - Show if faction change occurred */}
+              {character.originalFaction && (
+                <div className={`${themeClasses.card} p-5`}>
+                  <h3 className="text-xl font-bold mb-4 text-orange-400">📜 Transformation History</h3>
+                  <div className="p-4 bg-orange-600 bg-opacity-20 rounded-lg border border-orange-500">
+                    <div className="text-lg mb-2">
+                      <span className="text-gray-300">Originally:</span>
+                      <span className="ml-2 font-bold capitalize text-orange-300">
+                        {formatDisplayText(character.originalFaction)} 
+                        {character.originalSubfaction && ` - ${formatDisplayText(character.originalSubfaction)}`}
+                      </span>
+                    </div>
+                    <div className="text-lg">
+                      <span className="text-gray-300">Transformed to:</span>
+                      <span className="ml-2 font-bold capitalize text-purple-300">
+                        {formatDisplayText(character.faction)} 
+                        {character.subfaction && ` - ${formatDisplayText(character.subfaction)}`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'self-nerf' && (
+            <div className="space-y-5">
+              {/* Self Nerf Header */}
+              <div className={`${themeClasses.card} p-5`}>
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold mb-3 text-red-400">⚖️ Character Limitations</h2>
+                  <p className="text-lg text-gray-300 mb-4">
+                    Track derangements, flaws, mutations, and permanent taints that affect your character
+                  </p>
+                  <div className="text-sm text-gray-400">
+                    Self-imposed limitations, psychological issues, physical alterations, and permanent supernatural conditions
+                  </div>
+                </div>
+              </div>
+
+              {/* Add Self Nerf Form */}
+              <div className={`${themeClasses.card} p-5`}>
+                <h3 className="text-2xl font-bold mb-4 text-red-300">Add New Limitation</h3>
+                <SelfNerfForm
+                  character={character}
+                  onUpdate={(updatedCharacter) => {
+                    const newCharacters = [...characters];
+                    newCharacters[currentCharacterIndex] = updatedCharacter;
+                    setCharacters(newCharacters);
+                  }}
+                />
+              </div>
+
+              {/* Current Self Nerfs */}
+              <div className={`${themeClasses.card} p-5`}>
+                <h3 className="text-2xl font-bold mb-4 text-red-300">Current Limitations</h3>
+                
+                {character.selfNerfs && character.selfNerfs.length > 0 ? (
+                  <div className="space-y-3">
+                    {character.selfNerfs.map((selfNerf, index) => (
+                      <div key={index} className="border-2 border-red-500 rounded-lg p-4 bg-red-500 bg-opacity-5">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center mb-2">
+                              <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full mr-3">
+                                {selfNerf.category}
+                              </span>
+                              <h4 className="font-bold text-lg text-red-300">{selfNerf.name}</h4>
+                            </div>
+                            <p className="text-gray-300 mb-2">{selfNerf.description}</p>
+                            {selfNerf.mechanicalEffect && (
+                              <div className="p-2 bg-red-900 bg-opacity-30 rounded text-sm">
+                                <span className="font-semibold text-red-400">Mechanical Effect: </span>
+                                <span className="text-gray-300">{selfNerf.mechanicalEffect}</span>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => {
+                              const updated = {
+                                ...character,
+                                selfNerfs: character.selfNerfs.filter((_, i) => i !== index)
+                              };
+                              const newCharacters = [...characters];
+                              newCharacters[currentCharacterIndex] = updated;
+                              setCharacters(newCharacters);
+                            }}
+                            className="ml-4 px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-400 py-8">
+                    <div className="text-xl mb-3">No limitations recorded</div>
+                    <div className="text-gray-500">
+                      Use the form above to add derangements, flaws, or permanent taints
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Information Panel */}
+              <div className={`${themeClasses.card} p-5`}>
+                <h3 className="text-xl font-bold mb-4 text-orange-400">📋 About Character Limitations</h3>
+                <div className="space-y-4 text-gray-300">
+                  <div>
+                    <h4 className="font-semibold text-orange-300 mb-2">Derangements</h4>
+                    <p className="text-sm mb-3">
+                      Serious alterations to your thought pattern brought on by some interaction of supernatural forces. 
+                      While some of these traits share names with real world conditions, we acknowledge that these roleplay 
+                      requirements do not represent real-world experiences.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-2 text-xs">
+                      <div><strong>Amnesia:</strong> You have trouble remembering past events.</div>
+                      <div><strong>Aphasia:</strong> You are unable to speak coherently.</div>
+                      <div><strong>Melancholia:</strong> You are extremely depressed and difficult to motivate.</div>
+                      <div><strong>Delusional:</strong> You believe in a reality that simply doesn't exist.</div>
+                      <div><strong>Masochism:</strong> You drive others to cause you pain.</div>
+                      <div><strong>Megalomania:</strong> You must seek to control things.</div>
+                      <div><strong>Multiple Personality Disorder:</strong> You have several distinct personalities, only one of which manifests at any given time.</div>
+                      <div><strong>Obsessive Compulsion:</strong> You have a specific order that things must be kept in. If it is out of place, you will replace it.</div>
+                      <div><strong>Paranoia:</strong> You consider everything a threat.</div>
+                      <div><strong>Regression:</strong> Your mind has reverted to a childlike state to protect itself from the world.</div>
+                      <div><strong>Schizophrenia:</strong> You hear voices and follow their instructions.</div>
+                      <div><strong>Synesthesia:</strong> You are in a permanent hallucinatory state.</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-orange-300 mb-2">Flaws</h4>
+                    <p className="text-sm mb-3">
+                      Flaws are like physical derangements; alterations to your body that are caused by supernatural forces. 
+                      Once again, we acknowledge that these roleplay requirements do not represent real-world experiences of 
+                      conditions with similar names. You cannot pick a Flaw that will not impact your character (e.g. "No Claws" 
+                      on a character without any mechanical access to claws anyways).
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-2 text-xs">
+                      <div><strong>Deranged:</strong> Select a derangement from the list above.</div>
+                      <div><strong>Fragile:</strong> All damage is considered aggravated.</div>
+                      <div><strong>Hemophilia:</strong> Your Regeneration Rate is always 0.</div>
+                      <div><strong>Horns:</strong> You must wear horns.</div>
+                      <div><strong>Lame:</strong> You cannot run.</div>
+                      <div><strong>Mute:</strong> You cannot speak.</div>
+                      <div><strong>No Claws:</strong> You cannot use claws or purchase the Merit Mix Morph.</div>
+                      <div><strong>Puny:</strong> Your base maximum Health is 8 instead of 10.</div>
+                      <div><strong>Restricted Form (Shifter Only):</strong> You must always wear your War Form mask.</div>
+                      <div><strong>Tail:</strong> You must wear a tail.</div>
+                      <div><strong>Withered Arm:</strong> You cannot use one arm to hold any items during game (including packets).</div>
+                      <div><strong>Weak Musculature (Shifter Only):</strong> You do not get the Augment 1 bonus usually granted through War Form.</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-orange-300 mb-2">Mutations</h4>
+                    <p className="text-sm mb-3">
+                      Physical alterations to your body caused by supernatural forces, particularly Bane influence in Fomori. 
+                      These manifest as visible or hidden changes that distinguish you from normal humans. Unlike flaws, 
+                      mutations are specifically tied to corruption from otherworldly entities.
+                    </p>
+                    <p className="text-sm text-gray-400 mb-2">
+                      Examples: Extra eyes, chitinous shell, acidic blood, additional limbs, tentacles, scales, wings, 
+                      bone spurs, oversized organs, or any other physical manifestation of supernatural corruption.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-orange-300 mb-2">Permanent Taints</h4>
+                    <p className="text-sm">
+                      Lasting supernatural corruption or changes that cannot be easily removed.
+                      These represent permanent alterations to your character's essence or nature.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -6684,7 +9847,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
   // Settings
   const renderSettings = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+      <div className="w-full max-w-4xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Settings & Accessibility</h2>
           <button
@@ -6916,7 +10079,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
   // Changelog
   const renderChangelog = () => (
     <div className={`min-h-screen ${themeClasses.base}`}>
-      <div className="w-full px-2 py-4 sm:px-4 sm:py-6 lg:container lg:mx-auto lg:px-5">
+      <div className="w-full max-w-4xl mx-auto px-2 py-4 sm:px-4 sm:py-6">
         {/* Header */}
         <div className="text-center mb-4 sm:mb-5">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-400 mb-2">Shadow Accord Character Builder</h1>
@@ -6985,8 +10148,157 @@ Generated by Shadow Accord Character Builder v${currentVersion}
   return (
     <div className="min-h-screen">
       {renderCurrentMode()}
+      
+      {/* Faction Change Modal - Rendered at root level */}
+      {factionChangeModal && selectedFactionChange && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] p-4">
+          <div className={`bg-gray-800 border border-gray-600 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border-4 border-purple-500 shadow-2xl`}>
+            <div className="p-5">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-bold text-purple-400">
+                  🔄 Change to {selectedFactionChange.name}
+                </h3>
+                <button
+                  onClick={() => {
+                    setFactionChangeModal(false);
+                    setSelectedFactionChange(null);
+                  }}
+                  className="text-gray-400 hover:text-white text-2xl leading-none"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-600 bg-opacity-20 rounded-lg">
+                  <h4 className="font-bold mb-2 text-white">What will happen:</h4>
+                  <ul className="space-y-1 text-sm text-gray-300">
+                    <li>• Your character becomes {selectedFactionChange.name}</li>
+                    <li>• Current energy amount preserved (up to new faction maximum)</li>
+                    <li>• Gain new faction's fundamental powers</li>
+                    <li>• {selectedFactionChange.description}</li>
+                    <li>• Original faction recorded in character history</li>
+                  </ul>
+                </div>
+                
+                <div className="p-4 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
+                  <h4 className="font-bold mb-2 text-yellow-300">⚠️ Important Notes:</h4>
+                  <ul className="space-y-1 text-sm text-yellow-200">
+                    <li>• This change is permanent and cannot be undone</li>
+                    <li>• Some original abilities may be lost</li>
+                    <li>• You may need to make additional choices after conversion</li>
+                    <li>• Consider the story implications for your character</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-4 mt-6">
+                <button
+                  onClick={() => {
+                    setFactionChangeModal(false);
+                    setSelectedFactionChange(null);
+                  }}
+                  className="px-6 py-3 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    const character = characters[currentCharacterIndex];
+                    
+                    // Enhanced confirmation dialog
+                    const confirmMessage = `🔄 FACTION TRANSFORMATION CONFIRMATION
+
+Character: ${character.name}
+Current Faction: ${formatDisplayText(character.faction)} ${character.subfaction ? `- ${formatDisplayText(character.subfaction)}` : ''}
+New Faction: ${selectedFactionChange.name}
+
+This transformation will:
+• Change your supernatural type permanently
+• Take you through character creation to select new clan/tribe/court and abilities
+• Preserve your current energy (up to new maximum)
+• ${selectedFactionChange.description}
+• Record this change in your character history
+
+⚠️ THIS CANNOT BE UNDONE ⚠️
+
+Are you ready to proceed with the transformation and character creation?`;
+
+                    if (window.confirm(confirmMessage)) {
+                      console.log('Faction change confirmed');
+                      console.log('Current character:', character);
+                      console.log('Selected faction change:', selectedFactionChange);
+                      
+                      // Store the original character and faction change info
+                      setOriginalCharacterForFactionChange(character);
+                      
+                      // Apply faction change transformation with proper benefits
+                      const transformedCharacter = handleFactionChangeTransformation(character, selectedFactionChange.id);
+                      
+                      // Set up the character for creation mode with proper faction-specific settings
+                      const newCharacter = {
+                        ...transformedCharacter,
+                        // Preserve identity and XP
+                        name: character.name,
+                        player: character.player,
+                        totalXP: character.totalXP,
+                        xpSpent: 0, // Reset XP spent so they get all free dots back for faction selection
+                        checkInCount: character.checkInCount,
+                        // Store original faction info
+                        originalFaction: character.faction,
+                        originalSubfaction: character.subfaction,
+                        // Set new faction (already set by handleFactionChangeTransformation)
+                        faction: selectedFactionChange.id,
+                        subfaction: transformedCharacter.subfaction || selectedFactionChange.targetSubfaction || '',
+                        // Reset some faction-specific properties that need reconfiguration in creation
+                        clan: '',
+                        tribe: '',
+                        court: '',
+                        tradition: '',
+                        fellowship: '',
+                        // Keep innateTreeIds from transformation (important for shifter Homid)
+                        // fundamentalPowers already set by transformation
+                        // Track creation dots separately from existing powers
+                        creationDotsUsed: 0, // Track how many free creation dots have been used
+                        // Preserve current energy amount (will be capped to new max)
+                        preservedEnergy: character.stats.energy,
+                        // Mark as faction change
+                        isFactionChange: true,
+                        factionChangeId: selectedFactionChange.id
+                      };
+                      
+                      console.log('New character for creation:', newCharacter);
+                      
+                      // Update the character in the array
+                      const newCharacters = [...characters];
+                      newCharacters[currentCharacterIndex] = newCharacter;
+                      setCharacters(newCharacters);
+                      
+                      console.log('Setting modes...');
+                      
+                      // Set the newCharacter state for character creation
+                      setNewCharacter(newCharacter);
+                      
+                      // Close modal and enter faction change creation mode
+                      setFactionChangeModal(false);
+                      setSelectedFactionChange(null);
+                      setFactionChangeCreationMode(true);
+                      setCurrentMode('creation');
+                      
+                      console.log('Faction change setup complete');
+                    }
+                  }}
+                  className="px-8 py-3 rounded-lg font-bold bg-purple-600 hover:bg-purple-700 text-white transition-colors text-lg shadow-lg"
+                >
+                  🔄 CONFIRM TRANSFORMATION
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+          )}
     </div>
   );
-};
+  };
 
 export default ShadowAccordComplete;

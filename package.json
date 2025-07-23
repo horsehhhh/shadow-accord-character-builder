@@ -20,7 +20,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "electron-forge start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -30,7 +30,9 @@
     "dist": "npm run build && electron-builder --publish=never",
     "build-mobile": "GENERATE_SOURCEMAP=false npm run build && npx cap copy android",
     "open-android": "npx cap open android",
-    "android-build": "npm run build-mobile && npx cap build android"
+    "android-build": "npm run build-mobile && npx cap build android",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "main": "public/electron.js",
   "homepage": "./",
@@ -53,10 +55,12 @@
     ]
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
     "electron": "^37.2.3",
-    "electron-builder": "^26.0.12",
     "electron-is-dev": "^3.0.1",
-    "electron-packager": "^17.1.2"
+    "electron-packager": "^17.1.2",
+    "electron-winstaller": "^5.4.0"
   },
   "build": {
     "appId": "com.shadow-accord.character-builder",
@@ -70,15 +74,30 @@
       "!build/**/*.map",
       "!build/**/*.md",
       "!**/node_modules/**/*.d.ts",
-      "!**/node_modules/**/*.map"
+      "!**/node_modules/**/*.map",
+      "!**/node_modules/**/README.md",
+      "!**/node_modules/**/CHANGELOG.md",
+      "!**/node_modules/**/*.txt",
+      "!**/node_modules/**/test/**",
+      "!**/node_modules/**/tests/**",
+      "!**/node_modules/**/*.test.js",
+      "!**/node_modules/**/*.spec.js"
     ],
     "asarUnpack": [],
     "compression": "maximum",
-    "npmRebuild": false,
+    "npmRebuild": true,
+    "removePackageScripts": true,
     "win": {
-      "target": "portable",
+      "target": {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      },
       "icon": "public/logo512.png",
-      "signAndEditExecutable": false
+      "signAndEditExecutable": false,
+      "compression": "maximum",
+      "requestedExecutionLevel": "asInvoker"
     },
     "mac": {
       "target": "dmg",
