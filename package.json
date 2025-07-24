@@ -1,9 +1,35 @@
 {
-  "name": "shadow-accord-test",
-  "version": "0.1.0",
-  "description": "Shadow Accord Character Builder",
-  "author": "Shadow Accord Team",
-  "private": true,
+  "name": "shadow-accord-character-builder",
+  "version": "1.0.0",
+  "description": "A comprehensive character creation tool for the Shadow Accord RPG system.",
+  "author": "horsehhhh and Claude",
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "electron": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.shadowaccord.characterbuilder",
+    "productName": "Shadow Accord Character Builder",
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "public/favicon.ico"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "win": {
+      "target": "portable"
+    }
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3",
+    "react-scripts": "^5.0.0"
+  },
   "dependencies": {
     "@capacitor/android": "^7.4.2",
     "@capacitor/cli": "^7.4.2",
@@ -14,27 +40,12 @@
     "@testing-library/user-event": "^13.5.0",
     "lucide-react": "^0.525.0",
     "papaparse": "^5.5.3",
+    "pdf-lib": "^1.17.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "start": "electron-forge start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron": "electron public/electron.js",
-    "electron-dev": "ELECTRON_IS_DEV=true electron public/electron.js",
-    "build-electron": "npm run build && electron-builder",
-    "dist": "npm run build && electron-builder --publish=never",
-    "build-mobile": "GENERATE_SOURCEMAP=false npm run build && npx cap copy android",
-    "open-android": "npx cap open android",
-    "android-build": "npm run build-mobile && npx cap build android",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
-  },
-  "main": "public/electron.js",
   "homepage": "./",
   "eslintConfig": {
     "extends": [
@@ -53,65 +64,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@electron-forge/cli": "^7.8.1",
-    "@electron-forge/maker-squirrel": "^7.8.1",
-    "electron": "^37.2.3",
-    "electron-is-dev": "^3.0.1",
-    "electron-packager": "^17.1.2",
-    "electron-winstaller": "^5.4.0"
-  },
-  "build": {
-    "appId": "com.shadow-accord.character-builder",
-    "productName": "Shadow Accord Character Builder",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "build/**/*",
-      "public/electron.js",
-      "!build/**/*.map",
-      "!build/**/*.md",
-      "!**/node_modules/**/*.d.ts",
-      "!**/node_modules/**/*.map",
-      "!**/node_modules/**/README.md",
-      "!**/node_modules/**/CHANGELOG.md",
-      "!**/node_modules/**/*.txt",
-      "!**/node_modules/**/test/**",
-      "!**/node_modules/**/tests/**",
-      "!**/node_modules/**/*.test.js",
-      "!**/node_modules/**/*.spec.js"
-    ],
-    "asarUnpack": [],
-    "compression": "maximum",
-    "npmRebuild": true,
-    "removePackageScripts": true,
-    "win": {
-      "target": {
-        "target": "portable",
-        "arch": [
-          "x64"
-        ]
-      },
-      "icon": "public/logo512.png",
-      "signAndEditExecutable": false,
-      "compression": "maximum",
-      "requestedExecutionLevel": "asInvoker"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "public/logo512.png"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "public/logo512.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
   }
 }

@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0",
+  "name": "shadow-accord-test",
+  "dependencies": {
+    "@testing-library/dom": {
+      "version": "10.4.0",
+      "resolved": "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.0.tgz",
+      "overridden": false
+    },
+    "@testing-library/jest-dom": {
+      "version": "6.6.3",
+      "resolved": "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-6.6.3.tgz",
+      "overridden": false
+    },
+    "@testing-library/react": {
+      "version": "16.3.0",
+      "resolved": "https://registry.npmjs.org/@testing-library/react/-/react-16.3.0.tgz",
+      "overridden": false
+    },
+    "@testing-library/user-event": {
+      "version": "13.5.0",
+      "resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-13.5.0.tgz",
+      "overridden": false
+    },
+    "electron-builder": {
+      "version": "26.0.12",
+      "resolved": "https://registry.npmjs.org/electron-builder/-/electron-builder-26.0.12.tgz",
+      "overridden": false
+    },
+    "electron-is-dev": {
+      "version": "3.0.1",
+      "resolved": "https://registry.npmjs.org/electron-is-dev/-/electron-is-dev-3.0.1.tgz",
+      "overridden": false
+    },
+    "electron": {
+      "version": "37.2.3",
+      "resolved": "https://registry.npmjs.org/electron/-/electron-37.2.3.tgz",
+      "overridden": false
+    },
+    "lucide-react": {
+      "version": "0.525.0",
+      "resolved": "https://registry.npmjs.org/lucide-react/-/lucide-react-0.525.0.tgz",
+      "overridden": false
+    },
+    "papaparse": {
+      "version": "5.5.3",
+      "resolved": "https://registry.npmjs.org/papaparse/-/papaparse-5.5.3.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "19.1.0",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.1.0.tgz",
+      "overridden": false
+    },
+    "react-scripts": {
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/react-scripts/-/react-scripts-5.0.1.tgz",
+      "overridden": false
+    },
+    "react": {
+      "version": "19.1.0",
+      "resolved": "https://registry.npmjs.org/react/-/react-19.1.0.tgz",
+      "overridden": false
+    },
+    "web-vitals": {
+      "version": "2.1.4",
+      "resolved": "https://registry.npmjs.org/web-vitals/-/web-vitals-2.1.4.tgz",
+      "overridden": false
+    }
+  }
+}
