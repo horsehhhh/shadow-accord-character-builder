@@ -1,7 +1,6 @@
 WARNING ! 
 
-I don't know what im doing and there is so much duplicate data in here, this thing is held together with string and craft glue as far as im aware. AI is writing almost everything! pls help. there is alot of functionality i want to add in still but this is the baseline i feel comfortable sharing. TY TO MAX, JACOB, AND JOSH for helping.
-
+I don't know what im doing and there is so much duplicate data in here, this thing is held together with string and craft glue as far as im aware. AI is writing almost everything! pls help. there is alot of functionality i want to add in still but this is the baseline i feel comfortable sharing. TY TO MAX, JACOB, AND JOSH for helping. I also tried really hard not to be mean to the AI when it got stuck so maybe it's a bit more ethical idk.
 
 # Shadow Accord Character Builder
 
