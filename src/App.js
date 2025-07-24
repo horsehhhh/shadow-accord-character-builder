@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { PDFDocument, PDFTextField, PDFCheckBox } from 'pdf-lib';
 import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 // Helper function to load PDF files (works in web, Electron, and Capacitor)
 const loadPdfFile = async (filename) => {
