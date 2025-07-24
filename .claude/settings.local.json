@@ -32,7 +32,9 @@
       "Bash(del srcpdf-field-mappings.js)",
       "Bash(copy \"Shadow accord fixed fillable character sheet 7.24.pdf\" \"public/\")",
       "Bash(grep:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

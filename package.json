@@ -16,7 +16,9 @@
     "files": [
       "build/**/*",
       "public/electron.js",
-      "public/favicon.ico"
+      "public/preload.js",
+      "public/favicon.ico",
+      "public/*.pdf"
     ],
     "directories": {
       "buildResources": "public"

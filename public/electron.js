@@ -1,5 +1,6 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_IS_DEV === 'true';
 
 let mainWindow;
@@ -15,7 +16,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true
+      webSecurity: true,
+      preload: path.join(__dirname, 'preload.js')
     },
     icon: path.join(__dirname, 'favicon.ico'),
     show: false, // Don't show until ready
@@ -121,6 +123,40 @@ function createWindow() {
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 }
+
+// IPC handlers for PDF file loading
+ipcMain.handle('load-pdf-file', async (event, filename) => {
+  try {
+    console.log(`Loading PDF file: ${filename}`);
+    
+    // In development, load from public folder
+    // In production, load from resources folder
+    let pdfPath;
+    if (isDev) {
+      pdfPath = path.join(__dirname, filename);
+    } else {
+      // In production, files are in the same directory as electron.js
+      pdfPath = path.join(__dirname, filename);
+    }
+    
+    console.log(`PDF path: ${pdfPath}`);
+    
+    // Check if file exists
+    if (!fs.existsSync(pdfPath)) {
+      throw new Error(`PDF file not found: ${pdfPath}`);
+    }
+    
+    // Read the PDF file as buffer
+    const buffer = fs.readFileSync(pdfPath);
+    console.log(`Successfully loaded PDF: ${filename}, size: ${buffer.length} bytes`);
+    
+    // Return as ArrayBuffer (convert Buffer to ArrayBuffer)
+    return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+  } catch (error) {
+    console.error(`Error loading PDF file ${filename}:`, error);
+    throw error;
+  }
+});
 
 // App event handlers
 app.whenReady().then(createWindow);
