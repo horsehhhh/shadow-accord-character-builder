@@ -5,6 +5,22 @@ All notable changes to the Shadow Accord Character Builder will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.9] - 2025-07-24
+
+### Fixed
+- **PDF Export in Android APK**: Fixed critical issue where PDF export failed in Android APK builds
+- **Cross-Platform File Operations**: Resolved blob download limitations on mobile devices
+
+### Added
+- **Capacitor Filesystem Integration**: Added @capacitor/filesystem plugin for cross-platform file operations
+- **Universal Download Function**: Created downloadFile() helper that works across web, Electron, and Android platforms
+- **Android File Saving**: PDFs now save to Android Documents folder with user notification
+- **Enhanced Mobile Support**: Updated loadPdfFile() function to support Capacitor/Android environments with web fetch fallback
+
+### Changed
+- **PDF Export Architecture**: Replaced web-only blob download methods with cross-platform file saving approach
+- **Error Handling**: Enhanced PDF export error handling for mobile environments
+
 ## [v0.1.8] - 2025-07-24
 
 ### Fixed

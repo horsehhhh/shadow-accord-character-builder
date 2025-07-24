@@ -10,8 +10,10 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { PDFDocument, PDFTextField, PDFCheckBox } from 'pdf-lib';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
-// Helper function to load PDF files (works in both web and Electron)
+// Helper function to load PDF files (works in web, Electron, and Capacitor)
 const loadPdfFile = async (filename) => {
   try {
     // Check if we're running in Electron
@@ -20,7 +22,38 @@ const loadPdfFile = async (filename) => {
       const arrayBuffer = await window.electronAPI.loadPdfFile(filename);
       console.log(`Successfully loaded PDF via Electron: ${filename}`);
       return arrayBuffer;
-    } else {
+    } 
+    // Check if we're running in Capacitor (mobile)
+    else if (Capacitor.isNativePlatform()) {
+      console.log(`Loading PDF via Capacitor: ${filename}`);
+      try {
+        const result = await Filesystem.readFile({
+          path: `public/${filename}`,
+          directory: Directory.Cache
+        });
+        // Convert base64 to ArrayBuffer
+        const base64Data = result.data;
+        const binaryString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(binaryString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < binaryString.length; i++) {
+          uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        console.log(`Successfully loaded PDF via Capacitor: ${filename}`);
+        return arrayBuffer;
+      } catch (capacitorError) {
+        // Fallback to web fetch for Capacitor if file not found in cache
+        console.log(`Capacitor file read failed, falling back to web fetch: ${filename}`);
+        const response = await fetch(`/${filename}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        console.log(`Successfully loaded PDF via web fetch fallback: ${filename}`);
+        return arrayBuffer;
+      }
+    } 
+    else {
       // Fallback to web fetch
       console.log(`Loading PDF via web fetch: ${filename}`);
       const response = await fetch(`/${filename}`);
@@ -33,6 +66,54 @@ const loadPdfFile = async (filename) => {
     }
   } catch (error) {
     console.error(`Error loading PDF file ${filename}:`, error);
+    throw error;
+  }
+};
+
+// Helper function to download files (works in web, Electron, and Capacitor)
+const downloadFile = async (data, filename, mimeType = 'application/octet-stream') => {
+  try {
+    // Check if we're running in Capacitor (mobile)
+    if (Capacitor.isNativePlatform()) {
+      console.log(`Downloading file via Capacitor: ${filename}`);
+      
+      let base64Data;
+      if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
+        // Convert ArrayBuffer/Uint8Array to base64
+        const uint8Array = data instanceof ArrayBuffer ? new Uint8Array(data) : data;
+        const binaryString = Array.from(uint8Array, byte => String.fromCharCode(byte)).join('');
+        base64Data = btoa(binaryString);
+      } else if (typeof data === 'string') {
+        // Convert string to base64
+        base64Data = btoa(data);
+      } else {
+        throw new Error('Unsupported data type for Capacitor download');
+      }
+      
+      await Filesystem.writeFile({
+        path: filename,
+        data: base64Data,
+        directory: Directory.Documents
+      });
+      
+      alert(`File saved to Documents folder: ${filename}`);
+      console.log(`Successfully saved file via Capacitor: ${filename}`);
+    } else {
+      // Fallback to web/Electron download using blob
+      console.log(`Downloading file via web/Electron: ${filename}`);
+      const blob = new Blob([data], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(`Successfully downloaded file: ${filename}`);
+    }
+  } catch (error) {
+    console.error(`Error downloading file ${filename}:`, error);
     throw error;
   }
 };
@@ -116,8 +197,21 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.1.8';
+  const currentVersion = '0.1.9';
   const changelog = [
+    {
+      version: '0.1.9',
+      date: '2025-07-24',
+      changes: [
+        'Fixed PDF export functionality in Android APK builds',
+        'Added Capacitor Filesystem plugin for cross-platform file operations',
+        'Updated loadPdfFile() function to support Capacitor/Android environments with web fetch fallback',
+        'Created downloadFile() helper function that works across web, Electron, and Android platforms',
+        'Android PDF exports now save to Documents folder with user notification',
+        'Replaced web-only blob download methods with cross-platform file saving',
+        'Enhanced PDF export error handling for mobile environments'
+      ]
+    },
     {
       version: '0.1.8',
       date: '2025-07-24',
@@ -2187,15 +2281,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
             });
             
             const pdfBytes = await pdfDoc.save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `debug_field_mapping.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            await downloadFile(pdfBytes, 'debug_field_mapping.pdf', 'application/pdf');
             
             console.log('Debug PDF created! Check which skills line up with which Level checkboxes.');
           } catch (error) {
@@ -2704,15 +2790,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
 
             // Generate and download the filled PDF
             const pdfBytes = await pdfDoc.save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${character.name || 'character'}_shadowaccord_sheet.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            await downloadFile(pdfBytes, `${character.name || 'character'}_shadowaccord_sheet.pdf`, 'application/pdf');
             
           } catch (error) {
             console.error('Error exporting to PDF:', error);
