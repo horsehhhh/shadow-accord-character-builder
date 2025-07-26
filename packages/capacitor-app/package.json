@@ -1,0 +1,16 @@
+{
+  "name": "capacitor-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@capacitor/filesystem": "^7.1.2",
+    "core": "file:../core"
+  },
+  "scripts": {
+    "start": "npm run build:core && npx cap sync && npx cap open android",
+    "build:core": "npm run build --workspace=core"
+  }
+}

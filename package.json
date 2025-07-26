@@ -1,71 +1,20 @@
 {
-  "name": "shadow-accord-character-builder",
-  "version": "1.0.0",
-  "description": "A comprehensive character creation tool for the Shadow Accord RPG system.",
-  "author": "horsehhhh and Claude",
-  "main": "public/electron.js",
+  "name": "shadow-accord-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "electron": "electron .",
-    "dist": "electron-builder"
-  },
-  "build": {
-    "appId": "com.shadowaccord.characterbuilder",
-    "productName": "Shadow Accord Character Builder",
-    "files": [
-      "build/**/*",
-      "public/electron.js",
-      "public/preload.js",
-      "public/favicon.ico",
-      "public/*.pdf"
-    ],
-    "directories": {
-      "buildResources": "public"
-    },
-    "win": {
-      "target": "portable"
-    }
+    "start:core": "npm start --workspace=core",
+    "start:electron": "npm start --workspace=electron-app",
+    "build:core": "npm run build --workspace=core",
+    "build:electron": "npm run build --workspace=electron-app",
+    "dist:electron": "npm run dist --workspace=electron-app",
+    "start:capacitor": "npm start --workspace=capacitor-app"
   },
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3",
     "react-scripts": "^5.0.0"
-  },
-  "dependencies": {
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
-    "@capacitor/filesystem": "^7.1.2",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "lucide-react": "^0.525.0",
-    "papaparse": "^5.5.3",
-    "pdf-lib": "^1.17.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "homepage": "./",
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

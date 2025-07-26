@@ -1,0 +1,32 @@
+{
+  "name": "electron-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./public/electron.js",
+  "dependencies": {
+    "core": "file:../core"
+  },
+  "scripts": {
+    "start": "npm run build:core && electron .",
+    "dist": "npm run build:core && electron-builder",
+    "build:core": "npm run build --workspace=core"
+  },
+  "build": {
+    "appId": "com.shadowaccord.characterbuilder",
+    "productName": "Shadow Accord Character Builder",
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "public/preload.js",
+      "public/favicon.ico",
+      "public/*.pdf"
+    ],
+    "directories": {
+      "output": "../../dist/electron",
+      "buildResources": "public"
+    },
+    "win": {
+      "target": "portable"
+    }
+  }
+}
