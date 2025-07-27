@@ -3,7 +3,6 @@
     <color name="colorPrimary">#121212</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#BB86FC</color>
-    <color name="ic_launcher_background">#121212</color>
     
     <!-- Status bar and navigation bar colors for better mobile experience -->
     <color name="statusBarColor">#000000</color>
