@@ -8032,6 +8032,7 @@ Your character is ready to play!`;
                   // Go to previous step
                   setCreationStep(Math.max(0, creationStep - 1));
                 }
+                window.scrollTo(0, 0);
               }}
               className={themeClasses.button}
             >
@@ -8041,7 +8042,10 @@ Your character is ready to play!`;
             
             {creationStep < 4 && (
               <button
-                onClick={() => setCreationStep(Math.min(4, creationStep + 1))}
+                onClick={() => {
+                  setCreationStep(Math.min(4, creationStep + 1));
+                  window.scrollTo(0, 0);
+                }}
                 className={themeClasses.button}
                 disabled={
                   (creationStep === 0 && !newCharacter.faction) ||
@@ -8091,7 +8095,10 @@ Your character is ready to play!`;
               </div>
             )}
             <button
-              onClick={() => setCurrentMode('menu')}
+              onClick={() => {
+                setCurrentMode('menu');
+                window.scrollTo(0, 0);
+              }}
               className={themeClasses.button}
             >
               <Home className="w-4 h-4 mr-2 inline" />
@@ -11229,7 +11236,10 @@ Your character is ready to play!`;
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Settings & Accessibility</h2>
           <button
-            onClick={() => setCurrentMode('menu')}
+            onClick={() => {
+              setCurrentMode('menu');
+              window.scrollTo(0, 0);
+            }}
             className={themeClasses.button}
           >
             <X className="w-4 h-4 mr-2" />
@@ -11470,7 +11480,10 @@ Your character is ready to play!`;
         {/* Back Button */}
         <div className="mb-4 sm:mb-5">
           <button
-            onClick={() => setCurrentMode('menu')}
+            onClick={() => {
+              setCurrentMode('menu');
+              window.scrollTo(0, 0);
+            }}
             className={`${themeClasses.card} px-4 py-2 hover:shadow-lg transition-all flex items-center gap-2`}
           >
             <ArrowLeft className="w-4 h-4" />
