@@ -22,8 +22,8 @@ public class MainActivity extends BridgeActivity {
         // Run on UI thread to ensure WebView is available
         runOnUiThread(() -> {
             try {
-                // Find the WebView in the activity
-                WebView webView = findViewById(com.getcapacitor.R.id.webview);
+                // Find the WebView by traversing the view hierarchy
+                WebView webView = findWebView(findViewById(android.R.id.content));
                 if (webView != null) {
                     // Get the current layout params
                     ViewGroup.LayoutParams layoutParams = webView.getLayoutParams();
@@ -69,5 +69,22 @@ public class MainActivity extends BridgeActivity {
                 e.printStackTrace();
             }
         });
+    }
+    
+    // Helper method to find WebView in the view hierarchy
+    private WebView findWebView(View view) {
+        if (view instanceof WebView) {
+            return (WebView) view;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                WebView result = findWebView(group.getChildAt(i));
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 }
