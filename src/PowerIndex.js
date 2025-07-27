@@ -795,6 +795,33 @@ function PowerIndex({ onBack, embedded = false }) {
       searchableText: "medicine 60 seconds tending wounds tagged medical tool prop current health raised maximum vampires wraiths gorgons spirits healed skill"
     },
     {
+      name: "MEDICINE 2",
+      type: "TOUCH",
+      sources: "Medicine Skill 1",
+      cost: "None",
+      call: "\"Medicine 2\"",
+      description: "You must spend 60 uninterrupted seconds roleplaying tending to a target's wounds with an appropriate, tagged medical tool prop before you activate this power.\n\nThe target's current Health is raised to 2, not exceeding their maximum Health.\n\nVampires, Wraiths, Gorgons, and Spirits cannot be healed by Medicine and call \"No Effect\" instead.",
+      searchableText: "medicine 2 skill 60 seconds tending wounds tagged medical tool prop current health raised vampires wraiths gorgons spirits healed"
+    },
+    {
+      name: "MEDICINE 4",
+      type: "TOUCH",
+      sources: "Medicine Skill 2",
+      cost: "None",
+      call: "\"Medicine 4\"",
+      description: "You must spend 60 uninterrupted seconds roleplaying tending to a target's wounds with an appropriate, tagged medical tool prop before you activate this power.\n\nThe target's current Health is raised to 4, not exceeding their maximum Health.\n\nVampires, Wraiths, Gorgons, and Spirits cannot be healed by Medicine and call \"No Effect\" instead.",
+      searchableText: "medicine 4 skill 60 seconds tending wounds tagged medical tool prop current health raised vampires wraiths gorgons spirits healed"
+    },
+    {
+      name: "MEDICINE 6",
+      type: "TOUCH",
+      sources: "Medicine Skill 3",
+      cost: "None",
+      call: "\"Medicine 6\"",
+      description: "You must spend 60 uninterrupted seconds roleplaying tending to a target's wounds with an appropriate, tagged medical tool prop before you activate this power.\n\nThe target's current Health is raised to 6, not exceeding their maximum Health.\n\nVampires, Wraiths, Gorgons, and Spirits cannot be healed by Medicine and call \"No Effect\" instead.",
+      searchableText: "medicine 6 skill 60 seconds tending wounds tagged medical tool prop current health raised vampires wraiths gorgons spirits healed"
+    },
+    {
       name: "MEDITATE",
       type: "TOUCH",
       sources: "M K2 Hr2 S2",
