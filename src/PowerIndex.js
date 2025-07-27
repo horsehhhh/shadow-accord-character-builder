@@ -330,7 +330,7 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "DETECT FETTER",
       type: "SENSORY",
       sources: "H2 W2",
-      cost: "None",
+      cost: "1 Energy",
       call: "\"Detect Fetter\" or \"Detect Fetter <item>\"",
       description: "Touch the target for 10 seconds. The target responds \"No Effect\" if they are not a Wraith. Otherwise, they must OOG describe one of their Fetters and where they saw it last. If an item is stated, they must describe their Fetter that best matches it.",
       searchableText: "detect fetter touch 10 seconds wraith describe item matches sensory"
@@ -411,8 +411,8 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "DREAMSHAPE",
       type: "TOUCH <CONDITION>",
       sources: "Hr2 Hc2 S2 V2 Vc2 W2",
-      cost: "1 Energy",
-      call: "\"Condition: Dreamshape <dream> <action> <noun>\"",
+      cost: "2 Energy",
+      call: "\"Condition: Dreamshape <dream> <action> <non-plural noun>\"",
       description: "The target must be Incapacitated or asleep (asleep OOG or with the Daze power). If the target is asleep OOG, leave a 3x5 card with the call written down.\n\nThe target has the described dream. When they awake, they immediately carry out the stated action to the best of their ability. The condition ends once the action has been performed one time. The target may attack and defend themself as normal. This power may not be used to cause a target to physically harm themself.\n*Breachable Umbra → Realm*",
       searchableText: "dreamshape incapacitated asleep daze 3x5 card dream awake action performed harm breachable umbra realm"
     },
@@ -503,7 +503,7 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "W1",
       cost: "1 Energy",
       call: "\"Breach Fetter Creation\"",
-      description: "Touch an item at least 3 inches in length for 10 seconds to turn it into a Fetter for any Wraith. If making a Fetter for another Wraith, you must be holding their hand along with the item. Afterwards, fill out a Fetter tag and attach it to the item.\n\nYou receive one Fetter tag each Check-In.",
+      description: "Touch an item at least 3 inches in length or a Human, Vampire, or Shifter for 10 seconds to turn it into a Fetter for any Wraith. If making a Fetter for another Wraith, you must be holding their hand along with the item or person. If the non-Wraith target is not a Human, Vampire, or Shifter, they state \"No Effect\". Afterwards, fill out a Fetter tag and attach it to the item or give it to the non-Wraith.\n\nYou receive one Fetter tag each Check-In.",
       searchableText: "fetter creation touch item 3 inches 10 seconds wraith holding hand tag check-in"
     },
     {
@@ -528,7 +528,7 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "FIRE 4",
       type: "DAMAGE",
       sources: "S3 V3",
-      cost: "1 Energy",
+      cost: "2 Energy",
       call: "\"Fire 4\"",
       description: "Throw a packet that does 4 <Fire> damage.",
       searchableText: "fire 4 throw packet damage"
@@ -1140,7 +1140,7 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "SENSE DEMON",
       type: "SENSORY",
       sources: "H2 Hc1 Hr1 Vc1",
-      cost: "1 Energy",
+      cost: "None",
       call: "\"Sense Demon Vice\"",
       description: "Stare at the target for 10 seconds. They must answer OOG their Demonic Vice, or \"No Effect\" if they do not have one.",
       searchableText: "sense demon stare 10 seconds answer oog demonic vice no effect sensory"
@@ -1455,7 +1455,7 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "TEST GENERATION",
       type: "SENSORY",
       sources: "V1",
-      cost: "None",
+      cost: "1 Energy",
       call: "\"Test Generation\"",
       description: "Consume at least 1 point of a target's Vitae. The target must state OOG their generation. Targets that are not Vampires call \"No Effect\".",
       searchableText: "test generation consume 1 point target vitae state oog generation not vampires no effect vampire sensory"
@@ -1465,7 +1465,7 @@ function PowerIndex({ onBack, embedded = false }) {
       type: "SENSORY",
       sources: "V1",
       cost: "None",
-      call: "\"Test Oath\"",
+      call: "\"Test Blood Oath\"",
       description: "Consume at least 1 point of a target's blood or Vitae. The target must answer OOG \"yes\" or \"no\" if they are currently under the effect of a Blood Oath.",
       searchableText: "test oath consume 1 point target blood vitae answer oog yes no currently under effect blood oath vampire sensory"
     },
@@ -1599,7 +1599,7 @@ function PowerIndex({ onBack, embedded = false }) {
       name: "WITHER",
       type: "STATUS",
       sources: "Hr2 Hc1 S1 V1 Vc1 W2",
-      cost: "1 Energy",
+      cost: "None",
       call: "\"Wither\"",
       description: "The target's maximum damage with boffer attacks is reduced by one, to a limit of 1 damage.\n*Breachable Umbra → Realm*",
       searchableText: "wither maximum damage boffer attacks reduced one limit 1 damage breachable umbra realm status"
