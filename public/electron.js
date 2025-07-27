@@ -19,7 +19,7 @@ function createWindow() {
       webSecurity: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, 'favicon.ico'),
+    icon: path.join(__dirname, 'jotchua.png'),
     show: false, // Don't show until ready
     titleBarStyle: 'default'
   });
