@@ -17,7 +17,8 @@
       "build/**/*",
       "public/electron.js",
       "public/preload.js",
-      "public/favicon.ico",
+      "public/jotchua.png",
+      "public/icon.ico",
       "public/*.pdf"
     ],
     "directories": {
@@ -25,11 +26,13 @@
     },
     "win": {
       "target": "portable",
-      "icon": "jotchua.png"
+      "icon": "jotchua.ico"
     },
     "mac": {
+      "icon": "jotchua.png"
     },
     "linux": {
+      "icon": "jotchua.png"
     }
   },
   "devDependencies": {
