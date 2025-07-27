@@ -9997,6 +9997,9 @@ Your character is ready to play!`;
             <div className="space-y-4">
               <div className={`${themeClasses.card} p-3`}>
                 <h3 className="text-xl font-bold mb-2">Available Lore</h3>
+                <div className="mb-3 p-2 bg-amber-900/30 border border-amber-600 rounded text-amber-200 text-sm">
+                  <strong>Note:</strong> Lore can only be purchased during character creation. Existing characters cannot purchase new lore after creation.
+                </div>
                 
                 {/* Lore Search Bar */}
                 <div className="mb-4">
