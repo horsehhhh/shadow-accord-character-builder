@@ -24,7 +24,8 @@
       "buildResources": "public"
     },
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "icon": "jotchua.png"
     },
     "mac": {
     },
