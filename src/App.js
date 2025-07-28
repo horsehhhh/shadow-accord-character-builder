@@ -2039,6 +2039,11 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         };
         break;
       case 'virtue':
+        // Check if virtue is already at maximum
+        if (characterUpdate.stats.virtue >= 10) {
+          alert('Virtue is already at maximum level (10)');
+          return character;
+        }
         characterUpdate = {
           ...characterUpdate,
           stats: {
@@ -9165,14 +9170,17 @@ Your character is ready to play!`;
                         <div className="flex items-center mb-2">
                           <span className="text-sm text-gray-400 mr-2">Current:</span>
                           <span className="text-lg font-bold text-blue-400">{character.stats.virtue}</span>
+                          <span className="text-sm text-gray-400 ml-2">/ 10</span>
                         </div>
                         
                         <div className="mt-3 flex items-center justify-between">
                           <div className="flex items-center">
-                            <span className="text-sm font-medium text-blue-400">
-                              Next Level: 2 XP
+                            <span className={`text-sm font-medium ${
+                              character.stats.virtue >= 10 ? 'text-gray-400' : 'text-blue-400'
+                            }`}>
+                              {character.stats.virtue >= 10 ? 'Maximum Level' : 'Next Level: 2 XP'}
                             </span>
-                            {character.totalXP < 2 && (
+                            {character.totalXP < 2 && character.stats.virtue < 10 && (
                               <span className="ml-2 text-xs text-red-400">
                                 (Need {2 - character.totalXP} more XP)
                               </span>
@@ -9199,7 +9207,7 @@ Your character is ready to play!`;
                             <button
                               onClick={() => {
                                 const cost = calculateXPCost(character, 'virtue');
-                                if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'virtue', 'virtue')) {
+                                if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10) {
                                   const updated = advanceCharacter(character, {
                                     type: 'virtue',
                                     itemId: 'virtue',
@@ -9211,13 +9219,13 @@ Your character is ready to play!`;
                                 }
                               }}
                               className={`px-4 py-2 rounded font-medium text-sm transition-all ${
-                                character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue')
+                                character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10
                                   ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
                                   : 'bg-gray-700 cursor-not-allowed text-gray-400'
                               }`}
-                              disabled={character.totalXP < 2 || !canAdvanceAtCheckIn(character, 'virtue', 'virtue')}
+                              disabled={character.totalXP < 2 || !canAdvanceAtCheckIn(character, 'virtue', 'virtue') || character.stats.virtue >= 10}
                             >
-                              {character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') ? 'Advance' : 'Cannot Afford'}
+                              {character.stats.virtue >= 10 ? 'Maximum' : character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') ? 'Advance' : 'Cannot Afford'}
                             </button>
                           </div>
                         </div>
