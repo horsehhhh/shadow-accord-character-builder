@@ -1737,14 +1737,15 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       return character;
     }
 
-    if (character.totalXP < cost) {
+    // For negative costs (gaining XP), skip the XP check
+    if (cost > 0 && character.totalXP < cost) {
       alert('Insufficient XP');
       return character;
     }
 
     const updatedCharacter = { ...character };
-    const newTotalXP = updatedCharacter.totalXP - cost;
-    const newXpSpent = updatedCharacter.xpSpent + cost;
+    const newTotalXP = updatedCharacter.totalXP - cost; // This works for both positive and negative costs
+    const newXpSpent = cost > 0 ? updatedCharacter.xpSpent + cost : updatedCharacter.xpSpent; // Only count positive costs as "spent"
     const newLastModified = new Date().toISOString();
 
     // Create base character update object
@@ -1767,13 +1768,15 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       ]
     };
 
-    // Record XP spending in XP history (if cost > 0)
-    if (cost > 0) {
+    // Record XP spending/gaining in XP history
+    if (cost !== 0) {
       const xpEntry = {
         timestamp: newLastModified,
-        type: 'loss',
-        amount: cost,
-        reason: `Purchased ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`,
+        type: cost > 0 ? 'loss' : 'gain',
+        amount: Math.abs(cost),
+        reason: cost > 0 
+          ? `Purchased ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`
+          : `Increased ${type === 'virtue' ? 'Angst' : itemId}`,
         previousTotal: character.totalXP,
         newTotal: character.totalXP - cost
       };
@@ -9165,7 +9168,11 @@ Your character is ready to play!`;
                           <h4 className="font-bold text-lg">{character.stats.virtueType}</h4>
                         </div>
                         
-                        <p className="text-sm text-gray-300 mb-2">Your character's moral compass and spiritual strength</p>
+                        <p className="text-sm text-gray-300 mb-2">
+                          {character.stats.virtueType === 'Angst' 
+                            ? 'Your character\'s inner turmoil and suffering. Lower is better for Wraiths.'
+                            : 'Your character\'s moral compass and spiritual strength'}
+                        </p>
                         
                         <div className="flex items-center mb-2">
                           <span className="text-sm text-gray-400 mr-2">Current:</span>
@@ -9176,57 +9183,134 @@ Your character is ready to play!`;
                         <div className="mt-3 flex items-center justify-between">
                           <div className="flex items-center">
                             <span className={`text-sm font-medium ${
-                              character.stats.virtue >= 10 ? 'text-gray-400' : 'text-blue-400'
+                              character.stats.virtueType === 'Angst' 
+                                ? (character.stats.virtue <= 1 ? 'text-gray-400' : 'text-green-400')
+                                : (character.stats.virtue >= 10 ? 'text-gray-400' : 'text-blue-400')
                             }`}>
-                              {character.stats.virtue >= 10 ? 'Maximum Level' : 'Next Level: 2 XP'}
+                              {character.stats.virtueType === 'Angst' 
+                                ? (character.stats.virtue <= 1 ? 'Minimum Level' : 'Reduce Angst: 2 XP')
+                                : (character.stats.virtue >= 10 ? 'Maximum Level' : 'Next Level: 2 XP')
+                              }
                             </span>
-                            {character.totalXP < 2 && character.stats.virtue < 10 && (
-                              <span className="ml-2 text-xs text-red-400">
-                                (Need {2 - character.totalXP} more XP)
-                              </span>
-                            )}
+                            {character.stats.virtueType === 'Angst' 
+                              ? (character.totalXP < 2 && character.stats.virtue > 1 && (
+                                  <span className="ml-2 text-xs text-red-400">
+                                    (Need {2 - character.totalXP} more XP)
+                                  </span>
+                                ))
+                              : (character.totalXP < 2 && character.stats.virtue < 10 && (
+                                  <span className="ml-2 text-xs text-red-400">
+                                    (Need {2 - character.totalXP} more XP)
+                                  </span>
+                                ))
+                            }
                           </div>
                           
                           <div className="flex gap-2">
-                            {character.stats.virtue > 1 && (
-                              <button
-                                onClick={() => {
-                                  const updated = reduceCharacter(character, {
-                                    type: 'virtue',
-                                    itemId: 'virtue'
-                                  });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
-                                }}
-                                className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                Remove Level (+2 XP)
-                              </button>
+                            {character.stats.virtueType === 'Angst' ? (
+                              // Wraith Angst: First button reduces Angst (costs XP - good thing)
+                              <>
+                                {character.stats.virtue > 1 && (
+                                  <button
+                                    onClick={() => {
+                                      const cost = 2; // Cost XP to reduce Angst
+                                      if (character.totalXP >= cost) {
+                                        const updated = reduceCharacter(character, {
+                                          type: 'virtue',
+                                          itemId: 'virtue'
+                                        });
+                                        // Manually subtract XP for reducing Angst
+                                        updated.totalXP -= cost;
+                                        updated.xpSpent += cost;
+                                        updated.xpHistory = [
+                                          ...(updated.xpHistory || []),
+                                          {
+                                            timestamp: new Date().toISOString(),
+                                            type: 'loss',
+                                            amount: cost,
+                                            reason: 'Reduced Angst',
+                                            previousTotal: character.totalXP,
+                                            newTotal: character.totalXP - cost
+                                          }
+                                        ];
+                                        const newCharacters = [...characters];
+                                        newCharacters[currentCharacterIndex] = updated;
+                                        setCharacters(newCharacters);
+                                      }
+                                    }}
+                                    className={`px-3 py-2 rounded font-medium text-sm ${
+                                      character.totalXP >= 2 
+                                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                                        : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                    }`}
+                                    disabled={character.totalXP < 2}
+                                  >
+                                    Reduce Angst (-2 XP)
+                                  </button>
+                                )}
+                                {character.stats.virtue < 10 && (
+                                  <button
+                                    onClick={() => {
+                                      const refund = 2; // Get XP back for increasing Angst
+                                      const updated = advanceCharacter(character, {
+                                        type: 'virtue',
+                                        itemId: 'virtue',
+                                        cost: -refund // Negative cost = gaining XP
+                                      });
+                                      const newCharacters = [...characters];
+                                      newCharacters[currentCharacterIndex] = updated;
+                                      setCharacters(newCharacters);
+                                    }}
+                                    className="px-4 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-500 text-white"
+                                  >
+                                    Increase Angst (+2 XP)
+                                  </button>
+                                )}
+                              </>
+                            ) : (
+                              // Normal virtue system for non-Wraiths
+                              <>
+                                {character.stats.virtue > 1 && (
+                                  <button
+                                    onClick={() => {
+                                      const updated = reduceCharacter(character, {
+                                        type: 'virtue',
+                                        itemId: 'virtue'
+                                      });
+                                      const newCharacters = [...characters];
+                                      newCharacters[currentCharacterIndex] = updated;
+                                      setCharacters(newCharacters);
+                                    }}
+                                    className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
+                                  >
+                                    Remove Level (+2 XP)
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    const cost = calculateXPCost(character, 'virtue');
+                                    if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10) {
+                                      const updated = advanceCharacter(character, {
+                                        type: 'virtue',
+                                        itemId: 'virtue',
+                                        cost
+                                      });
+                                      const newCharacters = [...characters];
+                                      newCharacters[currentCharacterIndex] = updated;
+                                      setCharacters(newCharacters);
+                                    }
+                                  }}
+                                  className={`px-4 py-2 rounded font-medium text-sm transition-all ${
+                                    character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10
+                                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
+                                      : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                  }`}
+                                  disabled={character.totalXP < 2 || !canAdvanceAtCheckIn(character, 'virtue', 'virtue') || character.stats.virtue >= 10}
+                                >
+                                  {character.stats.virtue >= 10 ? 'Maximum' : character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') ? 'Advance' : 'Cannot Afford'}
+                                </button>
+                              </>
                             )}
-                            <button
-                              onClick={() => {
-                                const cost = calculateXPCost(character, 'virtue');
-                                if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10) {
-                                  const updated = advanceCharacter(character, {
-                                    type: 'virtue',
-                                    itemId: 'virtue',
-                                    cost
-                                  });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
-                                }
-                              }}
-                              className={`px-4 py-2 rounded font-medium text-sm transition-all ${
-                                character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10
-                                  ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
-                                  : 'bg-gray-700 cursor-not-allowed text-gray-400'
-                              }`}
-                              disabled={character.totalXP < 2 || !canAdvanceAtCheckIn(character, 'virtue', 'virtue') || character.stats.virtue >= 10}
-                            >
-                              {character.stats.virtue >= 10 ? 'Maximum' : character.totalXP >= 2 && canAdvanceAtCheckIn(character, 'virtue', 'virtue') ? 'Advance' : 'Cannot Afford'}
-                            </button>
                           </div>
                         </div>
                       </div>
