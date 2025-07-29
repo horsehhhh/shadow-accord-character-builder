@@ -1537,7 +1537,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       case 'willpower':
         return character.stats.willpower > 1; // Can't reduce below 1
       case 'virtue':
-        return character.stats.virtue > 1; // Can't reduce below 1
+        return character.stats.virtue > 0; // Can't reduce below 0
       case 'lore':
         // Defensive programming: ensure lores is an array
         const loresArray = Array.isArray(character.lores) ? character.lores : 
@@ -2200,7 +2200,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         }
         break;
       case 'virtue':
-        if (characterUpdate.stats.virtue > 1) {
+        if (characterUpdate.stats.virtue > 0) {
           characterUpdate = {
             ...characterUpdate,
             stats: {
@@ -9187,13 +9187,13 @@ Your character is ready to play!`;
                                 ? (character.stats.virtue <= 1 ? 'text-gray-400' : 'text-green-400')
                                 : (character.stats.virtue >= 10 ? 'text-gray-400' : 'text-blue-400')
                             }`}>
-                              {character.stats.virtueType === 'Angst' 
-                                ? (character.stats.virtue <= 1 ? 'Minimum Level' : 'Reduce Angst: 2 XP')
+                            {character.stats.virtueType === 'Angst' 
+                                ? (character.stats.virtue <= 0 ? 'Minimum Level' : 'Reduce Angst: 2 XP')
                                 : (character.stats.virtue >= 10 ? 'Maximum Level' : 'Next Level: 2 XP')
                               }
                             </span>
                             {character.stats.virtueType === 'Angst' 
-                              ? (character.totalXP < 2 && character.stats.virtue > 1 && (
+                              ? (character.totalXP < 2 && character.stats.virtue > 0 && (
                                   <span className="ml-2 text-xs text-red-400">
                                     (Need {2 - character.totalXP} more XP)
                                   </span>
@@ -9210,7 +9210,7 @@ Your character is ready to play!`;
                             {character.stats.virtueType === 'Angst' ? (
                               // Wraith Angst: First button reduces Angst (costs XP - good thing)
                               <>
-                                {character.stats.virtue > 1 && (
+                                {character.stats.virtue > 0 && (
                                   <button
                                     onClick={() => {
                                       const cost = 2; // Cost XP to reduce Angst
@@ -9270,7 +9270,7 @@ Your character is ready to play!`;
                             ) : (
                               // Normal virtue system for non-Wraiths
                               <>
-                                {character.stats.virtue > 1 && (
+                                {character.stats.virtue > 0 && (
                                   <button
                                     onClick={() => {
                                       const updated = reduceCharacter(character, {
