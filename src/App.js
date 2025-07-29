@@ -1270,7 +1270,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     const currentEnergy = character.stats.energy;
     const newMaxEnergy = parseInt(newFaction.base_energy);
     
-    // Base character updates
+    // Base character updates - preserve XP tracking
     let updatedCharacter = {
       ...newCharacter,
       faction: newFactionId,
@@ -1288,6 +1288,11 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       innateTreeIds: [],
       tempFactionChangePowers: 0, // Track free powers to assign
       powers: {}, // Clear all existing powers for faction change
+      // Preserve XP tracking
+      totalXP: character.totalXP,
+      xpSpent: character.xpSpent,
+      xpHistory: character.xpHistory || [],
+      advancementHistory: character.advancementHistory || [],
       lastModified: new Date().toISOString()
     };
     
