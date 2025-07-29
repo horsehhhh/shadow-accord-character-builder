@@ -202,8 +202,36 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.2.0';
+  const currentVersion = '0.2.2';
   const changelog = [
+    {
+      version: '0.2.2',
+      date: '2025-07-28',
+      changes: [
+        'Added Wraith Passion system for character creation',
+        'Implemented passion selection interface requiring 2 passions from 6 available options (Anger, Fear, Hate, Love, Pain, Pleasure)',
+        'Integrated passion data with PDF export - wraith characters now export passion information to character sheets',
+        'Added passion validation during character creation to ensure proper selection',
+        'Enhanced character review display to show selected passions for wraith characters',
+        'Updated Valeren Warrior discipline with expanded Level 1 powers',
+        'Added "Sense Mental" and "Sense Health" to existing "Sense Max Health" for Valeren Warrior Level 1',
+        'Implemented Android-compatible scroll-to-top functionality for character creation navigation',
+        'Enhanced navigation buttons (Previous, Next, Continue, Create Character) with multi-method scroll reset',
+        'Added comprehensive Android WebView compatibility with fallback scroll methods',
+        'Fixed mobile navigation scroll issues during character creation process'
+      ]
+    },
+    {
+      version: '0.2.1',
+      date: '2025-07-27',
+      changes: [
+        'Updated package dependencies to latest versions for improved security and performance',
+        'Enhanced mobile responsiveness and touch interaction support',
+        'Fixed minor UI alignment issues on smaller screen sizes',
+        'Optimized character data validation and error handling',
+        'Improved PDF export reliability across different platforms'
+      ]
+    },
     {
       version: '0.2.0',
       date: '2025-07-26',
@@ -630,7 +658,7 @@ thaumaturgy_rego_phobos,Rego Phobos (Path of Fear),vampire,Monsters,Dreamshape|T
 theurge,Theurge,shifter,Release Spirit|Sense Spirit,Umbra Sight,Umbra Strike
 usury,Usury,wraith,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
 valeren_healer,Valeren Healer,vampire,Healing Touch,Serenity,Revive
-valeren_warrior,Valeren Warrior,vampire,Sense Max Health,Body Wrack,Aggravated 1
+valeren_warrior,Valeren Warrior,vampire,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Aggravated 1
 vicissitude,Vicissitude,vampire,Malleable Visage,Body Wrack,Horrid Form
 visceratika,Visceratika,vampire,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
 warder_of_man_gift,Warder of Man Gift,shifter,Pence from Heaven,Fabricate Armor,Cloak Sight
@@ -793,7 +821,15 @@ parent,Parent,Overprotective loving and caring this Shadow wants you to love onl
 pessimist,Pessimist,The Pessimist will continually bear bad news to the Psyche about any number of things real or imagined. While in control it does its best to dissuade the Wraith's companions from doing anything that might be beneficial to the Psyche. This Shadow's aim is to wear down the Psyche's resolve to resist the pull of Oblivion,Playing devil's advocate to the detriment to those around you dismissing hopeful outcomes as impossible foundering others' hopes and dreams,Horrid Reality|Paralyze
 rationalist,Rationalist,This Shadow is the reasoning thinking person's Shadow. They calmly discuss your situation with you gently explaining why you should do what they want and offering totally logical reasons for doing so. They're not interested in openly lying to you. Instead they riddle your mind with doubts – doubts that only they can allay. When in power this Shadow creates conditions that prove their various postulates. They also advise other Wraiths trying to trick them into logical behavior that serves their descent to Oblivion,Explaining why a beneficial action would be harmful in the long term discussing how a harmful action would be helpful over time,Majesty|Sense Confidence
 teacher,Teacher,The Teacher has seen it all done it all knows it all and is willing to teach you too. Make sure you're ready to learn because oftentimes anguish is the best instructor. Don't worry if the test feels impossible the Teacher knows exactly how this will end,Instructing other characters in a way that may not actually benefit them in the long term using unfortunate situations as punishing lessons without offering to assist in their resolution,Tainted Healing Touch|Terror
-thinker,Thinker,This Shadow is intellectual and emotionless preferring to take time and think through all the possibilities before choosing to act. Snap decisions can ruin progress towards long-term goals so it's better to avoid missteps. Everything around you will certainly wait for your decision and freezing in a fast-paced situation never hurt anyone,Coming up with unnecessary contingencies and convincing others that they are necessary freezing during a moment of importance attempting to get others to consider the consequences of their actions prior to acting,Frenzy Control|Paralyze`
+thinker,Thinker,This Shadow is intellectual and emotionless preferring to take time and think through all the possibilities before choosing to act. Snap decisions can ruin progress towards long-term goals so it's better to avoid missteps. Everything around you will certainly wait for your decision and freezing in a fast-paced situation never hurt anyone,Coming up with unnecessary contingencies and convincing others that they are necessary freezing during a moment of importance attempting to get others to consider the consequences of their actions prior to acting,Frenzy Control|Paralyze`,
+
+    passions: `passion_id,passion_name,example_emotions
+anger,Anger,Fury|revenge|animosity
+fear,Fear,Terror|panic|cowardice|anxiety
+hate,Hate,Spite|jealousy|loathing|disgust
+love,Love,Friendship|romance|affection
+pain,Pain,Suffering|depression|sorrow|guilt
+pleasure,Pleasure,Joy|excitement|comfort`
   };
 
   // ==================
@@ -821,9 +857,30 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       merits: parseCSV(gameDataCSV.merits),
       xpCosts: parseCSV(gameDataCSV.xpCosts),
       lores: parseCSV(gameDataCSV.lores),
-      shadowArchetypes: parseCSV(gameDataCSV.shadowArchetypes)
+      shadowArchetypes: parseCSV(gameDataCSV.shadowArchetypes),
+      passions: parseCSV(gameDataCSV.passions)
     };
-  }, [gameDataCSV.factions, gameDataCSV.subfactions, gameDataCSV.skills, gameDataCSV.powerTrees, gameDataCSV.merits, gameDataCSV.xpCosts, gameDataCSV.lores, gameDataCSV.shadowArchetypes]);
+  }, [gameDataCSV.factions, gameDataCSV.subfactions, gameDataCSV.skills, gameDataCSV.powerTrees, gameDataCSV.merits, gameDataCSV.xpCosts, gameDataCSV.lores, gameDataCSV.shadowArchetypes, gameDataCSV.passions]);
+
+  // Android-friendly scroll to top function
+  const scrollToTop = useCallback(() => {
+    // Multiple methods for maximum Android compatibility
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Additional Android WebView compatibility
+    if (window.AndroidScrollFix) {
+      window.AndroidScrollFix.scrollToTop();
+    }
+    
+    // Force immediate scroll for some Android browsers
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 10);
+  }, []);
 
   // Lore Search Function - moved after gameData initialization
   const searchLore = useCallback((query) => {
@@ -894,6 +951,7 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     shadowArchetype: '', // For wraith shadow archetype selection
     thornOptions: [], // Available thorn options from shadow archetype
     selectedThorn: '', // Selected thorn option
+    selectedPassions: [], // Two passions selected by wraith during character creation
     mixedSubfaction: null, // For Gorgon/Fomori mixed heritage (sorcerer, ghoul, kinfolk)
     claimedStatus: null, // 'gorgon', 'fomori', or null
     selectedFomoriTree: null, // Which fomori tree if claimed by fomori
@@ -1266,29 +1324,60 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
     
     console.log('Found faction:', newFaction);
     
-    // Preserve current energy amount, update max to new faction's base
+    // Preserve current energy amount and max energy (characters can advance max energy)
     const currentEnergy = character.stats.energy;
-    const newMaxEnergy = parseInt(newFaction.base_energy);
+    const currentMaxEnergy = character.stats.maxEnergy;
     
-    // Base character updates - preserve XP tracking
+    // Determine max energy cap for the new faction/subfaction
+    let newMaxEnergyCap;
+    switch (newFactionId) {
+      case 'vampire':
+        newMaxEnergyCap = 45;
+        break;
+      case 'shifter':
+        newMaxEnergyCap = 20;
+        break;
+      case 'wraith':
+        newMaxEnergyCap = 20;
+        break;
+      case 'human':
+        // Human subfactions have different caps
+        newMaxEnergyCap = 15; // Default for most human subfactions
+        break;
+      default:
+        newMaxEnergyCap = 15; // Safe default
+        break;
+    }
+    
+    // Special handling: vampire becoming wraith gets capped at 20
+    const finalMaxEnergy = (character.faction === 'vampire' && newFactionId === 'wraith') ? 
+                           Math.min(currentMaxEnergy, 20) : 
+                           Math.min(currentMaxEnergy, newMaxEnergyCap);
+    
+    // Base character updates - preserve almost everything except faction-specific changes
     let updatedCharacter = {
       ...newCharacter,
       faction: newFactionId,
       subfaction: '', // Will be set based on new faction
       stats: {
-        ...newCharacter.stats,
-        energy: Math.min(currentEnergy, newMaxEnergy),
-        maxEnergy: newMaxEnergy,
+        ...character.stats, // Preserve all current stats including maxEnergy
+        energy: Math.min(currentEnergy, finalMaxEnergy), // Cap current energy at new max
+        maxEnergy: finalMaxEnergy, // Apply the new max energy cap
         energyType: newFaction.energy_type,
-        virtue: parseInt(newFaction.base_virtue),
-        virtueType: newFaction.virtue_type
+        virtueType: newFaction.virtue_type,
+        // Virtue handling: preserve current virtue except for Wraiths who reset to 4
+        virtue: newFactionId === 'wraith' ? 4 : character.stats.virtue
       },
       fundamentalPowers: newFaction.fundamental_powers ? 
         newFaction.fundamental_powers.split('|') : [],
-      innateTreeIds: [],
+      // Preserve existing powers - we'll selectively add faction-specific ones below
+      powers: { ...character.powers },
+      // Preserve all character progression and purchases
+      skills: { ...character.skills },
+      merits: { ...character.merits },
+      selfNerfs: [...(character.selfNerfs || [])],
       tempFactionChangePowers: 0, // Track free powers to assign
-      powers: {}, // Clear all existing powers for faction change
-      // Preserve XP tracking
+      // Preserve XP tracking and history
       totalXP: character.totalXP,
       xpSpent: character.xpSpent,
       xpHistory: character.xpHistory || [],
@@ -1302,7 +1391,8 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
         updatedCharacter = {
           ...updatedCharacter,
           subfaction: 'caitiff', // Default to Caitiff for flexibility
-          tempFactionChangePowers: 3 // 3 free powers
+          tempFactionChangePowers: 3, // 3 free powers
+          innateTreeIds: [] // Vampires don't have innate trees
         };
         break;
         
@@ -1319,7 +1409,8 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
       case 'wraith':
         updatedCharacter = {
           ...updatedCharacter,
-          tempFactionChangePowers: 3 // 3 free powers
+          tempFactionChangePowers: 3, // 3 free powers
+          innateTreeIds: [] // Wraiths don't have innate trees
           // Will need to select 3 arcanoi and shadow archetype
         };
         break;
@@ -1330,7 +1421,11 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
           subfaction: 'claimed_gorgon',
           innateTreeIds: ['gorgon'],
           powers: {
-            gorgon: { 1: true }
+            ...updatedCharacter.powers,
+            gorgon: { 
+              ...(updatedCharacter.powers.gorgon || {}),
+              1: true 
+            }
           },
           fundamentalPowers: [...updatedCharacter.fundamentalPowers, 'Frail']
         };
@@ -1522,8 +1617,32 @@ thinker,Thinker,This Shadow is intellectual and emotionless preferring to take t
   // ==============================
   // ADVANCEMENT SYSTEM
   // ==============================
+  
+  // Get energy cap for a character based on faction/subfaction
+  const getEnergyCapForCharacter = (character) => {
+    switch (character.faction) {
+      case 'vampire':
+        return 45;
+      case 'shifter':
+        return 20;
+      case 'wraith':
+        return 20;
+      case 'human':
+        // All human subfactions have 15 energy cap
+        return 15;
+      default:
+        return 15; // Safe default
+    }
+  };
+  
   const canAdvanceAtCheckIn = (character, type, itemId) => {
-    // No advancement limitations - players can advance as much as they want per check-in
+    // For energy, check if we're at the faction-specific cap
+    if (type === 'energy') {
+      const energyCap = getEnergyCapForCharacter(character);
+      return character.stats.maxEnergy < energyCap;
+    }
+    
+    // No advancement limitations for other types - players can advance as much as they want per check-in
     return true;
   };
 
@@ -2242,7 +2361,11 @@ Name: ${character.name}
 Player: ${character.player}
 Faction: ${formatDisplayText(character.faction)}
 Subfaction: ${formatDisplayText(character.subfaction)}${character.faction === 'wraith' && character.guild ? `
-Guild: ${formatDisplayText(character.guild)}` : ''}${character.breed ? `
+Guild: ${formatDisplayText(character.guild)}` : ''}${character.faction === 'wraith' && character.selectedPassions && character.selectedPassions.length > 0 ? `
+Passions: ${character.selectedPassions.map(passionId => {
+  const passion = gameData.passions.find(p => p.passion_id === passionId);
+  return passion ? passion.passion_name : passionId;
+}).join(', ')}` : ''}${character.breed ? `
 Breed: ${formatDisplayText(character.breed)}` : ''}${character.auspice ? `
 Auspice: ${formatDisplayText(character.auspice)}` : ''}
 Campaign: ${character.campaign || 'None'}
@@ -2280,7 +2403,7 @@ ${character.notes}
 
 Generated by Shadow Accord Character Builder v${currentVersion}
 `;
-  }, [gameData.merits, currentVersion, formatDisplayText]);
+  }, [gameData.merits, gameData.passions, currentVersion, formatDisplayText]);
 
   const exportCharacter = useCallback((character, format = 'json') => {
     const exportData = {
@@ -2649,9 +2772,16 @@ Generated by Shadow Accord Character Builder v${currentVersion}
             }
             setFormField('Gen/Rank', genRankValue);
             
-            // Fill Amaranth count for vampires (using Passion field if vampire)
+            // Fill Passion field based on faction
             if (character.faction === 'vampire' && character.amaranthCount && character.amaranthCount > 0) {
               setFormField('Passion', `Amaranth: ${character.amaranthCount}`);
+            } else if (character.faction === 'wraith' && character.selectedPassions && character.selectedPassions.length > 0) {
+              // For wraiths, display selected passions
+              const passionNames = character.selectedPassions.map(passionId => {
+                const passion = gameData.passions.find(p => p.passion_id === passionId);
+                return passion ? passion.passion_name : passionId;
+              }).join(', ');
+              setFormField('Passion', passionNames);
             } else {
               setFormField('Passion', character.passion || '');
             }
@@ -3120,7 +3250,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [generateCharacterSheet, gameData.merits, gameData.powerTrees, gameData.skills, gameData.lores, formatDisplayText]);
+  }, [generateCharacterSheet, gameData.merits, gameData.powerTrees, gameData.skills, gameData.lores, gameData.passions, formatDisplayText]);
 
   // =====================
   // AUTO-SAVE SYSTEM
@@ -3828,6 +3958,102 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
                     <p className="text-sm text-red-300">
                       👤 <strong>Shadow Nature:</strong> Your Shadow Archetype represents the darker impulses of your psyche. When your Shadow dominates, you gain access to these thorns and powers, but may act against your character's normal moral compass.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Wraith Passion Selection */}
+              {newCharacter.faction === 'wraith' && (
+                <div className={`${themeClasses.card} p-5 mt-5`}>
+                  <h4 className="text-xl font-bold mb-2">Select Two Passions</h4>
+                  <p className="text-gray-400 mb-3">Choose 2 passions that define your character's emotional drives in undeath. These represent the strongest feelings that anchor you to existence.</p>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {gameData.passions.map(passion => {
+                      const isSelected = newCharacter.selectedPassions.includes(passion.passion_id);
+                      const canSelect = newCharacter.selectedPassions.length < 2 || isSelected;
+                      
+                      return (
+                        <button
+                          key={passion.passion_id}
+                          onClick={() => {
+                            if (isSelected) {
+                              // Remove passion
+                              setNewCharacter({
+                                ...newCharacter,
+                                selectedPassions: newCharacter.selectedPassions.filter(p => p !== passion.passion_id)
+                              });
+                            } else if (canSelect) {
+                              // Add passion
+                              setNewCharacter({
+                                ...newCharacter,
+                                selectedPassions: [...newCharacter.selectedPassions, passion.passion_id]
+                              });
+                            }
+                          }}
+                          disabled={!canSelect}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            isSelected
+                              ? 'border-purple-500 bg-purple-500 bg-opacity-20'
+                              : canSelect
+                                ? 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                                : 'border-gray-700 bg-gray-800 cursor-not-allowed opacity-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-bold text-lg capitalize">{passion.passion_name}</h5>
+                            {isSelected && (
+                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-sm">✓</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-400 mb-1">Example emotions:</p>
+                            <p className="text-sm text-gray-300">
+                              {passion.example_emotions ? passion.example_emotions.split('|').join(', ') : ''}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-gray-700 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">Selected Passions:</span>
+                      <span className={`text-sm font-medium ${
+                        newCharacter.selectedPassions.length === 2 ? 'text-purple-400' : 'text-gray-400'
+                      }`}>
+                        {newCharacter.selectedPassions.length}/2
+                      </span>
+                    </div>
+                    
+                    {newCharacter.selectedPassions.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {newCharacter.selectedPassions.map(passionId => {
+                          const passion = gameData.passions.find(p => p.passion_id === passionId);
+                          return passion ? (
+                            <span key={passionId} className="px-2 py-1 bg-purple-600 text-purple-100 rounded text-sm capitalize">
+                              {passion.passion_name}
+                            </span>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                    
+                    {newCharacter.selectedPassions.length < 2 && (
+                      <p className="text-sm text-yellow-400 mt-2">
+                        Please select {2 - newCharacter.selectedPassions.length} more passion{2 - newCharacter.selectedPassions.length !== 1 ? 's' : ''} to continue.
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 p-3 bg-purple-600 bg-opacity-20 rounded-lg border border-purple-500">
+                    <p className="text-sm text-purple-300">
+                      💜 <strong>Passions:</strong> These emotional drives anchor your character to existence and influence roleplay. They represent the strongest feelings that keep you from fading into Oblivion.
                     </p>
                   </div>
                 </div>
@@ -7605,6 +7831,27 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   </div>
                 )}
 
+                {/* Passions for Wraiths */}
+                {newCharacter.faction === 'wraith' && newCharacter.selectedPassions && newCharacter.selectedPassions.length > 0 && (
+                  <div className={`${themeClasses.card} p-3`}>
+                    <h4 className="font-bold mb-2">Passions</h4>
+                    <div className="text-sm">
+                      {newCharacter.selectedPassions.map((passionId, index) => {
+                        const passion = gameData.passions.find(p => p.passion_id === passionId);
+                        return passion ? (
+                          <div key={passionId} className="flex justify-between mb-1">
+                            <span className="capitalize">{passion.passion_name}</span>
+                            <span className="text-purple-400">✓</span>
+                          </div>
+                        ) : null;
+                      })}
+                      <div className="text-xs text-gray-400 mt-2">
+                        <strong>Selected:</strong> {newCharacter.selectedPassions.length}/2 passions
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Fellowship for Sorcerers */}
                 {newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && (
                   <div className={`${themeClasses.card} p-3`}>
@@ -7770,8 +8017,12 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   onClick={() => {
                     let finalCharacter = {
                       ...newCharacter,
-                      id: Date.now() + Math.random(),
-                      created: new Date().toISOString(),
+                      id: factionChangeCreationMode && originalCharacterForFactionChange ? 
+                          originalCharacterForFactionChange.id : 
+                          Date.now() + Math.random(),
+                      created: factionChangeCreationMode && originalCharacterForFactionChange ? 
+                               originalCharacterForFactionChange.created : 
+                               new Date().toISOString(),
                       lastModified: new Date().toISOString()
                     };
                     
@@ -7941,6 +8192,7 @@ Your character is ready to play!`;
                     
                     setNewCharacter(null);
                     setCreationStep(0);
+                    scrollToTop();
                   }}
                   className={`${themeClasses.button} px-8 py-3 text-lg`}
                   disabled={!newCharacter.name}
@@ -8045,7 +8297,7 @@ Your character is ready to play!`;
                   // Go to previous step
                   setCreationStep(Math.max(0, creationStep - 1));
                 }
-                window.scrollTo(0, 0);
+                scrollToTop();
               }}
               className={themeClasses.button}
             >
@@ -8057,14 +8309,14 @@ Your character is ready to play!`;
               <button
                 onClick={() => {
                   setCreationStep(Math.min(4, creationStep + 1));
-                  window.scrollTo(0, 0);
+                  scrollToTop();
                 }}
                 className={themeClasses.button}
                 disabled={
                   (creationStep === 0 && !newCharacter.faction) ||
                   (creationStep === 1 && newCharacter.faction !== 'wraith' && newCharacter.faction !== 'human' && !newCharacter.subfaction) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction !== 'sorcerer' && newCharacter.subfaction !== 'faithful' && newCharacter.subfaction !== 'claimed_drone' && newCharacter.subfaction !== 'claimed_fomori' && newCharacter.subfaction !== 'claimed_gorgon' && newCharacter.subfaction !== 'commoner' && newCharacter.subfaction !== 'ghoul' && newCharacter.subfaction !== 'kinfolk' && !newCharacter.subfaction) ||
-                  (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.subfaction || !newCharacter.guild)) ||
+                  (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.subfaction || !newCharacter.guild || newCharacter.selectedPassions.length !== 2)) ||
                   (creationStep === 1 && newCharacter.faction === 'vampire' && newCharacter.subfaction === 'caitiff' && newCharacter.innateTreeIds.length !== 3) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && newCharacter.innateTreeIds.length !== 2) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' && newCharacter.innateTreeIds.length !== 1) ||
@@ -8110,7 +8362,7 @@ Your character is ready to play!`;
             <button
               onClick={() => {
                 setCurrentMode('menu');
-                window.scrollTo(0, 0);
+                scrollToTop();
               }}
               className={themeClasses.button}
             >
@@ -9070,13 +9322,19 @@ Your character is ready to play!`;
                                 }
                               }}
                               className={`px-4 py-2 rounded font-medium text-sm transition-all ${
-                                character.totalXP >= 3 && canAdvanceAtCheckIn(character, 'energy', 'energy')
-                                  ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
-                                  : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                character.stats.maxEnergy >= getEnergyCapForCharacter(character)
+                                  ? 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                  : character.totalXP >= 3 && canAdvanceAtCheckIn(character, 'energy', 'energy')
+                                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
+                                    : 'bg-gray-700 cursor-not-allowed text-gray-400'
                               }`}
                               disabled={character.totalXP < 3 || !canAdvanceAtCheckIn(character, 'energy', 'energy')}
                             >
-                              {character.totalXP >= 3 && canAdvanceAtCheckIn(character, 'energy', 'energy') ? 'Advance' : 'Cannot Afford'}
+                              {character.stats.maxEnergy >= getEnergyCapForCharacter(character) 
+                                ? 'Maximum' 
+                                : character.totalXP >= 3 && canAdvanceAtCheckIn(character, 'energy', 'energy') 
+                                  ? 'Advance' 
+                                  : 'Cannot Afford'}
                             </button>
                           </div>
                         </div>
@@ -11335,7 +11593,7 @@ Your character is ready to play!`;
           <button
             onClick={() => {
               setCurrentMode('menu');
-              window.scrollTo(0, 0);
+              scrollToTop();
             }}
             className={themeClasses.button}
           >
@@ -11579,7 +11837,7 @@ Your character is ready to play!`;
           <button
             onClick={() => {
               setCurrentMode('menu');
-              window.scrollTo(0, 0);
+              scrollToTop();
             }}
             className={`${themeClasses.card} px-4 py-2 hover:shadow-lg transition-all flex items-center gap-2`}
           >
