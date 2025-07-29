@@ -1635,7 +1635,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     }
   };
   
-  const canAdvanceAtCheckIn = (character, type, itemId) => {
+  const canAdvanceAtCheckIn = useCallback((character, type, itemId) => {
     // For energy, check if we're at the faction-specific cap
     if (type === 'energy') {
       const energyCap = getEnergyCapForCharacter(character);
@@ -1644,7 +1644,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     
     // No advancement limitations for other types - players can advance as much as they want per check-in
     return true;
-  };
+  }, []);
 
   // Function to check if a reduction is valid
   const canReduce = (character, type, itemId, level) => {
@@ -2194,7 +2194,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     }
 
     return characterUpdate;
-  }, [gameData]);
+  }, [gameData, canAdvanceAtCheckIn]);
 
   // Function to reduce/remove character attributes with XP refund
   const reduceCharacter = useCallback((character, reduction) => {
