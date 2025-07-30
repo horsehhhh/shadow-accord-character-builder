@@ -418,7 +418,10 @@ router.put('/:id', [
             
             // Add all other update fields to the raw MongoDB update
             for (const [remainingKey, remainingValue] of Object.entries(updateData)) {
-              if (remainingKey !== 'advancementHistory' && remainingKey !== 'xpHistory' && remainingKey !== '__v') {
+              if (remainingKey !== 'advancementHistory' && 
+                  remainingKey !== 'xpHistory' && 
+                  remainingKey !== '__v' && 
+                  remainingKey !== '_id') {
                 mongoUpdateFields[remainingKey] = remainingValue;
               }
             }
