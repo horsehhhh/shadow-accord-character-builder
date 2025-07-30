@@ -50,7 +50,18 @@ router.get('/', auth, async (req, res) => {
       queryUserId: query.userId,
       queryUserIdType: typeof query.userId,
       queryUserIdConstructor: query.userId.constructor.name,
+      queryUserIdString: query.userId.toString(),
       query: query
+    });
+    
+    // Test the query directly to see what's happening
+    console.log('🧪 Testing ObjectId query directly...');
+    const testQuery = { userId: new mongoose.Types.ObjectId(req.user.id) };
+    const testCount = await Character.countDocuments(testQuery);
+    console.log('🧪 Direct ObjectId query test result:', {
+      testQuery: testQuery,
+      testCount: testCount,
+      queryWorks: testCount > 0
     });
     
     const options = {
@@ -64,9 +75,23 @@ router.get('/', auth, async (req, res) => {
       .limit(options.limit * 1)
       .skip((options.page - 1) * options.limit);
     
+    console.log('🔍 Character.find() raw result:', {
+      queryUsed: query,
+      charactersFound: characters.length,
+      firstCharacterSample: characters[0] ? {
+        id: characters[0]._id,
+        name: characters[0].name,
+        userId: characters[0].userId,
+        userIdType: typeof characters[0].userId
+      } : 'No characters found'
+    });
+
     const total = await Character.countDocuments(query);
     
-    // Debug: Check which users own characters in the database
+    console.log('🔍 Character.countDocuments() result:', {
+      queryUsed: query,
+      totalCount: total
+    });    // Debug: Check which users own characters in the database
     const allCharacterUsers = await Character.aggregate([
       { $group: { _id: "$userId", count: { $sum: 1 }, names: { $push: "$name" } } },
       { $limit: 10 }
