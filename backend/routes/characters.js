@@ -251,9 +251,33 @@ router.put('/:id', [
       });
     }
 
+    // Log the update data for debugging
+    console.log('Character update request:', {
+      characterId: req.params.id,
+      userId: req.user.id,
+      bodyKeys: Object.keys(req.body),
+      hasStats: !!req.body.stats,
+      hasSkills: !!req.body.skills,
+      hasPowers: !!req.body.powers,
+      hasMerits: !!req.body.merits,
+      hasLores: !!req.body.lores,
+      totalXP: req.body.totalXP,
+      xpSpent: req.body.xpSpent
+    });
+
     // Update character
     Object.assign(character, req.body);
     await character.save();
+
+    console.log('Character updated successfully:', {
+      characterId: character._id,
+      name: character.name,
+      totalXP: character.totalXP,
+      skillsCount: Object.keys(character.skills || {}).length,
+      powersCount: Object.keys(character.powers || {}).length,
+      meritsCount: Object.keys(character.merits || {}).length,
+      loresCount: (character.lores || []).length
+    });
 
     res.json({
       success: true,

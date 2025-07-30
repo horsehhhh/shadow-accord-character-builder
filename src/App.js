@@ -143,6 +143,22 @@ const ShadowAccordComplete = () => {
     createCharacter: cloudCreateCharacter,
     updateCharacter: cloudUpdateCharacter
   } = useCharacters();
+
+  // Helper function to update character with cloud sync
+  const updateCurrentCharacter = useCallback(async (updatedCharacter) => {
+    if (currentCharacterIndex !== null && currentCharacterIndex >= 0) {
+      try {
+        await cloudUpdateCharacter(currentCharacterIndex, updatedCharacter);
+        console.log('✅ Character updated with cloud sync:', updatedCharacter.name);
+      } catch (error) {
+        console.error('❌ Failed to update character with cloud sync:', error);
+        // Fallback to direct state update if cloud sync fails
+        const newCharacters = [...characters];
+        newCharacters[currentCharacterIndex] = updatedCharacter;
+        setCharacters(newCharacters);
+      }
+    }
+  }, [currentCharacterIndex, cloudUpdateCharacter, characters, setCharacters]);
   
   // Lore Search State
   const [loreSearchQuery, setLoreSearchQuery] = useState('');
@@ -1967,12 +1983,6 @@ pleasure,Pleasure,Joy|excitement|comfort`
     }
   }, [characters, currentCharacterIndex, setCharacters]);
 
-  // Helper function to update current character
-  const updateCurrentCharacter = useCallback((updatedCharacter) => {
-    const newCharacters = [...characters];
-    newCharacters[currentCharacterIndex] = updatedCharacter;
-    setCharacters(newCharacters);
-  }, [characters, currentCharacterIndex, setCharacters]);
 
   const advanceCharacter = useCallback((character, advancement) => {
     const { type, itemId, level, cost } = advancement;
@@ -9026,11 +9036,9 @@ Your character is ready to play!`;
                     <input
                       type="text"
                       value={character.name || ''}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const updated = { ...character, name: e.target.value, lastModified: new Date().toISOString() };
-                        const newCharacters = [...characters];
-                        newCharacters[currentCharacterIndex] = updated;
-                        setCharacters(newCharacters);
+                        await updateCurrentCharacter(updated);
                       }}
                       className={themeClasses.input}
                       placeholder="Enter character name..."
@@ -9041,11 +9049,9 @@ Your character is ready to play!`;
                     <input
                       type="text"
                       value={character.player || ''}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const updated = { ...character, player: e.target.value, lastModified: new Date().toISOString() };
-                        const newCharacters = [...characters];
-                        newCharacters[currentCharacterIndex] = updated;
-                        setCharacters(newCharacters);
+                        await updateCurrentCharacter(updated);
                       }}
                       className={themeClasses.input}
                       placeholder="Enter player name..."
@@ -9328,15 +9334,13 @@ Your character is ready to play!`;
                               <div className="flex gap-2">
                                 {currentLevel > 0 && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const updated = reduceCharacter(character, {
                                         type: 'skill',
                                         itemId: skill.skill_id,
                                         level: currentLevel - 1
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }}
                                     className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                                   >
@@ -9345,16 +9349,14 @@ Your character is ready to play!`;
                                 )}
                                 {canAdvance && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const updated = advanceCharacter(character, {
                                         type: 'skill',
                                         itemId: skill.skill_id,
                                         level: nextLevel,
                                         cost
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }}
                                     className={`px-4 py-2 rounded font-medium text-sm transition-all ${
                                       canAdvanceNow
@@ -9433,7 +9435,7 @@ Your character is ready to play!`;
                               </button>
                             )}
                             <button
-                              onClick={() => {
+                              onClick={async () => {
                                 const cost = calculateXPCost(character, 'energy');
                                 if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'energy', 'energy')) {
                                   const updated = advanceCharacter(character, {
@@ -9441,9 +9443,7 @@ Your character is ready to play!`;
                                     itemId: 'energy',
                                     cost
                                   });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
+                                  await updateCurrentCharacter(updated);
                                 }
                               }}
                               className={`px-4 py-2 rounded font-medium text-sm transition-all ${
@@ -9516,7 +9516,7 @@ Your character is ready to play!`;
                               </button>
                             )}
                             <button
-                              onClick={() => {
+                              onClick={async () => {
                                 const cost = calculateXPCost(character, 'willpower');
                                 if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'willpower', 'willpower')) {
                                   const updated = advanceCharacter(character, {
@@ -9524,9 +9524,7 @@ Your character is ready to play!`;
                                     itemId: 'willpower',
                                     cost
                                   });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
+                                  await updateCurrentCharacter(updated);
                                 }
                               }}
                               className={`px-4 py-2 rounded font-medium text-sm transition-all ${
@@ -9638,16 +9636,14 @@ Your character is ready to play!`;
                                 )}
                                 {character.stats.virtue < 10 && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const refund = 2; // Get XP back for increasing Angst
                                       const updated = advanceCharacter(character, {
                                         type: 'virtue',
                                         itemId: 'virtue',
                                         cost: -refund // Negative cost = gaining XP
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }}
                                     className="px-4 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-500 text-white"
                                   >
@@ -9660,14 +9656,12 @@ Your character is ready to play!`;
                               <>
                                 {character.stats.virtue > 0 && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const updated = reduceCharacter(character, {
                                         type: 'virtue',
                                         itemId: 'virtue'
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }}
                                     className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                                   >
@@ -9675,7 +9669,7 @@ Your character is ready to play!`;
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => {
+                                  onClick={async () => {
                                     const cost = calculateXPCost(character, 'virtue');
                                     if (character.totalXP >= cost && canAdvanceAtCheckIn(character, 'virtue', 'virtue') && character.stats.virtue < 10) {
                                       const updated = advanceCharacter(character, {
@@ -9683,9 +9677,7 @@ Your character is ready to play!`;
                                         itemId: 'virtue',
                                         cost
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }
                                   }}
                                   className={`px-4 py-2 rounded font-medium text-sm transition-all ${
@@ -9796,16 +9788,14 @@ Your character is ready to play!`;
                                 )}
                                 {(!hasMerit || merit.can_purchase_multiple === 'true') && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       if (canAdvanceNow) {
                                         const updated = advanceCharacter(character, {
                                           type: 'merit',
                                           itemId: merit.merit_id,
                                           cost
                                         });
-                                        const newCharacters = [...characters];
-                                        newCharacters[currentCharacterIndex] = updated;
-                                        setCharacters(newCharacters);
+                                        await updateCurrentCharacter(updated);
                                       }
                                     }}
                                     className={`px-4 py-2 rounded font-medium text-sm transition-all ${
@@ -10854,11 +10844,9 @@ Your character is ready to play!`;
               <h3 className="text-xl font-bold mb-2">Character Notes</h3>
               <textarea
                 value={character.notes || ''}
-                onChange={(e) => {
+                onChange={async (e) => {
                   const updated = { ...character, notes: e.target.value, lastModified: new Date().toISOString() };
-                  const newCharacters = [...characters];
-                  newCharacters[currentCharacterIndex] = updated;
-                  setCharacters(newCharacters);
+                  await updateCurrentCharacter(updated);
                 }}
                 className={`${themeClasses.input} h-64 resize-none`}
                 placeholder="Add notes about your character, their goals, relationships, etc..."
@@ -11473,11 +11461,9 @@ Your character is ready to play!`;
                       {['cub', 'cliath', 'fostern', 'adren', 'athro', 'elder'].map(rank => (
                         <button
                           key={rank}
-                          onClick={() => {
+                          onClick={async () => {
                             const updatedCharacter = { ...character, rank };
-                            const newCharacters = [...characters];
-                            newCharacters[currentCharacterIndex] = updatedCharacter;
-                            setCharacters(newCharacters);
+                            await updateCurrentCharacter(updatedCharacter);
                           }}
                           className={`p-3 rounded-lg border-2 transition-colors text-center capitalize ${
                             character.rank === rank
@@ -11525,12 +11511,10 @@ Your character is ready to play!`;
                         min="6"
                         max="13"
                         value={character.generation || ''}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const generation = parseInt(e.target.value);
                           const updatedCharacter = { ...character, generation };
-                          const newCharacters = [...characters];
-                          newCharacters[currentCharacterIndex] = updatedCharacter;
-                          setCharacters(newCharacters);
+                          await updateCurrentCharacter(updatedCharacter);
                         }}
                         className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:border-purple-400 focus:outline-none"
                         placeholder="13"
@@ -11547,12 +11531,10 @@ Your character is ready to play!`;
                         <label className="text-gray-300 font-medium">Amaranth Count:</label>
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               const amaranthCount = Math.max(0, (character.amaranthCount || 0) - 1);
                               const updatedCharacter = { ...character, amaranthCount };
-                              const newCharacters = [...characters];
-                              newCharacters[currentCharacterIndex] = updatedCharacter;
-                              setCharacters(newCharacters);
+                              await updateCurrentCharacter(updatedCharacter);
                             }}
                             className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-lg font-bold"
                             disabled={(character.amaranthCount || 0) <= 0}
@@ -11563,12 +11545,10 @@ Your character is ready to play!`;
                             {character.amaranthCount || 0}
                           </span>
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               const amaranthCount = (character.amaranthCount || 0) + 1;
                               const updatedCharacter = { ...character, amaranthCount };
-                              const newCharacters = [...characters];
-                              newCharacters[currentCharacterIndex] = updatedCharacter;
-                              setCharacters(newCharacters);
+                              await updateCurrentCharacter(updatedCharacter);
                             }}
                             className="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-lg font-bold"
                           >

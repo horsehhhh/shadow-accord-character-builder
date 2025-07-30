@@ -156,12 +156,41 @@ export const useCharacters = () => {
       if (isAuthenticated && character.id.startsWith('api_')) {
         try {
           console.log('🔄 Syncing API character update to cloud:', character.name);
+          console.log('📤 Character data being sent:', {
+            name: updatedWithTimestamp.name,
+            hasStats: !!updatedWithTimestamp.stats,
+            hasSkills: !!updatedWithTimestamp.skills,
+            hasPowers: !!updatedWithTimestamp.powers,
+            hasMerits: !!updatedWithTimestamp.merits,
+            hasLores: !!updatedWithTimestamp.lores,
+            skillsCount: updatedWithTimestamp.skills ? Object.keys(updatedWithTimestamp.skills).length : 0,
+            powersCount: updatedWithTimestamp.powers ? Object.keys(updatedWithTimestamp.powers).length : 0,
+            meritsCount: updatedWithTimestamp.merits ? Object.keys(updatedWithTimestamp.merits).length : 0,
+            loresCount: updatedWithTimestamp.lores ? updatedWithTimestamp.lores.length : 0,
+            totalXP: updatedWithTimestamp.totalXP,
+            xpSpent: updatedWithTimestamp.xpSpent
+          });
+          
           const cloudUpdated = await charactersAPI.update(character.id.replace('api_', ''), updatedWithTimestamp);
           const cloudCharacterWithId = { ...cloudUpdated, id: `api_${cloudUpdated._id}` };
           
           // Update local state with cloud response
           setCharacters(prev => prev.map((c, i) => i === characterIndex ? cloudCharacterWithId : c));
           console.log('✅ Character successfully synced to cloud');
+          console.log('📥 Cloud response data:', {
+            name: cloudCharacterWithId.name,
+            hasStats: !!cloudCharacterWithId.stats,
+            hasSkills: !!cloudCharacterWithId.skills,
+            hasPowers: !!cloudCharacterWithId.powers,
+            hasMerits: !!cloudCharacterWithId.merits,
+            hasLores: !!cloudCharacterWithId.lores,
+            skillsCount: cloudCharacterWithId.skills ? Object.keys(cloudCharacterWithId.skills).length : 0,
+            powersCount: cloudCharacterWithId.powers ? Object.keys(cloudCharacterWithId.powers).length : 0,
+            meritsCount: cloudCharacterWithId.merits ? Object.keys(cloudCharacterWithId.merits).length : 0,
+            loresCount: cloudCharacterWithId.lores ? cloudCharacterWithId.lores.length : 0,
+            totalXP: cloudCharacterWithId.totalXP,
+            xpSpent: cloudCharacterWithId.xpSpent
+          });
           return cloudCharacterWithId;
         } catch (apiError) {
           console.error('❌ Cloud sync failed:', apiError.message);

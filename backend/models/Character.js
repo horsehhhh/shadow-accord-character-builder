@@ -48,21 +48,18 @@ const characterSchema = new mongoose.Schema({
   
   // Character abilities
   skills: {
-    type: Map,
-    of: Number,
-    default: new Map()
+    type: Object,
+    default: {}
   },
   
   powers: {
-    type: Map,
-    of: Map,
-    default: new Map()
+    type: Object,
+    default: {}
   },
   
   merits: {
-    type: Map,
-    of: mongoose.Schema.Types.Mixed,
-    default: new Map()
+    type: Object,
+    default: {}
   },
   
   lores: [{
