@@ -1967,7 +1967,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
         setCurrentMode('menu');
       }
     }
-  }, [characters, currentCharacterIndex]);
+  }, [characters, currentCharacterIndex, setCharacters]);
 
   // Helper function to update current character
   const updateCurrentCharacter = useCallback((updatedCharacter) => {
@@ -11977,7 +11977,7 @@ Your character is ready to play!`;
       }
     };
     reader.readAsText(file);
-  }, [characters.length]);
+  }, [characters.length, setCharacters]);
 
   // Changelog
   const renderChangelog = () => (
