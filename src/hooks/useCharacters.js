@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { charactersAPI, migrationUtils } from '../services/api';
 
 // Custom hook to manage characters with API integration
@@ -258,7 +258,7 @@ export const useCharacters = () => {
   };
 
   // Refresh characters from cloud (for auto-sync)
-  const refreshFromCloud = async () => {
+  const refreshFromCloud = useCallback(async () => {
     if (!isAuthenticated) {
       throw new Error('Must be authenticated to refresh from cloud');
     }
@@ -283,7 +283,7 @@ export const useCharacters = () => {
       console.error('Error refreshing from cloud:', err);
       throw err;
     }
-  };
+  }, [isAuthenticated, characters]);
 
   // Migration function
   const migrateToAPI = async () => {
@@ -325,7 +325,7 @@ export const useCharacters = () => {
   };
 
   // Sync all local changes to cloud (for manual sync)
-  const syncAllToCloud = async () => {
+  const syncAllToCloud = useCallback(async () => {
     if (!isAuthenticated) {
       throw new Error('Must be authenticated to sync to cloud');
     }
@@ -339,12 +339,13 @@ export const useCharacters = () => {
       // First refresh from cloud to get latest data
       await refreshFromCloud();
       
-      // Then push any local-only characters
+      // Then push any local-only characters using the fresh state
       let syncCount = 0;
       
       for (const character of localOnlyCharacters) {
         try {
           const created = await charactersAPI.create(character);
+          // Update state with the new API character
           setCharacters(prev => prev.map(c => 
             c.id === character.id 
               ? { ...created, id: `api_${created._id}` }
@@ -362,7 +363,7 @@ export const useCharacters = () => {
       console.error('Sync error:', err);
       throw err;
     }
-  };
+  }, [isAuthenticated, characters, refreshFromCloud]);
 
   return {
     characters,
