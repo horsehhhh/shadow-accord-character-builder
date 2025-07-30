@@ -16,6 +16,7 @@ import AuthComponent from './components/AuthComponent';
 import SettingsComponent from './components/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useCharacters } from './hooks/useCharacters';
+import { charactersAPI } from './services/api';
 
 // Helper function to load PDF files (works in web, Electron, and Capacitor)
 const loadPdfFile = async (filename) => {
@@ -1976,12 +1977,31 @@ pleasure,Pleasure,Joy|excitement|comfort`
   // ============================
   // CHARACTER MANAGEMENT
   // ============================
-  const handleDeleteCharacter = useCallback((characterId) => {
+  const handleDeleteCharacter = useCallback(async (characterId) => {
     if (window.confirm('Are you sure you want to delete this character? This cannot be undone.')) {
-      setCharacters(prev => prev.filter(c => c.id !== characterId));
-      if (characters[currentCharacterIndex]?.id === characterId) {
-        setCurrentCharacterIndex(0);
-        setCurrentMode('menu');
+      try {
+        // Find the character in the array to get database ID
+        const characterToDelete = characters.find(c => c.id === characterId || c._id === characterId);
+        if (characterToDelete && (characterToDelete._id || characterToDelete.id.startsWith('api_'))) {
+          // Delete from cloud/database
+          const dbId = characterToDelete._id || characterToDelete.id.replace('api_', '');
+          await charactersAPI.delete(dbId);
+          console.log('✅ Character deleted from database:', dbId);
+        }
+        
+        // Remove from local state
+        setCharacters(prev => prev.filter(c => (c.id !== characterId && c._id !== characterId)));
+        
+        // Navigate away if we deleted the current character
+        if (characters[currentCharacterIndex]?.id === characterId || characters[currentCharacterIndex]?._id === characterId) {
+          setCurrentCharacterIndex(0);
+          setCurrentMode('menu');
+        }
+        
+        console.log('✅ Character deleted successfully');
+      } catch (error) {
+        console.error('❌ Failed to delete character:', error);
+        alert('Failed to delete character. Please try again.');
       }
     }
   }, [characters, currentCharacterIndex, setCharacters]);
