@@ -47,25 +47,29 @@ export const useCharacters = () => {
   // Load characters based on authentication status
   useEffect(() => {
     const loadCharacters = async () => {
+      console.log('🔄 Load characters triggered, isAuthenticated:', isAuthenticated);
       setLoading(true);
       setError(null);
       
       try {
         if (isAuthenticated) {
           // Load from API if authenticated
-          console.log('Loading characters from API...');
+          console.log('📡 Loading characters from API...');
           const apiCharacters = await charactersAPI.getAll();
-          console.log('Raw API response:', apiCharacters);
+          console.log('📡 Raw API response:', apiCharacters);
+          console.log('📡 API response count:', apiCharacters?.length || 0);
+          
           const charactersWithId = apiCharacters.map(char => ({
             ...char,
             id: `api_${char._id}`,
             xpHistory: char.xpHistory || []
           }));
-          console.log('Processed characters:', charactersWithId);
+          console.log('📡 Processed characters for state:', charactersWithId.map(c => ({ id: c.id, name: c.name })));
           setCharacters(charactersWithId);
+          console.log('✅ Characters loaded from API and set in state');
         } else {
           // Fall back to localStorage if not authenticated
-          console.log('Loading characters from localStorage...');
+          console.log('📱 Loading characters from localStorage (not authenticated)...');
           const savedData = localStorage.getItem('shadowAccordPhase8');
           if (savedData) {
             const data = JSON.parse(savedData);
@@ -74,8 +78,15 @@ export const useCharacters = () => {
                 ...char,
                 xpHistory: char.xpHistory || []
               }));
+              console.log('📱 Setting characters from localStorage:', migratedCharacters.map(c => ({ id: c.id, name: c.name })));
               setCharacters(migratedCharacters);
+            } else {
+              console.log('📱 No characters found in localStorage data');
+              setCharacters([]);
             }
+          } else {
+            console.log('📱 No localStorage data found');
+            setCharacters([]);
           }
         }
       } catch (err) {
