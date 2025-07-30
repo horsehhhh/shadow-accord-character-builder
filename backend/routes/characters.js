@@ -370,9 +370,32 @@ router.put('/:id', [
     // Don't use Object.assign for complex fields to avoid reference issues
     for (const [key, value] of Object.entries(updateData)) {
       if (arrayFields.includes(key) || objectFields.includes(key)) {
+        // Log state before assignment
+        if (key === 'advancementHistory') {
+          console.log(`🔍 Before assignment - character.${key}:`, 
+            Array.isArray(character[key]) ? `Array[${character[key].length}]` : typeof character[key],
+            character[key] && typeof character[key] === 'string' ? character[key].substring(0, 100) + '...' : ''
+          );
+          console.log(`🔍 Value to assign:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
+        }
+        
+        // Try to force clean the field first if it's corrupted
+        if (key === 'advancementHistory' && typeof character[key] === 'string') {
+          console.log('🧹 Found corrupted advancementHistory, clearing first');
+          character[key] = undefined;
+          character.markModified(key);
+        }
+        
         // Directly assign complex fields to ensure proper type casting
         character[key] = value;
         console.log(`📝 Directly assigned ${key}:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
+        
+        // Verify assignment worked
+        if (key === 'advancementHistory') {
+          console.log(`✅ After assignment - character.${key}:`, 
+            Array.isArray(character[key]) ? `Array[${character[key].length}]` : typeof character[key]
+          );
+        }
       } else {
         // Use normal assignment for simple fields
         character[key] = value;
