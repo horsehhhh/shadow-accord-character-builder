@@ -394,17 +394,41 @@ router.put('/:id', [
       }
     }
     
-    await character.save();
-
-    console.log('✅ Character update successful:', {
-      characterId: character._id,
-      name: character.name,
-      totalXP: character.totalXP,
-      skillsCount: Object.keys(character.skills || {}).length,
-      powersCount: Object.keys(character.powers || {}).length,
-      meritsCount: Object.keys(character.merits || {}).length,
-      loresCount: (character.lores || []).length
-    });
+    try {
+      await character.save();
+      console.log('✅ Character update successful:', {
+        characterId: character._id,
+        name: character.name,
+        totalXP: character.totalXP,
+        skillsCount: Object.keys(character.skills || {}).length,
+        powersCount: Object.keys(character.powers || {}).length,
+        meritsCount: Object.keys(character.merits || {}).length,
+        loresCount: (character.lores || []).length
+      });
+    } catch (saveError) {
+      console.error('💥 Character save failed with detailed error:', {
+        errorName: saveError.name,
+        errorMessage: saveError.message,
+        validationErrors: saveError.errors ? Object.keys(saveError.errors) : 'none',
+        characterId: character._id,
+        characterData: {
+          name: character.name,
+          advancementHistoryLength: character.advancementHistory?.length,
+          advancementHistoryType: Array.isArray(character.advancementHistory) ? 'Array' : typeof character.advancementHistory,
+          xpHistoryLength: character.xpHistory?.length,
+          xpHistoryType: Array.isArray(character.xpHistory) ? 'Array' : typeof character.xpHistory
+        }
+      });
+      
+      // Log specific validation errors
+      if (saveError.errors) {
+        for (const [field, error] of Object.entries(saveError.errors)) {
+          console.error(`❌ Validation error for ${field}:`, error.message);
+        }
+      }
+      
+      throw saveError; // Re-throw to trigger the main error handler
+    }
 
     res.json({
       success: true,
