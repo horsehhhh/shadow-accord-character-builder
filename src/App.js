@@ -140,8 +140,6 @@ const ShadowAccordComplete = () => {
   const { 
     loading: cloudLoading, 
     createCharacter: cloudCreateCharacter, 
-    updateCharacter: cloudUpdateCharacter, 
-    deleteCharacter: cloudDeleteCharacter, 
     isAuthenticated,
     currentUser 
   } = useCharacters();
