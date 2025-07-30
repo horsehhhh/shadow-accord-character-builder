@@ -23,11 +23,10 @@ router.get('/', auth, async (req, res) => {
       timestamp: new Date().toISOString() // Force Railway redeploy
     });
     
-    // Use string userId to match database format (characters store userId as strings)
-    const query = { userId: req.user.id }; // Keep as string - this is the correct format
+    // Convert string userId to ObjectId to match actual database format
+    const query = { userId: new mongoose.Types.ObjectId(req.user.id) };
     
-    // Remove migration code - characters are correctly stored with string userIds
-    console.log('✅ Using string userId format as designed for database compatibility');
+    console.log('✅ Converting string userId to ObjectId to match database format');
     
     // Add faction filter
     if (faction) {
@@ -42,9 +41,11 @@ router.get('/', auth, async (req, res) => {
       ];
     }
     
-    console.log('🔍 MongoDB query (using string userId as designed):', {
-      userId: req.user.id,
+    console.log('🔍 MongoDB query (converting string to ObjectId to match database):', {
+      originalUserId: req.user.id,
       userIdType: typeof req.user.id,
+      convertedUserId: query.userId,
+      convertedType: query.userId.constructor.name,
       query: query
     });
     
@@ -240,7 +241,7 @@ router.post('/', [
 
     let characterData = {
       ...req.body,
-      userId: req.user.id  // Keep as string to match database design
+      userId: new mongoose.Types.ObjectId(req.user.id)  // Convert to ObjectId to match database format
     };
 
     // Preprocess data types before creating (same as update)
@@ -613,7 +614,7 @@ router.post('/:id/clone', [
     delete cloneData.updatedAt;
     
     cloneData.name = req.body.name;
-    cloneData.userId = req.user.id;  // Keep as string to match database design
+    cloneData.userId = new mongoose.Types.ObjectId(req.user.id);  // Convert to ObjectId to match database format
     cloneData.isPublic = false;
     cloneData.sharedWith = [];
     cloneData.campaignId = null;
