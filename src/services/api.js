@@ -21,15 +21,23 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('API request with token:', config.url, token.substring(0, 20) + '...');
+  } else {
+    console.log('API request without token:', config.url);
   }
   return config;
 });
 
 // Handle authentication errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API response success:', response.config.url, response.status);
+    return response;
+  },
   (error) => {
+    console.error('API error:', error.config?.url, error.response?.status, error.response?.data);
     if (error.response?.status === 401) {
+      console.log('Authentication failed, clearing tokens');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       // Optionally redirect to login

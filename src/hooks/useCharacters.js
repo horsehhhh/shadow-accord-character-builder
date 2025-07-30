@@ -43,7 +43,14 @@ export const useCharacters = () => {
           // Load from API if authenticated
           console.log('Loading characters from API...');
           const apiCharacters = await charactersAPI.getAll();
-          setCharacters(apiCharacters);
+          console.log('Raw API response:', apiCharacters);
+          const charactersWithId = apiCharacters.map(char => ({
+            ...char,
+            id: `api_${char._id}`,
+            xpHistory: char.xpHistory || []
+          }));
+          console.log('Processed characters:', charactersWithId);
+          setCharacters(charactersWithId);
         } else {
           // Fall back to localStorage if not authenticated
           console.log('Loading characters from localStorage...');
@@ -82,15 +89,21 @@ export const useCharacters = () => {
   // Create character function
   const createCharacter = async (character) => {
     try {
+      console.log('Creating character, isAuthenticated:', isAuthenticated);
+      console.log('Character data being sent:', character);
+      
       if (isAuthenticated) {
         try {
           // Attempt to create new API character
+          console.log('Attempting cloud save...');
           const created = await charactersAPI.create(character);
+          console.log('Cloud save successful:', created);
           const newCharacter = { ...created, id: `api_${created._id}` };
           setCharacters(prev => [...prev, newCharacter]);
           return newCharacter;
         } catch (apiError) {
-          console.warn('API character creation failed, falling back to localStorage:', apiError.message);
+          console.error('API character creation failed, falling back to localStorage:', apiError);
+          console.error('Error details:', apiError.response?.data || apiError.message);
           // If API fails (token invalid, server down, etc.), fall back to localStorage
           setIsAuthenticated(false); // Update auth status
           // Fall through to localStorage creation

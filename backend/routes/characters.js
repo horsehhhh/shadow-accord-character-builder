@@ -30,12 +30,10 @@ router.get('/', auth, async (req, res) => {
     const options = {
       page: parseInt(page),
       limit: parseInt(limit),
-      sort,
-      select: 'name player faction subfaction totalXP checkInCount lastModified isPublic'
+      sort
     };
     
     const characters = await Character.find(query)
-      .select(options.select)
       .sort(options.sort)
       .limit(options.limit * 1)
       .skip((options.page - 1) * options.limit);
