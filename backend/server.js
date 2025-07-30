@@ -27,13 +27,28 @@ app.use(compression());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS?.split(',') || [
-    'http://localhost:3000',
-    'https://front-end-production-a8cc.up.railway.app',
-    'https://shadowaccordcharacterbuilder.up.railway.app'
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = process.env.CORS_ORIGINS?.split(',') || [
+      'http://localhost:3000',
+      'https://front-end-production-a8cc.up.railway.app',
+      'https://shadowaccordcharacterbuilder.up.railway.app'
+    ];
+    
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log(`CORS: Allowing origin ${origin}`);
+      callback(null, true);
+    } else {
+      console.log(`CORS: Blocking origin ${origin}. Allowed origins:`, allowedOrigins);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 
