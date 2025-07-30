@@ -221,14 +221,18 @@ export const useCharacters = () => {
       
       // Not authenticated - just update locally
       else {
-        setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c));
+        setCharacters(prev => {
+          const updatedCharacters = prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c);
+          
+          // Save to localStorage as backup when not authenticated
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          const data = savedData ? JSON.parse(savedData) : {};
+          data.characters = updatedCharacters;
+          localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+          
+          return updatedCharacters;
+        });
         console.log('📱 Character updated locally only (not authenticated)');
-        
-        // Save to localStorage as backup when not authenticated
-        const savedData = localStorage.getItem('shadowAccordPhase8');
-        const data = savedData ? JSON.parse(savedData) : {};
-        data.characters = characters.map((c, i) => i === characterIndex ? updatedWithTimestamp : c);
-        localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
         
         return updatedWithTimestamp;
       }
@@ -260,18 +264,21 @@ export const useCharacters = () => {
         const characterToSave = { ...character, id: character.id || Date.now().toString() };
         setCharacters(prev => {
           const existing = prev.find(c => c.id === characterToSave.id);
+          let updatedCharacters;
           if (existing) {
-            return prev.map(c => c.id === characterToSave.id ? characterToSave : c);
+            updatedCharacters = prev.map(c => c.id === characterToSave.id ? characterToSave : c);
           } else {
-            return [...prev, characterToSave];
+            updatedCharacters = [...prev, characterToSave];
           }
+          
+          // Update localStorage with current data
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          const data = savedData ? JSON.parse(savedData) : {};
+          data.characters = updatedCharacters;
+          localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+          
+          return updatedCharacters;
         });
-        
-        // Update localStorage
-        const savedData = localStorage.getItem('shadowAccordPhase8');
-        const data = savedData ? JSON.parse(savedData) : {};
-        data.characters = characters;
-        localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
       }
     } catch (err) {
       console.error('Error saving character:', err);
@@ -289,15 +296,19 @@ export const useCharacters = () => {
       }
       
       // Remove from local state
-      setCharacters(prev => prev.filter(c => c.id !== characterId));
-      
-      // Update localStorage if not authenticated
-      if (!isAuthenticated) {
-        const savedData = localStorage.getItem('shadowAccordPhase8');
-        const data = savedData ? JSON.parse(savedData) : {};
-        data.characters = characters.filter(c => c.id !== characterId);
-        localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
-      }
+      setCharacters(prev => {
+        const updatedCharacters = prev.filter(c => c.id !== characterId);
+        
+        // Update localStorage if not authenticated
+        if (!isAuthenticated) {
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          const data = savedData ? JSON.parse(savedData) : {};
+          data.characters = updatedCharacters;
+          localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+        }
+        
+        return updatedCharacters;
+      });
     } catch (err) {
       console.error('Error deleting character:', err);
       setError(err.message);
