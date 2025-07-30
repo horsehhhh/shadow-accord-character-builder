@@ -1733,7 +1733,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     // Check if character already has all powers at this level from other trees
     return powersAtLevel.every(power => {
       // Search all other power trees the character has
-      return Object.entries(character.powers).some(([otherTreeId, levels]) => {
+      return Object.entries(character.powers || {}).some(([otherTreeId, levels]) => {
         if (otherTreeId === treeId) return false;
         const otherTree = gameData.powerTrees.find(t => t.tree_id === otherTreeId);
         if (!otherTree) return false;
@@ -2518,15 +2518,15 @@ XP Spent: ${character.xpSpent}
 Check-ins: ${character.checkInCount}
 
 === SKILLS ===
-${Object.entries(character.skills).map(([skill, level]) => `${skill}: ${level}`).join('\n')}
+${Object.entries(character.skills || {}).map(([skill, level]) => `${skill}: ${level}`).join('\n')}
 
 === POWERS ===
-${Object.entries(character.powers).map(([tree, levels]) => 
+${Object.entries(character.powers || {}).map(([tree, levels]) => 
   `${tree}: ${Object.keys(levels).join(', ')}`
 ).join('\n')}
 
 === MERITS ===
-${Object.entries(character.merits).map(([meritId, value]) => {
+${Object.entries(character.merits || {}).map(([meritId, value]) => {
   const merit = gameData.merits.find(m => m.merit_id === meritId);
   const isStackable = merit?.can_purchase_multiple === 'true';
   const displayText = isStackable && value > 1 ? `${meritId} (x${value})` : meritId;
@@ -9160,7 +9160,7 @@ Your character is ready to play!`;
               <div className={`${themeClasses.card} p-3`}>
                 <h3 className="text-xl font-bold mb-2">Skills</h3>
                 <div className="space-y-2">
-                  {Object.entries(character.skills).map(([skillId, level]) => {
+                  {Object.entries(character.skills || {}).map(([skillId, level]) => {
                     const skill = gameData.skills.find(s => s.skill_id === skillId);
                     return (
                       <div key={skillId} className="flex justify-between items-center">
@@ -9188,7 +9188,7 @@ Your character is ready to play!`;
               <div className={`${themeClasses.card} p-3`}>
                 <h3 className="text-xl font-bold mb-2">Merits</h3>
                 <div className="space-y-2">
-                  {Object.entries(character.merits).map(([meritId, value]) => {
+                  {Object.entries(character.merits || {}).map(([meritId, value]) => {
                     const merit = gameData.merits.find(m => m.merit_id === meritId);
                     const isStackable = merit?.can_purchase_multiple === 'true';
                     const displayText = isStackable && value > 1 ? `${merit?.merit_name || meritId} (x${value})` : (merit?.merit_name || meritId);
@@ -9898,7 +9898,7 @@ Your character is ready to play!`;
               <div className={`${themeClasses.card} p-3`}>
                 <h3 className="text-xl font-bold mb-2">Current Powers</h3>
                 <div className="space-y-4 max-h-[800px] overflow-y-auto">
-                  {Object.entries(character.powers).map(([treeId, levels]) => {
+                  {Object.entries(character.powers || {}).map(([treeId, levels]) => {
                     const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
                     if (!tree) return null;
                     
