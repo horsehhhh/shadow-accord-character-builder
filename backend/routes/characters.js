@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult, param, query } = require('express-validator');
+const mongoose = require('mongoose');
 const Character = require('../models/Character');
 const { auth, optionalAuth } = require('../middleware/auth');
 
@@ -19,7 +20,16 @@ router.get('/', auth, async (req, res) => {
       queryParams: { page, limit, faction, search, sort }
     });
     
-    const query = { userId: req.user.id };
+    // Convert string user ID to ObjectId for proper MongoDB matching
+    const userObjectId = new mongoose.Types.ObjectId(req.user.id);
+    const query = { userId: userObjectId };
+    
+    console.log('🔍 Fixed ObjectId conversion:', {
+      originalUserId: req.user.id,
+      originalType: typeof req.user.id,
+      convertedUserId: userObjectId,
+      convertedType: typeof userObjectId
+    });
     
     // Add faction filter
     if (faction) {
