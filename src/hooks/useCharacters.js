@@ -172,10 +172,52 @@ export const useCharacters = () => {
           });
           
           const cloudUpdated = await charactersAPI.update(character.id.replace('api_', ''), updatedWithTimestamp);
-          const cloudCharacterWithId = { ...cloudUpdated, id: `api_${cloudUpdated._id}` };
+          
+          // Enhanced debugging for character update response
+          console.log('🔍 Raw API response:', cloudUpdated);
+          console.log('🔍 API response structure:', {
+            hasId: !!cloudUpdated.id,
+            has_id: !!cloudUpdated._id,
+            hasName: !!cloudUpdated.name,
+            hasStats: !!cloudUpdated.stats,
+            hasSkills: !!cloudUpdated.skills,
+            hasPowers: !!cloudUpdated.powers,
+            hasMerits: !!cloudUpdated.merits,
+            isObject: typeof cloudUpdated === 'object',
+            keys: Object.keys(cloudUpdated || {}).slice(0, 10)
+          });
+          
+          // Ensure character has proper ID structure
+          const cloudCharacterWithId = { 
+            ...cloudUpdated, 
+            id: `api_${cloudUpdated._id || cloudUpdated.id}`,
+            _id: cloudUpdated._id || cloudUpdated.id
+          };
+          
+          console.log('🔍 Character before state update:', {
+            originalId: character.id,
+            newId: cloudCharacterWithId.id,
+            originalName: character.name,
+            newName: cloudCharacterWithId.name,
+            hasRequiredFields: !!(cloudCharacterWithId.id && cloudCharacterWithId.name)
+          });
           
           // Update local state with cloud response
-          setCharacters(prev => prev.map((c, i) => i === characterIndex ? cloudCharacterWithId : c));
+          setCharacters(prev => {
+            const newState = prev.map((c, i) => i === characterIndex ? cloudCharacterWithId : c);
+            console.log('🔍 Characters state after update:', {
+              totalCharacters: newState.length,
+              updatedCharacterIndex: characterIndex,
+              updatedCharacter: {
+                id: cloudCharacterWithId.id,
+                name: cloudCharacterWithId.name,
+                hasStats: !!cloudCharacterWithId.stats
+              },
+              allCharacterIds: newState.map(c => ({ id: c.id, name: c.name }))
+            });
+            return newState;
+          });
+          
           console.log('✅ Character successfully synced to cloud');
           console.log('📥 Cloud response data:', {
             name: cloudCharacterWithId.name,
