@@ -382,17 +382,42 @@ router.put('/:id', [
         // Force repair corrupted advancementHistory field in database
         if (key === 'advancementHistory') {
           console.log('🧹 Repairing corrupted advancementHistory field in database');
+          
+          // Ensure the value is a proper array with proper objects
+          let cleanedValue = [];
+          if (Array.isArray(value)) {
+            cleanedValue = value.map(item => {
+              if (typeof item === 'string') {
+                try {
+                  return JSON.parse(item);
+                } catch (e) {
+                  return item;
+                }
+              }
+              return item;
+            });
+          } else if (typeof value === 'string') {
+            try {
+              cleanedValue = JSON.parse(value);
+              if (!Array.isArray(cleanedValue)) {
+                cleanedValue = [];
+              }
+            } catch (e) {
+              cleanedValue = [];
+            }
+          }
+          
           // Use direct MongoDB update to fix corrupted field
           await Character.updateOne(
             { _id: character._id },
             { 
               $set: { 
-                advancementHistory: Array.isArray(value) ? value : [],
+                advancementHistory: cleanedValue,
                 xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || []
               }
             }
           );
-          console.log('✅ Database field repaired, skipping Mongoose assignment for this field');
+          console.log('✅ Database field repaired with cleaned data, skipping Mongoose assignment for this field');
           continue; // Skip the normal assignment for this field
         }
         
