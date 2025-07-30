@@ -333,11 +333,13 @@ export const useCharacters = () => {
     try {
       console.log('🔄 Syncing all local changes to cloud...');
       
-      // First refresh from cloud to get latest data
-      await refreshFromCloud();
-      
-      // Then push any local-only characters or updates
+      // Get current local-only characters before refreshing
       const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      
+      // First refresh from cloud to get latest data
+      const refreshedCharacters = await refreshFromCloud();
+      
+      // Then push any local-only characters
       let syncCount = 0;
       
       for (const character of localOnlyCharacters) {
