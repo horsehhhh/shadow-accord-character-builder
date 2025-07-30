@@ -186,12 +186,38 @@ router.post('/', [
       });
     }
 
-    const characterData = {
+    let characterData = {
       ...req.body,
       userId: req.user.id
     };
 
-    console.log('Creating character with data:', characterData);
+    // Preprocess data types before creating (same as update)
+    const arrayFields = ['advancementHistory', 'xpHistory', 'lores', 'innateTreeIds', 'fundamentalPowers', 'thornOptions', 'selectedPassions', 'claimedInnateTreeIds', 'selfNerfs', 'sharedWith', 'factionChanges'];
+    
+    arrayFields.forEach(field => {
+      if (characterData[field] && typeof characterData[field] === 'string') {
+        try {
+          characterData[field] = JSON.parse(characterData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field} as JSON during creation:`, characterData[field]);
+        }
+      }
+    });
+    
+    // Handle nested object fields that might be stringified
+    const objectFields = ['stats', 'skills', 'powers', 'merits'];
+    
+    objectFields.forEach(field => {
+      if (characterData[field] && typeof characterData[field] === 'string') {
+        try {
+          characterData[field] = JSON.parse(characterData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field} as JSON during creation:`, characterData[field]);
+        }
+      }
+    });
+
+    console.log('Creating character with processed data:', characterData);
     const character = await Character.create(characterData);
     console.log('Character created successfully:', character._id);
 
@@ -291,8 +317,37 @@ router.put('/:id', [
       xpSpent: req.body.xpSpent
     });
 
+    // Preprocess data types before updating
+    const updateData = { ...req.body };
+    
+    // Handle array fields that might be stringified
+    const arrayFields = ['advancementHistory', 'xpHistory', 'lores', 'innateTreeIds', 'fundamentalPowers', 'thornOptions', 'selectedPassions', 'claimedInnateTreeIds', 'selfNerfs', 'sharedWith', 'factionChanges'];
+    
+    arrayFields.forEach(field => {
+      if (updateData[field] && typeof updateData[field] === 'string') {
+        try {
+          updateData[field] = JSON.parse(updateData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field} as JSON:`, updateData[field]);
+        }
+      }
+    });
+    
+    // Handle nested object fields that might be stringified
+    const objectFields = ['stats', 'skills', 'powers', 'merits'];
+    
+    objectFields.forEach(field => {
+      if (updateData[field] && typeof updateData[field] === 'string') {
+        try {
+          updateData[field] = JSON.parse(updateData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field} as JSON:`, updateData[field]);
+        }
+      }
+    });
+
     // Update character
-    Object.assign(character, req.body);
+    Object.assign(character, updateData);
     await character.save();
 
     console.log('✅ Character update successful:', {
