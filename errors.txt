@@ -1,16 +1,28 @@
-50.47.84.24 - - [30/Jul/2025:18:51:05 +0000] "PUT /api/characters/688a5ea0c460820eeba480db HTTP/1.1" 500 61 "https://shadowaccordcharacterbuilder.up.railway.app/"; "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
 
-        `  "    itemId: 'brawl',\\n" +\n` +
 
-        "  '    level: 1,\\n' +\n" +
+npm warn config production Use `--omit=dev` instead.
 
-        "  '    cost: 2,\\n' +\n" +
+ 
 
-📝 Directly assigned lores: Array[0]
+> shadow-accord-backend@0.3.0 start
+
+> node server.js
+
+ 
+
+Shadow Accord Backend running on port 8080
+
+Environment: production
+
+MongoDB connected successfully
+
+50.47.84.24 - - [30/Jul/2025:21:26:48 +0000] "GET /api/characters HTTP/1.1" 304 - "https://shadowaccordcharacterbuilder.up.railway.app/"; "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 OPR/120.0.0.0"
+
+50.47.84.24 - - [30/Jul/2025:21:26:48 +0000] "GET /api/characters HTTP/1.1" 304 - "https://shadowaccordcharacterbuilder.up.railway.app/"; "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 OPR/120.0.0.0"
 
 Character update request: {
 
-  characterId: '688a5ea0c460820eeba480db',
+  characterId: '688a73fe54a32f443d2c4f3b',
 
   userId: '6889a102acb70dc0dcb3b834',
 
@@ -59,3 +71,45 @@ Character update request: {
     'id'
 
   ],
+
+  hasStats: true,
+
+  hasSkills: true,
+
+  hasPowers: true,
+
+  hasMerits: true,
+
+  hasLores: true,
+
+  hasAdvancementHistory: true,
+
+  advancementHistoryType: 'object',
+
+  advancementHistoryValue: '[{"checkIn":0,"type":"skill","itemId":"alchemy","level":1,"cost":2,"timestamp":"2025-07-30T19:45:37.486Z","redundant":false},{"checkIn":0,"type":"skill","itemId":"alchemy","level":2,"cost":4,"timestam...',
+
+  totalXP: 0,
+
+  xpSpent: 27
+
+}
+
+🔍 Processing advancementHistory: object Array with 9 items
+
+✅ After processing advancementHistory: object Array with 9 items
+
+🔍 Processing xpHistory: object Array with 9 items
+
+✅ After processing xpHistory: object Array with 9 items
+
+🔍 Processing lores: object Array with 0 items
+
+✅ After processing lores: object Array with 0 items
+
+🔍 Processing innateTreeIds: object Array with 1 items
+
+✅ After processing innateTreeIds: object Array with 1 items
+
+🔍 Processing fundamentalPowers: object Array with 0 items
+
+✅ After processing fundamentalPowers: object Array with 0 items

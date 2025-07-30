@@ -12,6 +12,13 @@ router.get('/', auth, async (req, res) => {
   try {
     const { page = 1, limit = 50, faction, search, sort = '-lastModified' } = req.query;
     
+    console.log('🔍 GET Characters request:', {
+      userId: req.user.id,
+      userEmail: req.user.email,
+      hasUser: !!req.user,
+      queryParams: { page, limit, faction, search, sort }
+    });
+    
     const query = { userId: req.user.id };
     
     // Add faction filter
@@ -27,6 +34,8 @@ router.get('/', auth, async (req, res) => {
       ];
     }
     
+    console.log('🔍 MongoDB query:', query);
+    
     const options = {
       page: parseInt(page),
       limit: parseInt(limit),
@@ -39,6 +48,13 @@ router.get('/', auth, async (req, res) => {
       .skip((options.page - 1) * options.limit);
     
     const total = await Character.countDocuments(query);
+    
+    console.log('🔍 Characters query result:', {
+      foundCharacters: characters.length,
+      totalCount: total,
+      characterIds: characters.map(c => ({ id: c._id, name: c.name, userId: c.userId })),
+      queryUserId: req.user.id
+    });
     
     res.json({
       success: true,
