@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
-  Download, Upload, Save, Plus, ChevronRight, ChevronLeft, 
+  Download, Upload, Plus, ChevronRight, ChevronLeft, 
   Trash2, X, Search, Users, Book,
   CheckCircle, AlertCircle, Settings, 
   TrendingUp, Archive,
-  Moon, Sun,
   Minus,
   Home,
   ArrowLeft
@@ -202,7 +201,6 @@ const ShadowAccordComplete = () => {
     largeText: false,
     keyboardNavigation: true
   });
-  const [exportFormat, setExportFormat] = useState('pdf');
   const [autoSave, setAutoSave] = useState(true);
   const [lastSaved, setLastSaved] = useState(null);
   
@@ -534,7 +532,6 @@ const ShadowAccordComplete = () => {
       ]
     }
   ];
-  const [clearDataConfirmOpen, setClearDataConfirmOpen] = useState(false);
 
 
   // ========================================
@@ -8571,7 +8568,7 @@ Your character is ready to play!`;
                     Edit
                   </button>
                   <button
-                    onClick={() => exportCharacter(character, exportFormat)}
+                    onClick={() => exportCharacter(character, 'pdf')}
                     className="text-green-400 hover:text-green-300"
                   >
                     <Download className="w-4 h-4" />
@@ -8856,7 +8853,7 @@ Your character is ready to play!`;
                   Back
                 </button>
               <button
-                onClick={() => exportCharacter(character, exportFormat)}
+                onClick={() => exportCharacter(character, 'pdf')}
                 className={themeClasses.button}
               >
                 <Download className="w-4 h-4 mr-2 inline" />
