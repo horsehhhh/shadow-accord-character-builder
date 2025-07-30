@@ -29,7 +29,8 @@ app.use(compression());
 const corsOptions = {
   origin: process.env.CORS_ORIGINS?.split(',') || [
     'http://localhost:3000',
-    'https://front-end-production-a8cc.up.railway.app'
+    'https://front-end-production-a8cc.up.railway.app',
+    'https://shadowaccordcharacterbuilder.up.railway.app'
   ],
   credentials: true,
   optionsSuccessStatus: 200
