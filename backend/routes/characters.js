@@ -379,13 +379,21 @@ router.put('/:id', [
           console.log(`🔍 Value to assign:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
         }
         
-        // Force clear the field completely to reset Mongoose's internal state
+        // Force repair corrupted advancementHistory field in database
         if (key === 'advancementHistory') {
-          console.log('🧹 Force clearing advancementHistory field state');
-          character[key] = undefined;
-          character.markModified(key);
-          // Clear from modified paths and validation state
-          character.$__reset();
+          console.log('🧹 Repairing corrupted advancementHistory field in database');
+          // Use direct MongoDB update to fix corrupted field
+          await Character.updateOne(
+            { _id: character._id },
+            { 
+              $set: { 
+                advancementHistory: Array.isArray(value) ? value : [],
+                xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || []
+              }
+            }
+          );
+          console.log('✅ Database field repaired, skipping Mongoose assignment for this field');
+          continue; // Skip the normal assignment for this field
         }
         
         // Directly assign complex fields to ensure proper type casting
