@@ -141,8 +141,7 @@ const ShadowAccordComplete = () => {
     setCharacters,
     loading: cloudLoading, 
     createCharacter: cloudCreateCharacter,
-    updateCharacter: cloudUpdateCharacter,
-    isAuthenticated
+    updateCharacter: cloudUpdateCharacter
   } = useCharacters();
   
   // Lore Search State
@@ -1975,7 +1974,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     const newCharacters = [...characters];
     newCharacters[currentCharacterIndex] = updatedCharacter;
     setCharacters(newCharacters);
-  }, [characters, currentCharacterIndex]);
+  }, [characters, currentCharacterIndex, setCharacters]);
 
   const advanceCharacter = useCallback((character, advancement) => {
     const { type, itemId, level, cost } = advancement;
