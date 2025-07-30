@@ -153,12 +153,14 @@ const ShadowAccordComplete = () => {
       } catch (error) {
         console.error('❌ Failed to update character with cloud sync:', error);
         // Fallback to direct state update if cloud sync fails
-        const newCharacters = [...characters];
-        newCharacters[currentCharacterIndex] = updatedCharacter;
-        setCharacters(newCharacters);
+        setCharacters(prev => {
+          const newCharacters = [...prev];
+          newCharacters[currentCharacterIndex] = updatedCharacter;
+          return newCharacters;
+        });
       }
     }
-  }, [currentCharacterIndex, cloudUpdateCharacter, characters, setCharacters]);
+  }, [currentCharacterIndex, cloudUpdateCharacter, setCharacters]);
   
   // Lore Search State
   const [loreSearchQuery, setLoreSearchQuery] = useState('');
