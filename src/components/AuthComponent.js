@@ -11,6 +11,7 @@ const AuthComponent = ({ onAuthChange }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(migrationUtils.isAuthenticated());
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,6 +50,32 @@ const AuthComponent = ({ onAuthChange }) => {
 
   if (isAuthenticated) {
     const user = migrationUtils.getCurrentUser();
+    
+    if (isMinimized) {
+      return (
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          left: '10px',
+          background: '#28a745',
+          color: 'white',
+          border: 'none',
+          padding: '8px 12px',
+          borderRadius: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          zIndex: 9999,
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        }}
+        onClick={() => setIsMinimized(false)}
+        title="Click to expand"
+        >
+          👤 {user?.username?.substring(0, 3)}...
+        </div>
+      );
+    }
+    
     return (
       <div style={{
         position: 'fixed',
@@ -62,7 +89,23 @@ const AuthComponent = ({ onAuthChange }) => {
         zIndex: 9999,
         minWidth: '250px'
       }}>
-        <h4>👤 Welcome, {user?.username}!</h4>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <h4 style={{ margin: 0 }}>👤 Welcome, {user?.username}!</h4>
+          <button
+            onClick={() => setIsMinimized(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '16px',
+              cursor: 'pointer',
+              padding: '0',
+              color: '#666'
+            }}
+            title="Minimize"
+          >
+            ➖
+          </button>
+        </div>
         <div style={{ fontSize: '12px', color: '#666', marginBottom: '10px' }}>
           Characters are now saved to the cloud
         </div>
@@ -84,6 +127,32 @@ const AuthComponent = ({ onAuthChange }) => {
     );
   }
 
+  // Show minimized login button when not authenticated
+  if (isMinimized) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        background: '#007bff',
+        color: 'white',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '20px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        zIndex: 9999,
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: 'bold'
+      }}
+      onClick={() => setIsMinimized(false)}
+      title="Click to expand login"
+      >
+        🔐 Login
+      </div>
+    );
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -97,7 +166,23 @@ const AuthComponent = ({ onAuthChange }) => {
       zIndex: 9999,
       minWidth: '300px'
     }}>
-      <h4>🔐 {isLogin ? 'Login' : 'Register'}</h4>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <h4 style={{ margin: 0 }}>🔐 {isLogin ? 'Login' : 'Register'}</h4>
+        <button
+          onClick={() => setIsMinimized(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '16px',
+            cursor: 'pointer',
+            padding: '0',
+            color: '#666'
+          }}
+          title="Minimize"
+        >
+          ➖
+        </button>
+      </div>
       <form onSubmit={handleSubmit}>
         {!isLogin && (
           <div style={{ marginBottom: '10px' }}>
