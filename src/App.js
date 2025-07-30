@@ -14,6 +14,7 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import PowerIndex from './PowerIndex';
 import AuthComponent from './components/AuthComponent';
+import SettingsComponent from './components/Settings';
 import { useCharacters } from './hooks/useCharacters';
 
 // Helper function to load PDF files (works in web, Electron, and Capacitor)
@@ -11729,232 +11730,19 @@ Your character is ready to play!`;
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Interface Settings */}
-          <div className={`${themeClasses.card} p-5`}>
-            <h3 className="text-xl font-bold mb-2">Interface Settings</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {darkMode ? <Moon className="w-5 h-5 mr-3" /> : <Sun className="w-5 h-5 mr-3" />}
-                  <span>Dark Mode</span>
-                </div>
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                    darkMode ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      darkMode ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Save className="w-5 h-5 mr-3" />
-                  <span>Auto-save</span>
-                </div>
-                <button
-                  onClick={() => setAutoSave(!autoSave)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                    autoSave ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      autoSave ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Accessibility Settings */}
-          <div className={`${themeClasses.card} p-5`}>
-            <h3 className="text-xl font-bold mb-2">Accessibility Options</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span>High Contrast Mode</span>
-                <button
-                  onClick={() => setAccessibility(prev => ({
-                    ...prev,
-                    highContrast: !prev.highContrast
-                  }))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                    accessibility.highContrast ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      accessibility.highContrast ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span>Large Text</span>
-                <button
-                  onClick={() => setAccessibility(prev => ({
-                    ...prev,
-                    largeText: !prev.largeText
-                  }))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                    accessibility.largeText ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      accessibility.largeText ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span>Keyboard Navigation</span>
-                <button
-                  onClick={() => setAccessibility(prev => ({
-                    ...prev,
-                    keyboardNavigation: !prev.keyboardNavigation
-                  }))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                    accessibility.keyboardNavigation ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      accessibility.keyboardNavigation ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Export Settings */}
-          <div className={`${themeClasses.card} p-5`}>
-            <h3 className="text-xl font-bold mb-2">Export Settings</h3>
-            <div className="space-y-4">
-              <div>
-                <label className={themeClasses.label}>Default Export Format</label>
-                <select
-                  value={exportFormat}
-                  onChange={(e) => setExportFormat(e.target.value)}
-                  className={themeClasses.input}
-                >
-                  <option value="json">JSON (Recommended)</option>
-                  <option value="csv">CSV (Spreadsheet)</option>
-                  <option value="pdf">PDF (Character Sheet)</option>
-                  <option value="pdf-debug">PDF (Debug - Field Names)</option>
-                  <option value="txt">Text (Character Sheet)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Management */}
-          <div className={`${themeClasses.card} p-5`}>
-            <h3 className="text-xl font-bold mb-2">Data Management</h3>
-            <div className="space-y-4">
-              <button
-                onClick={() => setClearDataConfirmOpen(true)}
-                className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-medium"
-              >
-                Clear All Data
-              </button>
-              
-              <button
-                onClick={() => {
-                  const data = localStorage.getItem('shadowAccordPhase8');
-                  if (data) {
-                    const blob = new Blob([data], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'shadow_accord_backup.json';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }
-                }}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium"
-              >
-                Export Backup
-              </button>
-              
-              {/* System Status */}
-              <div className="mt-6 pt-4 border-t border-gray-600">
-                <h4 className="text-lg font-semibold mb-3">System Status</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span>Characters stored locally:</span>
-                    <span className="text-green-400">✅ Always available offline</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Cloud sync:</span>
-                    <span className="text-green-400">✅ Automatic when online</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Manual backup:</span>
-                    <span className="text-green-400">✅ Export/import anytime</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Application version:</span>
-                    <span className="text-blue-400">0.3.0</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Storage location:</span>
-                    <span className="text-gray-300">Browser localStorage</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Cloud storage:</span>
-                    <span className="text-gray-300">MongoDB Atlas (when authenticated)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Clear Data Confirmation Dialog */}
-          {clearDataConfirmOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-3">
-              <div className={`${themeClasses.card} max-w-md w-full`}>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold mb-2">Clear All Data</h3>
-                  <p className="text-gray-300 mb-5">This will permanently delete all character data. This action cannot be undone.</p>
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      onClick={() => setClearDataConfirmOpen(false)}
-                      className="px-4 py-2 rounded font-medium bg-gray-600 hover:bg-gray-700"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCharacters([]);
-
-                        localStorage.removeItem('shadowAccordPhase8');
-                        setClearDataConfirmOpen(false);
-                      }}
-                      className="px-4 py-2 rounded font-medium bg-red-600 hover:bg-red-700"
-                    >
-                      Clear All Data
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        <SettingsComponent 
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          accessibility={accessibility}
+          setAccessibility={setAccessibility}
+          autoSave={autoSave}
+          setAutoSave={setAutoSave}
+          lastSaved={lastSaved}
+          characters={characters}
+        />
       </div>
     </div>
   );
-
   // Import character
   const importCharacter = useCallback((file) => {
     const reader = new FileReader();

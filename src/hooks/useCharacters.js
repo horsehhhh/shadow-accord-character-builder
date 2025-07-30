@@ -139,35 +139,51 @@ export const useCharacters = () => {
     }
   };
 
-  // Update character function
+  // Update character function with automatic cloud sync
   const updateCharacter = async (characterIndex, updatedCharacter) => {
     try {
       const character = characters[characterIndex];
       if (!character) throw new Error('Character not found');
 
+      // Always update local state first for immediate UI response
+      const updatedWithId = { ...updatedCharacter, id: character.id, lastModified: new Date().toISOString() };
+      setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithId : c));
+
+      // Sync to cloud if authenticated
       if (isAuthenticated && character.id.startsWith('api_')) {
         try {
-          // Attempt to update existing API character
+          console.log('🔄 Auto-syncing character update to cloud:', character.name);
           const updated = await charactersAPI.update(character.id.replace('api_', ''), updatedCharacter);
-          const updatedWithId = { ...updated, id: `api_${updated._id}` };
-          setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithId : c));
-          return updatedWithId;
+          const cloudUpdatedWithId = { ...updated, id: `api_${updated._id}` };
+          setCharacters(prev => prev.map((c, i) => i === characterIndex ? cloudUpdatedWithId : c));
+          console.log('✅ Character successfully synced to cloud');
+          return cloudUpdatedWithId;
         } catch (apiError) {
-          console.warn('API character update failed, falling back to localStorage:', apiError.message);
-          setIsAuthenticated(false); // Update auth status
-          // Fall through to localStorage update
+          console.warn('⚠️ Cloud sync failed, keeping local changes:', apiError.message);
+          // Don't set authentication to false here - might be temporary network issue
+          // Fall through to localStorage backup
+        }
+      } else if (isAuthenticated && !character.id.startsWith('api_')) {
+        // Try to create this character in the cloud for the first time
+        try {
+          console.log('🔄 Creating character in cloud for first time:', character.name);
+          const created = await charactersAPI.create(updatedCharacter);
+          const newCloudCharacter = { ...created, id: `api_${created._id}` };
+          setCharacters(prev => prev.map((c, i) => i === characterIndex ? newCloudCharacter : c));
+          console.log('✅ Character successfully created in cloud');
+          return newCloudCharacter;
+        } catch (apiError) {
+          console.warn('⚠️ Failed to create character in cloud:', apiError.message);
+          // Fall through to localStorage backup
         }
       }
       
-      // Update localStorage character (either not authenticated, not API character, or API failed)
-      const updatedWithId = { ...updatedCharacter, id: character.id };
-      setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithId : c));
-      
-      // Update localStorage
+      // Update localStorage as backup (either not authenticated, not API character, or API failed)
       const savedData = localStorage.getItem('shadowAccordPhase8');
       const data = savedData ? JSON.parse(savedData) : {};
       data.characters = characters.map((c, i) => i === characterIndex ? updatedWithId : c);
       localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+      
       return updatedWithId;
     } catch (err) {
       console.error('Error updating character:', err);
@@ -241,6 +257,34 @@ export const useCharacters = () => {
     }
   };
 
+  // Refresh characters from cloud (for auto-sync)
+  const refreshFromCloud = async () => {
+    if (!isAuthenticated) {
+      throw new Error('Must be authenticated to refresh from cloud');
+    }
+
+    try {
+      console.log('🔄 Refreshing characters from cloud...');
+      const apiCharacters = await charactersAPI.getAll();
+      const charactersWithId = apiCharacters.map(char => ({
+        ...char,
+        id: `api_${char._id}`,
+        xpHistory: char.xpHistory || []
+      }));
+      
+      // Merge with local-only characters
+      const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      const allCharacters = [...charactersWithId, ...localOnlyCharacters];
+      
+      setCharacters(allCharacters);
+      console.log('✅ Successfully refreshed characters from cloud');
+      return allCharacters;
+    } catch (err) {
+      console.error('Error refreshing from cloud:', err);
+      throw err;
+    }
+  };
+
   // Migration function
   const migrateToAPI = async () => {
     if (!isAuthenticated) {
@@ -249,19 +293,28 @@ export const useCharacters = () => {
 
     try {
       setLoading(true);
+      
+      // First, refresh from cloud to get latest data
+      await refreshFromCloud();
+      
+      // Then migrate any local-only characters
       const localStorageCharacters = characters.filter(c => !c.id.startsWith('api_'));
       
       for (const character of localStorageCharacters) {
-        const created = await charactersAPI.create(character);
-        // Update the character in state with new API ID
-        setCharacters(prev => prev.map(c => 
-          c.id === character.id 
-            ? { ...created, id: `api_${created._id}` }
-            : c
-        ));
+        try {
+          const created = await charactersAPI.create(character);
+          // Update the character in state with new API ID
+          setCharacters(prev => prev.map(c => 
+            c.id === character.id 
+              ? { ...created, id: `api_${created._id}` }
+              : c
+          ));
+        } catch (createError) {
+          console.warn('Failed to migrate character to cloud:', character.name, createError);
+        }
       }
       
-      console.log(`Migrated ${localStorageCharacters.length} characters to API`);
+      console.log(`✅ Migration complete. Processed ${localStorageCharacters.length} local characters`);
     } catch (err) {
       console.error('Migration error:', err);
       setError(err.message);
@@ -283,6 +336,7 @@ export const useCharacters = () => {
     saveCharacter, // Legacy function
     deleteCharacter,
     migrateToAPI,
+    refreshFromCloud,
     setIsAuthenticated
   };
 };
