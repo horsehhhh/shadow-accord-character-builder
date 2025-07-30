@@ -5,6 +5,20 @@ All notable changes to the Shadow Accord Character Builder will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## ⚖️ Legal Disclaimer
+
+**Shadow Accord Character Builder** is an unofficial, fan-created tool for the Shadow Accord RPG system. This project is not affiliated with, endorsed by, or connected to the creators or publishers of Shadow Accord, World of Darkness, or any related intellectual properties.
+
+- **Shadow Accord** and related game content are the intellectual property of their respective creators
+- **World of Darkness** and associated trademarks are owned by Modiphius Entertainment and Paradox Interactive
+- This character builder is created and maintained by fans for the fan community
+- No copyright infringement is intended
+- This tool is provided free of charge for personal, non-commercial use only
+
+All game mechanics, character data, and rulebook references implemented in this application remain the intellectual property of their original creators. This project serves only as a digital tool to assist players in character creation and management.
+
+---
+
 ## [v0.3.0] - 2025-07-29
 
 ### 🌐 Major Release: Full-Stack Web Application

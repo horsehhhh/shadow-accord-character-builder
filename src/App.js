@@ -11976,6 +11976,29 @@ Your character is ready to play!`;
           </button>
         </div>
 
+        {/* Legal Disclaimer */}
+        <div className={`${themeClasses.card} p-5 mb-5 border-l-4 border-yellow-500`}>
+          <h3 className="text-lg font-bold text-yellow-400 mb-3">⚖️ Legal Disclaimer</h3>
+          <div className="text-sm text-gray-300 space-y-2">
+            <p>
+              <strong>Shadow Accord Character Builder</strong> is an unofficial, fan-created tool for the Shadow Accord RPG system. 
+              This project is not affiliated with, endorsed by, or connected to the creators or publishers of Shadow Accord, 
+              World of Darkness, or any related intellectual properties.
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Shadow Accord</strong> and related game content are the intellectual property of their respective creators</li>
+              <li><strong>World of Darkness</strong> and associated trademarks are owned by Modiphius Entertainment and Paradox Interactive</li>
+              <li>This character builder is created and maintained by fans for the fan community</li>
+              <li>No copyright infringement is intended - this tool is provided free of charge for personal, non-commercial use only</li>
+            </ul>
+            <p className="text-xs text-gray-400 mt-3">
+              All game mechanics, character data, and rulebook references implemented in this application remain 
+              the intellectual property of their original creators. This project serves only as a digital tool 
+              to assist players in character creation and management.
+            </p>
+          </div>
+        </div>
+
         {/* Changelog Entries */}
         <div className="space-y-5">
           {changelog.map((entry, index) => (

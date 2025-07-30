@@ -234,6 +234,19 @@ See [DISTRIBUTION_INSTRUCTIONS.md](DISTRIBUTION_INSTRUCTIONS.md) for Android bui
 
 This project is actively developed with AI assistance. Bug reports, feature requests, and contributions are welcome!
 
+## ⚖️ Legal Disclaimer
+
+This character builder is an **unofficial fan-made tool** and is not affiliated with, endorsed by, or sponsored by the creators or publishers of Shadow Accord or World of Darkness.
+
+- **Shadow Accord** and all related game content, rules, lore, and intellectual property are owned by their respective creators and publishers
+- **World of Darkness**, **Vampire: The Masquerade**, **Werewolf: The Apocalypse**, **Wraith: The Oblivion**, and all related properties are trademarks and copyrights of **Modiphius Entertainment** and/or their licensors
+- This application is a **non-commercial fan project** created to enhance the gaming experience for the Shadow Accord community
+- All game data, rules, and content used in this application are **property of their respective owners**
+- This tool is provided **as-is** for educational and entertainment purposes only
+- No claim of ownership is made regarding any copyrighted material used within this application
+
+If you are a rights holder and have concerns about this project, please contact the repository owner for resolution.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -258,3 +271,14 @@ Special thanks to:
 **Current Version**: 0.3.0 | **Last Updated**: July 29, 2025
 
 🌐 **[Launch Web App](https://shadowaccordcharacterbuilder.up.railway.app)** | Created with ❤️ for the Shadow Accord Community!
+
+## ⚖️ Legal Disclaimer
+
+**Shadow Accord Character Builder** is an unofficial, fan-created tool for the Shadow Accord RPG system. This project is not affiliated with, endorsed by, or connected to the creators or publishers of Shadow Accord, World of Darkness, or any related intellectual properties.
+
+- **Shadow Accord** and related game content are the intellectual property of their respective creators
+- **World of Darkness** and associated trademarks are owned by Modiphius Entertainment and Paradox Interactive  
+- This character builder is created and maintained by fans for the fan community
+- No copyright infringement is intended - this tool is provided free of charge for personal, non-commercial use only
+
+All game mechanics, character data, and rulebook references implemented in this application remain the intellectual property of their original creators. This project serves only as a digital tool to assist players in character creation and management.
