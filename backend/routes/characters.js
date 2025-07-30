@@ -24,13 +24,6 @@ router.get('/', auth, async (req, res) => {
     const userObjectId = new mongoose.Types.ObjectId(req.user.id);
     const query = { userId: userObjectId };
     
-    console.log('🔍 Fixed ObjectId conversion:', {
-      originalUserId: req.user.id,
-      originalType: typeof req.user.id,
-      convertedUserId: userObjectId,
-      convertedType: typeof userObjectId
-    });
-    
     // Add faction filter
     if (faction) {
       query.faction = faction;
@@ -58,20 +51,6 @@ router.get('/', auth, async (req, res) => {
       .skip((options.page - 1) * options.limit);
     
     const total = await Character.countDocuments(query);
-    
-    // Debug: Let's also check what characters exist in the database regardless of userId
-    const allCharacters = await Character.find({}).limit(10);
-    console.log('🔍 All characters in database (first 10):', 
-      allCharacters.map(c => ({ id: c._id, name: c.name, userId: c.userId, userIdType: typeof c.userId }))
-    );
-    
-    console.log('🔍 Characters query result:', {
-      foundCharacters: characters.length,
-      totalCount: total,
-      characterIds: characters.map(c => ({ id: c._id, name: c.name, userId: c.userId })),
-      queryUserId: req.user.id,
-      queryUserIdType: typeof req.user.id
-    });
     
     res.json({
       success: true,
@@ -221,7 +200,7 @@ router.post('/', [
 
     let characterData = {
       ...req.body,
-      userId: req.user.id
+      userId: new mongoose.Types.ObjectId(req.user.id)  // Convert to ObjectId
     };
 
     // Preprocess data types before creating (same as update)
@@ -521,7 +500,7 @@ router.delete('/:id', [
       });
     }
 
-    // Only owner can delete
+    // Only owner can delete  
     if (character.userId.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
@@ -590,7 +569,7 @@ router.post('/:id/clone', [
     delete cloneData.updatedAt;
     
     cloneData.name = req.body.name;
-    cloneData.userId = req.user.id;
+    cloneData.userId = new mongoose.Types.ObjectId(req.user.id);  // Convert to ObjectId
     cloneData.isPublic = false;
     cloneData.sharedWith = [];
     cloneData.campaignId = null;
