@@ -17,12 +17,34 @@ router.get('/', auth, async (req, res) => {
       userId: req.user.id,
       userEmail: req.user.email,
       hasUser: !!req.user,
+      userObjectId: req.user._id,
+      userIdVsObjectId: req.user.id === req.user._id.toString(),
       queryParams: { page, limit, faction, search, sort }
     });
     
-    // Convert string user ID to ObjectId for proper MongoDB matching
+    // Properly use ObjectId for user relationships (security best practice)
     const userObjectId = new mongoose.Types.ObjectId(req.user.id);
     const query = { userId: userObjectId };
+    
+    // Migration: Convert any string userIds to ObjectIds for security
+    try {
+      const stringUserIdQuery = { userId: req.user.id }; // String format
+      const charactersWithStringUserId = await Character.find(stringUserIdQuery);
+      
+      if (charactersWithStringUserId.length > 0) {
+        console.log(`🔄 Migrating ${charactersWithStringUserId.length} characters from string userId to ObjectId`);
+        
+        // Update characters to use proper ObjectId
+        await Character.updateMany(
+          stringUserIdQuery,
+          { $set: { userId: userObjectId } }
+        );
+        
+        console.log('✅ Migration completed: String userIds converted to ObjectIds');
+      }
+    } catch (migrationError) {
+      console.warn('⚠️ Migration warning (non-critical):', migrationError.message);
+    }
     
     // Add faction filter
     if (faction) {
@@ -37,7 +59,10 @@ router.get('/', auth, async (req, res) => {
       ];
     }
     
-    console.log('🔍 MongoDB query:', query);
+    console.log('🔍 MongoDB query (using proper ObjectId):', {
+      userObjectId: userObjectId.toString(),
+      query: JSON.stringify(query, null, 2)
+    });
     
     const options = {
       page: parseInt(page),
@@ -51,6 +76,25 @@ router.get('/', auth, async (req, res) => {
       .skip((options.page - 1) * options.limit);
     
     const total = await Character.countDocuments(query);
+    
+    // Debug: Check which users own characters in the database
+    const allCharacterUsers = await Character.aggregate([
+      { $group: { _id: "$userId", count: { $sum: 1 }, names: { $push: "$name" } } },
+      { $limit: 10 }
+    ]);
+    
+    console.log('🔍 GET Characters result:', {
+      currentUserAuthenticated: req.user._id.toString(),
+      searchingForUserId: userObjectId.toString(),
+      foundCharacters: characters.length,
+      totalCount: total,
+      characterNames: characters.map(c => c.name),
+      allCharacterOwners: allCharacterUsers.map(u => ({
+        userId: u._id.toString(),
+        characterCount: u.count,
+        characterNames: u.names
+      }))
+    });
     
     res.json({
       success: true,
@@ -231,7 +275,11 @@ router.post('/', [
 
     console.log('Creating character with processed data:', characterData);
     const character = await Character.create(characterData);
-    console.log('Character created successfully:', character._id);
+    console.log('✅ Character created successfully:', {
+      id: character._id,
+      name: character.name,
+      userId: character.userId
+    });
 
     res.status(201).json({
       success: true,
