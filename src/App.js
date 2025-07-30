@@ -12079,11 +12079,6 @@ Your character is ready to play!`;
           💾 Syncing to cloud...
         </div>
       )}
-      {currentMode === 'menu' && isAuthenticated && currentUser && (
-        <div className="fixed top-10 left-10 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          ☁️ Cloud sync active: {currentUser.username}
-        </div>
-      )}
       
       {renderCurrentMode()}
       
