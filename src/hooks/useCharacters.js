@@ -333,24 +333,55 @@ export const useCharacters = () => {
     try {
       console.log('🔄 Syncing all local changes to cloud...');
       
-      // Get current local-only characters before refreshing
+      // Get current local-only characters and API characters that might need updates
       const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      const localApiCharacters = characters.filter(c => c.id.startsWith('api_'));
       console.log(`Found ${localOnlyCharacters.length} local-only characters to sync:`, localOnlyCharacters.map(c => c.name));
+      console.log(`Found ${localApiCharacters.length} API characters to check for updates:`, localApiCharacters.map(c => c.name));
       
       // First refresh from cloud to get latest data
       const refreshedCharacters = await refreshFromCloud();
       console.log(`Refreshed ${refreshedCharacters.length} total characters (API + local)`);
       
       // Filter to get only API characters from the refresh
-      const apiCharacters = refreshedCharacters.filter(c => c.id.startsWith('api_'));
-      console.log(`Found ${apiCharacters.length} API characters in cloud`);
+      const cloudApiCharacters = refreshedCharacters.filter(c => c.id.startsWith('api_'));
+      console.log(`Found ${cloudApiCharacters.length} API characters in cloud`);
+      
+      // Check for API characters that need updates
+      let updateCount = 0;
+      for (const localChar of localApiCharacters) {
+        const cloudChar = cloudApiCharacters.find(c => c.id === localChar.id);
+        if (cloudChar) {
+          // Compare lastModified timestamps to see if local version is newer
+          const localModified = new Date(localChar.lastModified || 0);
+          const cloudModified = new Date(cloudChar.lastModified || 0);
+          
+          if (localModified > cloudModified) {
+            try {
+              console.log(`Updating cloud character: ${localChar.name} (local: ${localModified.toISOString()}, cloud: ${cloudModified.toISOString()})`);
+              const updated = await charactersAPI.update(localChar.id.replace('api_', ''), localChar);
+              console.log(`Successfully updated character in cloud:`, updated);
+              
+              // Update local state with the updated cloud version
+              setCharacters(prev => prev.map(c => 
+                c.id === localChar.id 
+                  ? { ...updated, id: `api_${updated._id}` }
+                  : c
+              ));
+              updateCount++;
+            } catch (updateError) {
+              console.warn('Failed to update character in cloud:', localChar.name, updateError);
+            }
+          }
+        }
+      }
       
       // Then push any local-only characters that weren't already synced
       let syncCount = 0;
       
       for (const character of localOnlyCharacters) {
         // Check if this character was already synced in the refresh
-        const alreadySynced = apiCharacters.some(c => 
+        const alreadySynced = cloudApiCharacters.some(c => 
           c.name === character.name && 
           c.player === character.player &&
           c.faction === character.faction
@@ -380,8 +411,8 @@ export const useCharacters = () => {
         }
       }
       
-      console.log(`✅ Sync complete. Pushed ${syncCount} characters to cloud, refreshed from cloud`);
-      return { pushed: syncCount, refreshed: true };
+      console.log(`✅ Sync complete. Updated ${updateCount} characters, pushed ${syncCount} new characters to cloud, refreshed from cloud`);
+      return { updated: updateCount, pushed: syncCount, refreshed: true };
     } catch (err) {
       console.error('Sync error:', err);
       throw err;
