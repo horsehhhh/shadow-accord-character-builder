@@ -8889,7 +8889,7 @@ Your character is ready to play!`;
                       xpHistory: [...(character.xpHistory || []), xpEntry],
                       lastModified: new Date().toISOString()
                     };
-                    updateCurrentCharacter(updated);
+                    await updateCurrentCharacter(updated);
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium"
                 >
