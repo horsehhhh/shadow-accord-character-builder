@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // API Configuration
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Auto-detect environment and platform
+const isProduction = process.env.NODE_ENV === 'production';
+const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
+
+const API_BASE = process.env.REACT_APP_API_URL || 
+  (isProduction || isCapacitor ? 'https://shadowaccordapi.up.railway.app/api' : 'http://localhost:5000/api');
 
 // Create axios instance with default config
 const api = axios.create({
