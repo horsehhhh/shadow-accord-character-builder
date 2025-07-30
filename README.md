@@ -272,6 +272,8 @@ Special thanks to:
 
 🌐 **[Launch Web App](https://shadowaccordcharacterbuilder.up.railway.app)** | Created with ❤️ for the Shadow Accord Community!
 
+<!-- Build trigger: Cloud sync fixes deployed -->
+
 ## ⚖️ Legal Disclaimer
 
 **Shadow Accord Character Builder** is an unofficial, fan-created tool for the Shadow Accord RPG system. This project is not affiliated with, endorsed by, or connected to the creators or publishers of Shadow Accord, World of Darkness, or any related intellectual properties.
