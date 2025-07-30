@@ -379,15 +379,18 @@ router.put('/:id', [
           console.log(`🔍 Value to assign:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
         }
         
-        // Try to force clean the field first if it's corrupted
-        if (key === 'advancementHistory' && typeof character[key] === 'string') {
-          console.log('🧹 Found corrupted advancementHistory, clearing first');
+        // Force clear the field completely to reset Mongoose's internal state
+        if (key === 'advancementHistory') {
+          console.log('🧹 Force clearing advancementHistory field state');
           character[key] = undefined;
           character.markModified(key);
+          // Clear from modified paths and validation state
+          character.$__reset();
         }
         
         // Directly assign complex fields to ensure proper type casting
-        character[key] = value;
+        character.set(key, value);  // Use .set() instead of direct assignment
+        character.markModified(key); // Explicitly mark as modified
         console.log(`📝 Directly assigned ${key}:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
         
         // Verify assignment worked
