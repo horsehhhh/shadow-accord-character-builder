@@ -1,0 +1,453 @@
+2025-07-30T20:26:05.000000000Z [info] Starting Container
+2025-07-30T20:26:06.410470430Z [error] npm warn config production Use `--omit=dev` instead.
+2025-07-30T20:26:06.410481866Z [info] 
+2025-07-30T20:26:06.410495434Z [info] > shadow-accord-backend@0.3.0 start
+2025-07-30T20:26:06.410511911Z [info] > node server.js
+2025-07-30T20:26:06.410522477Z [info] 
+2025-07-30T20:26:06.410534786Z [info] Shadow Accord Backend running on port 8080
+2025-07-30T20:26:06.410547652Z [info] Environment: production
+2025-07-30T20:26:06.410559852Z [info] MongoDB connected successfully
+2025-07-30T20:28:36.542512046Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:36 +0000] "GET /api/characters HTTP/1.1" 304 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:36.542530472Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:36 +0000] "GET /api/characters HTTP/1.1" 304 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:41.316403943Z [info] Character update request: {
+2025-07-30T20:28:41.316423593Z [info]   characterId: '688a5972ac74c41cb63ba627',
+2025-07-30T20:28:41.316436971Z [info]   userId: '6889a102acb70dc0dcb3b834',
+2025-07-30T20:28:41.316449787Z [info]   bodyKeys: [
+2025-07-30T20:28:41.316461420Z [info]     'stats',                '_id',
+2025-07-30T20:28:41.316473150Z [info]     'userId',               'name',
+2025-07-30T20:28:41.316485848Z [info]     'player',               'faction',
+2025-07-30T20:28:41.316500256Z [info]     'subfaction',           'skills',
+2025-07-30T20:28:41.316514816Z [info]     'powers',               'merits',
+2025-07-30T20:28:41.316530762Z [info]     'lores',                'totalXP',
+2025-07-30T20:28:41.316548165Z [info]     'xpSpent',              'checkInCount',
+2025-07-30T20:28:41.316562650Z [info]     'xpHistory',            'advancementHistory',
+2025-07-30T20:28:41.316574336Z [info]     'innateTreeIds',        'fundamentalPowers',
+2025-07-30T20:28:41.316586789Z [info]     'shadowArchetype',      'thornOptions',
+2025-07-30T20:28:41.316598500Z [info]     'selectedPassions',     'generation',
+2025-07-30T20:28:41.316611057Z [info]     'amaranthCount',        'breed',
+2025-07-30T20:28:41.316621696Z [info]     'auspice',              'guild',
+2025-07-30T20:28:41.316634503Z [info]     'claimedStatus',        'selectedFomoriTree',
+2025-07-30T20:28:41.316646546Z [info]     'claimedInnateTreeIds', 'selfNerfs',
+2025-07-30T20:28:41.316658860Z [info]     'notes',                'isPublic',
+2025-07-30T20:28:41.316670532Z [info]     'campaignId',           'version',
+2025-07-30T20:28:41.316680990Z [info]     'lastModified',         'sharedWith',
+2025-07-30T20:28:41.316693420Z [info]     'factionChanges',       'createdAt',
+2025-07-30T20:28:41.316706793Z [info]     'updatedAt',            '__v',
+2025-07-30T20:28:41.316717675Z [info]     'id'
+2025-07-30T20:28:41.316727980Z [info]   ],
+2025-07-30T20:28:41.316739526Z [info]   hasStats: true,
+2025-07-30T20:28:41.316750308Z [info]   hasSkills: true,
+2025-07-30T20:28:41.316763560Z [info]   hasPowers: true,
+2025-07-30T20:28:41.316774137Z [info]   hasMerits: true,
+2025-07-30T20:28:41.316785782Z [info]   hasLores: true,
+2025-07-30T20:28:41.316800948Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.316814860Z [info]   advancementHistoryType: 'object',
+2025-07-30T20:28:41.316851023Z [info]   advancementHistoryValue: '[{checkIn:0,type:"skill",itemId:"archery",level:1,cost:2,timestamp:"2025-07-30T20:28:42.635Z",redundant:false}]...',
+2025-07-30T20:28:41.316864941Z [info]   totalXP: 25,
+2025-07-30T20:28:41.316877045Z [info]   xpSpent: 2
+2025-07-30T20:28:41.316886999Z [info] }
+2025-07-30T20:28:41.316904462Z [info] 🔍 Processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.316921733Z [info] ✅ After processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.316933732Z [info] 🔍 Processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.316946262Z [info] ✅ After processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.316957571Z [info] 🔍 Processing lores: object Array with 0 items
+2025-07-30T20:28:41.316973956Z [info] ✅ After processing lores: object Array with 0 items
+2025-07-30T20:28:41.316986609Z [info] 🔍 Processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.316998244Z [info] ✅ After processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.317013108Z [info] 🔍 Processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.317029384Z [info] ✅ After processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.317040982Z [info] 🔍 Processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.317052748Z [info] ✅ After processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.317065358Z [info] 🔍 Processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.317077956Z [info] ✅ After processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.317090510Z [info] 🔍 Processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.317101874Z [info] ✅ After processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.317114432Z [info] 🔍 Processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.317125819Z [info] ✅ After processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.317136690Z [info] 🔍 Processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.317147748Z [info] ✅ After processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.317158490Z [info] 🔍 Processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.317169814Z [info] ✅ After processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.317183307Z [info] 🔍 Processing object stats: object
+2025-07-30T20:28:41.317194186Z [info] ✅ After processing object stats: object
+2025-07-30T20:28:41.317205345Z [info] 🔍 Processing object skills: object
+2025-07-30T20:28:41.317215765Z [info] ✅ After processing object skills: object
+2025-07-30T20:28:41.317226880Z [info] 🔍 Processing object powers: object
+2025-07-30T20:28:41.317241039Z [info] ✅ After processing object powers: object
+2025-07-30T20:28:41.317254171Z [info] 🔍 Processing object merits: object
+2025-07-30T20:28:41.317265990Z [info] ✅ After processing object merits: object
+2025-07-30T20:28:41.317278543Z [info] 🔄 Using raw MongoDB update for all character changes to prevent data corruption
+2025-07-30T20:28:41.317289750Z [info] 🧹 Processing advancementHistory field
+2025-07-30T20:28:41.317300642Z [info] 📤 Raw MongoDB update fields: {
+2025-07-30T20:28:41.317310913Z [info]   fieldCount: 39,
+2025-07-30T20:28:41.317323669Z [info]   hasStats: true,
+2025-07-30T20:28:41.317333357Z [info]   hasSkills: true,
+2025-07-30T20:28:41.317343230Z [info]   hasPowers: true,
+2025-07-30T20:28:41.317352893Z [info]   hasMerits: true,
+2025-07-30T20:28:41.317362737Z [info]   hasLores: true,
+2025-07-30T20:28:41.317375757Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.317386012Z [info]   hasXpHistory: true
+2025-07-30T20:28:41.317396095Z [info] }
+2025-07-30T20:28:41.352118205Z [info] Character update request: {
+2025-07-30T20:28:41.352151001Z [info]   characterId: '688a5972ac74c41cb63ba627',
+2025-07-30T20:28:41.352165015Z [info]   userId: '6889a102acb70dc0dcb3b834',
+2025-07-30T20:28:41.352178783Z [info]   bodyKeys: [
+2025-07-30T20:28:41.352190615Z [info]     'stats',                '_id',
+2025-07-30T20:28:41.352202697Z [info]     'userId',               'name',
+2025-07-30T20:28:41.352215070Z [info]     'player',               'faction',
+2025-07-30T20:28:41.352226489Z [info]     'subfaction',           'skills',
+2025-07-30T20:28:41.352238339Z [info]     'powers',               'merits',
+2025-07-30T20:28:41.352250594Z [info]     'lores',                'totalXP',
+2025-07-30T20:28:41.352262582Z [info]     'xpSpent',              'checkInCount',
+2025-07-30T20:28:41.352273518Z [info]     'xpHistory',            'advancementHistory',
+2025-07-30T20:28:41.352284524Z [info]     'innateTreeIds',        'fundamentalPowers',
+2025-07-30T20:28:41.352295544Z [info]     'shadowArchetype',      'thornOptions',
+2025-07-30T20:28:41.352304253Z [info]   hasStats: true,
+2025-07-30T20:28:41.352307883Z [info]     'selectedPassions',     'generation',
+2025-07-30T20:28:41.352318369Z [info]     'amaranthCount',        'breed',
+2025-07-30T20:28:41.352324831Z [info]   hasSkills: true,
+2025-07-30T20:28:41.352328985Z [info]     'auspice',              'guild',
+2025-07-30T20:28:41.352339392Z [info]   hasPowers: true,
+2025-07-30T20:28:41.352344416Z [info]     'claimedStatus',        'selectedFomoriTree',
+2025-07-30T20:28:41.352351749Z [info]   hasMerits: true,
+2025-07-30T20:28:41.352356519Z [info]     'claimedInnateTreeIds', 'selfNerfs',
+2025-07-30T20:28:41.352363840Z [info]   hasLores: true,
+2025-07-30T20:28:41.352367917Z [info]     'notes',                'isPublic',
+2025-07-30T20:28:41.352379073Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.352380475Z [info]     'campaignId',           'version',
+2025-07-30T20:28:41.352393195Z [info]   hasXpHistory: true
+2025-07-30T20:28:41.352397487Z [info]     'lastModified',         'sharedWith',
+2025-07-30T20:28:41.352405904Z [info] }
+2025-07-30T20:28:41.352414065Z [info]     'factionChanges',       'createdAt',
+2025-07-30T20:28:41.352421084Z [info] ✅ Raw MongoDB update successful: {
+2025-07-30T20:28:41.352428937Z [info]     'updatedAt',            '__v',
+2025-07-30T20:28:41.352434278Z [info]   acknowledged: true,
+2025-07-30T20:28:41.352440972Z [info]     'id'
+2025-07-30T20:28:41.352445149Z [info]   modifiedCount: 1,
+2025-07-30T20:28:41.352451549Z [info]   ],
+2025-07-30T20:28:41.352457778Z [info]   upsertedId: null,
+2025-07-30T20:28:41.352462752Z [info]   hasStats: true,
+2025-07-30T20:28:41.352470108Z [info]   upsertedCount: 0,
+2025-07-30T20:28:41.352473763Z [info]   hasSkills: true,
+2025-07-30T20:28:41.352481418Z [info]   matchedCount: 1
+2025-07-30T20:28:41.352484702Z [info]   hasPowers: true,
+2025-07-30T20:28:41.352492716Z [info] }
+2025-07-30T20:28:41.352495915Z [info]   hasMerits: true,
+2025-07-30T20:28:41.352506046Z [info]   hasLores: true,
+2025-07-30T20:28:41.352518208Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.352528846Z [info]   advancementHistoryType: 'object',
+2025-07-30T20:28:41.352547696Z [info]   advancementHistoryValue: '[{checkIn:0,type:"skill",itemId:"archery",level:1,cost:2,timestamp:"2025-07-30T20:28:42.820Z",redundant:false}]...',
+2025-07-30T20:28:41.352557403Z [info]   totalXP: 25,
+2025-07-30T20:28:41.352567323Z [info]   xpSpent: 2
+2025-07-30T20:28:41.352576712Z [info] }
+2025-07-30T20:28:41.352590244Z [info] 🔍 Processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.352604523Z [info] ✅ After processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.352616304Z [info] 🔍 Processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.352627264Z [info] ✅ After processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.352640124Z [info] 🔍 Processing lores: object Array with 0 items
+2025-07-30T20:28:41.352651002Z [info] ✅ After processing lores: object Array with 0 items
+2025-07-30T20:28:41.352662631Z [info] 🔍 Processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.352673908Z [info] ✅ After processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.352684806Z [info] 🔍 Processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.352696245Z [info] ✅ After processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.352707287Z [info] 🔍 Processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.352718696Z [info] ✅ After processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.352731023Z [info] 🔍 Processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.352742220Z [info] ✅ After processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.352753477Z [info] 🔍 Processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.352765313Z [info] ✅ After processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.352776196Z [info] 🔍 Processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.352787250Z [info] ✅ After processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.352798234Z [info] 🔍 Processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.352813253Z [info] ✅ After processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.352826641Z [info] 🔍 Processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.352840250Z [info] ✅ After processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.352853457Z [info] 🔍 Processing object stats: object
+2025-07-30T20:28:41.352868887Z [info] ✅ After processing object stats: object
+2025-07-30T20:28:41.352882922Z [info] 🔍 Processing object skills: object
+2025-07-30T20:28:41.352897053Z [info] ✅ After processing object skills: object
+2025-07-30T20:28:41.352911821Z [info] 🔍 Processing object powers: object
+2025-07-30T20:28:41.352925095Z [info] ✅ After processing object powers: object
+2025-07-30T20:28:41.352941261Z [info] 🔍 Processing object merits: object
+2025-07-30T20:28:41.352956938Z [info] ✅ After processing object merits: object
+2025-07-30T20:28:41.352974359Z [info] 🔄 Using raw MongoDB update for all character changes to prevent data corruption
+2025-07-30T20:28:41.352989574Z [info] 🧹 Processing advancementHistory field
+2025-07-30T20:28:41.353007523Z [info] 📤 Raw MongoDB update fields: {
+2025-07-30T20:28:41.353021722Z [info]   fieldCount: 39,
+2025-07-30T20:28:41.370351155Z [info] ✅ Character update completed successfully with raw MongoDB update
+2025-07-30T20:28:41.373862680Z [info] ✅ Raw MongoDB update successful: {
+2025-07-30T20:28:41.373875306Z [info]   acknowledged: true,
+2025-07-30T20:28:41.373888468Z [info]   modifiedCount: 1,
+2025-07-30T20:28:41.373899799Z [info]   upsertedId: null,
+2025-07-30T20:28:41.373910575Z [info]   upsertedCount: 0,
+2025-07-30T20:28:41.373920904Z [info]   matchedCount: 1
+2025-07-30T20:28:41.373931026Z [info] }
+2025-07-30T20:28:41.377239750Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:41 +0000] "PUT /api/characters/688a5972ac74c41cb63ba627 HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:41.395593718Z [info] ✅ Character update completed successfully with raw MongoDB update
+2025-07-30T20:28:41.399090995Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:41 +0000] "PUT /api/characters/688a5972ac74c41cb63ba627 HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:41.534700024Z [info] Character update request: {
+2025-07-30T20:28:41.534715849Z [info]   characterId: '688a5972ac74c41cb63ba627',
+2025-07-30T20:28:41.534733072Z [info]   userId: '6889a102acb70dc0dcb3b834',
+2025-07-30T20:28:41.534746347Z [info]   bodyKeys: [
+2025-07-30T20:28:41.534762976Z [info]     'stats',                '_id',
+2025-07-30T20:28:41.534777033Z [info]     'userId',               'name',
+2025-07-30T20:28:41.534791639Z [info]     'player',               'faction',
+2025-07-30T20:28:41.534807239Z [info]     'subfaction',           'skills',
+2025-07-30T20:28:41.534821761Z [info]     'powers',               'merits',
+2025-07-30T20:28:41.534833955Z [info]     'lores',                'totalXP',
+2025-07-30T20:28:41.534848637Z [info]     'xpSpent',              'checkInCount',
+2025-07-30T20:28:41.534866610Z [info]     'xpHistory',            'advancementHistory',
+2025-07-30T20:28:41.534881978Z [info]     'innateTreeIds',        'fundamentalPowers',
+2025-07-30T20:28:41.534895366Z [info]     'shadowArchetype',      'thornOptions',
+2025-07-30T20:28:41.534906269Z [info]     'selectedPassions',     'generation',
+2025-07-30T20:28:41.534917134Z [info]     'amaranthCount',        'breed',
+2025-07-30T20:28:41.534928755Z [info]     'auspice',              'guild',
+2025-07-30T20:28:41.534942293Z [info]     'claimedStatus',        'selectedFomoriTree',
+2025-07-30T20:28:41.534952759Z [info]     'claimedInnateTreeIds', 'selfNerfs',
+2025-07-30T20:28:41.534964458Z [info]     'notes',                'isPublic',
+2025-07-30T20:28:41.534975003Z [info]     'campaignId',           'version',
+2025-07-30T20:28:41.534985271Z [info]     'lastModified',         'sharedWith',
+2025-07-30T20:28:41.534997021Z [info]     'factionChanges',       'createdAt',
+2025-07-30T20:28:41.535008033Z [info]     'updatedAt',            '__v',
+2025-07-30T20:28:41.535018890Z [info]     'id'
+2025-07-30T20:28:41.535028041Z [info]   ],
+2025-07-30T20:28:41.535037953Z [info]   hasStats: true,
+2025-07-30T20:28:41.535048134Z [info]   hasSkills: true,
+2025-07-30T20:28:41.535058876Z [info]   hasPowers: true,
+2025-07-30T20:28:41.535068621Z [info]   hasMerits: true,
+2025-07-30T20:28:41.535078384Z [info]   hasLores: true,
+2025-07-30T20:28:41.535088815Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.535099677Z [info]   advancementHistoryType: 'object',
+2025-07-30T20:28:41.535114852Z [info]   advancementHistoryValue: '[{checkIn:0,type:"skill",itemId:"archery",level:1,cost:2,timestamp:"2025-07-30T20:28:42.997Z",redundant:false}]...',
+2025-07-30T20:28:41.535124358Z [info]   totalXP: 25,
+2025-07-30T20:28:41.535133669Z [info]   xpSpent: 2
+2025-07-30T20:28:41.535142896Z [info] }
+2025-07-30T20:28:41.535157466Z [info] 🔍 Processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.535170133Z [info] ✅ After processing advancementHistory: object Array with 1 items
+2025-07-30T20:28:41.535181324Z [info] 🔍 Processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.535193522Z [info] ✅ After processing xpHistory: object Array with 1 items
+2025-07-30T20:28:41.535205421Z [info] 🔍 Processing lores: object Array with 0 items
+2025-07-30T20:28:41.535217149Z [info] ✅ After processing lores: object Array with 0 items
+2025-07-30T20:28:41.535227899Z [info] 🔍 Processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.535238964Z [info] ✅ After processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.535249380Z [info] 🔍 Processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.535260699Z [info] ✅ After processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.535271545Z [info] 🔍 Processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.535282565Z [info] ✅ After processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.535295010Z [info] 🔍 Processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.535306162Z [info] ✅ After processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.535317116Z [info] 🔍 Processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.535327967Z [info] ✅ After processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.535338642Z [info] 🔍 Processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.535349678Z [info] ✅ After processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.535361331Z [info] 🔍 Processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.535372389Z [info] ✅ After processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.535383236Z [info] 🔍 Processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.535394519Z [info] ✅ After processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.535405528Z [info] 🔍 Processing object stats: object
+2025-07-30T20:28:41.535416020Z [info] ✅ After processing object stats: object
+2025-07-30T20:28:41.535427411Z [info] 🔍 Processing object skills: object
+2025-07-30T20:28:41.535437566Z [info] ✅ After processing object skills: object
+2025-07-30T20:28:41.535448335Z [info] 🔍 Processing object powers: object
+2025-07-30T20:28:41.535461416Z [info] ✅ After processing object powers: object
+2025-07-30T20:28:41.535471541Z [info] 🔍 Processing object merits: object
+2025-07-30T20:28:41.535481752Z [info] ✅ After processing object merits: object
+2025-07-30T20:28:41.535494269Z [info] 🔄 Using raw MongoDB update for all character changes to prevent data corruption
+2025-07-30T20:28:41.535504996Z [info] 🧹 Processing advancementHistory field
+2025-07-30T20:28:41.535514731Z [info] 📤 Raw MongoDB update fields: {
+2025-07-30T20:28:41.535524730Z [info]   fieldCount: 39,
+2025-07-30T20:28:41.535534653Z [info]   hasStats: true,
+2025-07-30T20:28:41.535544459Z [info]   hasSkills: true,
+2025-07-30T20:28:41.535555400Z [info]   hasPowers: true,
+2025-07-30T20:28:41.535564993Z [info]   hasMerits: true,
+2025-07-30T20:28:41.535574292Z [info]   hasLores: true,
+2025-07-30T20:28:41.535584101Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.535593950Z [info]   hasXpHistory: true
+2025-07-30T20:28:41.535602927Z [info] }
+2025-07-30T20:28:41.552352271Z [info] ✅ Raw MongoDB update successful: {
+2025-07-30T20:28:41.552374965Z [info]   acknowledged: true,
+2025-07-30T20:28:41.552387678Z [info]   modifiedCount: 1,
+2025-07-30T20:28:41.552401322Z [info]   upsertedId: null,
+2025-07-30T20:28:41.552411581Z [info]   upsertedCount: 0,
+2025-07-30T20:28:41.552422264Z [info]   matchedCount: 1
+2025-07-30T20:28:41.552433570Z [info] }
+2025-07-30T20:28:41.586972753Z [info] ✅ Character update completed successfully with raw MongoDB update
+2025-07-30T20:28:41.586999497Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:41 +0000] "PUT /api/characters/688a5972ac74c41cb63ba627 HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:41.776771787Z [info] Character update request: {
+2025-07-30T20:28:41.776786296Z [info]   characterId: '688a5972ac74c41cb63ba627',
+2025-07-30T20:28:41.776798328Z [info]   userId: '6889a102acb70dc0dcb3b834',
+2025-07-30T20:28:41.776810713Z [info]   bodyKeys: [
+2025-07-30T20:28:41.776823551Z [info]     'stats',                '_id',
+2025-07-30T20:28:41.776836428Z [info]     'userId',               'name',
+2025-07-30T20:28:41.776848760Z [info]     'player',               'faction',
+2025-07-30T20:28:41.776860695Z [info]     'subfaction',           'skills',
+2025-07-30T20:28:41.776871705Z [info]     'powers',               'merits',
+2025-07-30T20:28:41.776885481Z [info]     'lores',                'totalXP',
+2025-07-30T20:28:41.776897894Z [info]     'xpSpent',              'checkInCount',
+2025-07-30T20:28:41.776907109Z [info] ✅ Raw MongoDB update successful: {
+2025-07-30T20:28:41.776911636Z [info]     'xpHistory',            'advancementHistory',
+2025-07-30T20:28:41.776923519Z [info]     'innateTreeIds',        'fundamentalPowers',
+2025-07-30T20:28:41.776930133Z [info]   acknowledged: true,
+2025-07-30T20:28:41.776935449Z [info]     'shadowArchetype',      'thornOptions',
+2025-07-30T20:28:41.776945796Z [info]   modifiedCount: 1,
+2025-07-30T20:28:41.776950026Z [info]     'selectedPassions',     'generation',
+2025-07-30T20:28:41.776964961Z [info]     'amaranthCount',        'breed',
+2025-07-30T20:28:41.776965141Z [info]   upsertedId: null,
+2025-07-30T20:28:41.776983705Z [info]     'auspice',              'guild',
+2025-07-30T20:28:41.776983779Z [info]   upsertedCount: 0,
+2025-07-30T20:28:41.777004854Z [info]   matchedCount: 1
+2025-07-30T20:28:41.777010329Z [info]     'claimedStatus',        'selectedFomoriTree',
+2025-07-30T20:28:41.777016398Z [info] }
+2025-07-30T20:28:41.777029425Z [info]     'claimedInnateTreeIds', 'selfNerfs',
+2025-07-30T20:28:41.777041634Z [info]     'notes',                'isPublic',
+2025-07-30T20:28:41.777053339Z [info]     'campaignId',           'version',
+2025-07-30T20:28:41.777064133Z [info]     'lastModified',         'sharedWith',
+2025-07-30T20:28:41.777075564Z [info]     'factionChanges',       'createdAt',
+2025-07-30T20:28:41.777085827Z [info]     'updatedAt',            '__v',
+2025-07-30T20:28:41.777095526Z [info]     'id'
+2025-07-30T20:28:41.777105096Z [info]   ],
+2025-07-30T20:28:41.777116391Z [info]   hasStats: true,
+2025-07-30T20:28:41.777127337Z [info]   hasSkills: true,
+2025-07-30T20:28:41.777137556Z [info]   hasPowers: true,
+2025-07-30T20:28:41.777148245Z [info]   hasMerits: true,
+2025-07-30T20:28:41.777158326Z [info]   hasLores: true,
+2025-07-30T20:28:41.777168777Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.777180289Z [info]   advancementHistoryType: 'object',
+2025-07-30T20:28:41.777199820Z [info]   advancementHistoryValue: '[{checkIn:0,type:"skill",itemId:"archery",level:1,cost:2,timestamp:"2025-07-30T20:28:42.820Z",redundant:false},{checkIn:0,type:"skill",itemId:"archery",level:2,cost:4,"timestam...',
+2025-07-30T20:28:41.777211112Z [info]   totalXP: 21,
+2025-07-30T20:28:41.777221608Z [info]   xpSpent: 6
+2025-07-30T20:28:41.777231026Z [info] }
+2025-07-30T20:28:41.777245293Z [info] 🔍 Processing advancementHistory: object Array with 2 items
+2025-07-30T20:28:41.777257995Z [info] ✅ After processing advancementHistory: object Array with 2 items
+2025-07-30T20:28:41.777268806Z [info] 🔍 Processing xpHistory: object Array with 2 items
+2025-07-30T20:28:41.777279724Z [info] ✅ After processing xpHistory: object Array with 2 items
+2025-07-30T20:28:41.777290342Z [info] 🔍 Processing lores: object Array with 0 items
+2025-07-30T20:28:41.777301072Z [info] ✅ After processing lores: object Array with 0 items
+2025-07-30T20:28:41.777311971Z [info] 🔍 Processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.777322503Z [info] ✅ After processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:41.777333363Z [info] 🔍 Processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.777344627Z [info] ✅ After processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:41.777355500Z [info] 🔍 Processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.777367787Z [info] ✅ After processing thornOptions: object Array with 0 items
+2025-07-30T20:28:41.777381552Z [info] 🔍 Processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.777393758Z [info] ✅ After processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:41.777405242Z [info] 🔍 Processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.777416591Z [info] ✅ After processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:41.777427538Z [info] 🔍 Processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.777438367Z [info] ✅ After processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:41.777450578Z [info] 🔍 Processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.777462720Z [info] ✅ After processing sharedWith: object Array with 0 items
+2025-07-30T20:28:41.777473850Z [info] 🔍 Processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.777484803Z [info] ✅ After processing factionChanges: object Array with 0 items
+2025-07-30T20:28:41.777495800Z [info] 🔍 Processing object stats: object
+2025-07-30T20:28:41.777506556Z [info] ✅ After processing object stats: object
+2025-07-30T20:28:41.777517003Z [info] 🔍 Processing object skills: object
+2025-07-30T20:28:41.777527305Z [info] ✅ After processing object skills: object
+2025-07-30T20:28:41.777537989Z [info] 🔍 Processing object powers: object
+2025-07-30T20:28:41.777550739Z [info] ✅ After processing object powers: object
+2025-07-30T20:28:41.777561559Z [info] 🔍 Processing object merits: object
+2025-07-30T20:28:41.777573559Z [info] ✅ After processing object merits: object
+2025-07-30T20:28:41.777585828Z [info] 🔄 Using raw MongoDB update for all character changes to prevent data corruption
+2025-07-30T20:28:41.777596907Z [info] 🧹 Processing advancementHistory field
+2025-07-30T20:28:41.777607682Z [info] 📤 Raw MongoDB update fields: {
+2025-07-30T20:28:41.777617509Z [info]   fieldCount: 39,
+2025-07-30T20:28:41.777627974Z [info]   hasStats: true,
+2025-07-30T20:28:41.777637263Z [info]   hasSkills: true,
+2025-07-30T20:28:41.777646977Z [info]   hasPowers: true,
+2025-07-30T20:28:41.777657141Z [info]   hasMerits: true,
+2025-07-30T20:28:41.777666630Z [info]   hasLores: true,
+2025-07-30T20:28:41.777677479Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:41.777686803Z [info]   hasXpHistory: true
+2025-07-30T20:28:41.777696468Z [info] }
+2025-07-30T20:28:41.804210859Z [info] ✅ Character update completed successfully with raw MongoDB update
+2025-07-30T20:28:41.804236341Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:41 +0000] "PUT /api/characters/688a5972ac74c41cb63ba627 HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:42.243260735Z [info] Character update request: {
+2025-07-30T20:28:42.243316540Z [info]   characterId: '688a5972ac74c41cb63ba627',
+2025-07-30T20:28:42.243333192Z [info]   userId: '6889a102acb70dc0dcb3b834',
+2025-07-30T20:28:42.243345503Z [info]   bodyKeys: [
+2025-07-30T20:28:42.243357419Z [info]     'stats',                '_id',
+2025-07-30T20:28:42.243376092Z [info]     'userId',               'name',
+2025-07-30T20:28:42.243386936Z [info]     'player',               'faction',
+2025-07-30T20:28:42.243398949Z [info]     'subfaction',           'skills',
+2025-07-30T20:28:42.243412472Z [info]     'powers',               'merits',
+2025-07-30T20:28:42.243426974Z [info]     'lores',                'totalXP',
+2025-07-30T20:28:42.243439150Z [info]     'xpSpent',              'checkInCount',
+2025-07-30T20:28:42.243450281Z [info]     'xpHistory',            'advancementHistory',
+2025-07-30T20:28:42.243462890Z [info]     'innateTreeIds',        'fundamentalPowers',
+2025-07-30T20:28:42.243475994Z [info]     'shadowArchetype',      'thornOptions',
+2025-07-30T20:28:42.243487306Z [info]     'selectedPassions',     'generation',
+2025-07-30T20:28:42.243498455Z [info]     'amaranthCount',        'breed',
+2025-07-30T20:28:42.243510691Z [info]     'auspice',              'guild',
+2025-07-30T20:28:42.243536126Z [info]     'claimedStatus',        'selectedFomoriTree',
+2025-07-30T20:28:42.243550625Z [info]     'claimedInnateTreeIds', 'selfNerfs',
+2025-07-30T20:28:42.243563000Z [info]     'notes',                'isPublic',
+2025-07-30T20:28:42.243577596Z [info]     'campaignId',           'version',
+2025-07-30T20:28:42.243588705Z [info]     'lastModified',         'sharedWith',
+2025-07-30T20:28:42.243599816Z [info]     'factionChanges',       'createdAt',
+2025-07-30T20:28:42.243610453Z [info]     'updatedAt',            '__v',
+2025-07-30T20:28:42.243621784Z [info]     'id'
+2025-07-30T20:28:42.243633071Z [info]   ],
+2025-07-30T20:28:42.243644069Z [info]   hasStats: true,
+2025-07-30T20:28:42.243654210Z [info]   hasSkills: true,
+2025-07-30T20:28:42.243666546Z [info]   hasPowers: true,
+2025-07-30T20:28:42.243676772Z [info]   hasMerits: true,
+2025-07-30T20:28:42.243702670Z [info]   hasLores: true,
+2025-07-30T20:28:42.243715176Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:42.243726993Z [info]   advancementHistoryType: 'object',
+2025-07-30T20:28:42.243751750Z [info]   advancementHistoryValue: '[{checkIn:0,type:"skill",itemId:"archery",level:1,cost:2,timestamp:"2025-07-30T20:28:42.820Z",redundant:false},{checkIn:0,type:"skill",itemId:"archery",level:2,cost:4,"timestam...',
+2025-07-30T20:28:42.243761977Z [info]   totalXP: 15,
+2025-07-30T20:28:42.243773383Z [info]   xpSpent: 12
+2025-07-30T20:28:42.243782760Z [info] }
+2025-07-30T20:28:42.243803297Z [info] 🔍 Processing advancementHistory: object Array with 3 items
+2025-07-30T20:28:42.243835366Z [info] ✅ After processing advancementHistory: object Array with 3 items
+2025-07-30T20:28:42.243847907Z [info] 🔍 Processing xpHistory: object Array with 3 items
+2025-07-30T20:28:42.243859143Z [info] ✅ After processing xpHistory: object Array with 3 items
+2025-07-30T20:28:42.243871859Z [info] 🔍 Processing lores: object Array with 0 items
+2025-07-30T20:28:42.243884031Z [info] ✅ After processing lores: object Array with 0 items
+2025-07-30T20:28:42.243895329Z [info] 🔍 Processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:42.243906370Z [info] ✅ After processing innateTreeIds: object Array with 1 items
+2025-07-30T20:28:42.243925713Z [info] 🔍 Processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:42.243938657Z [info] ✅ After processing fundamentalPowers: object Array with 0 items
+2025-07-30T20:28:42.243950348Z [info] 🔍 Processing thornOptions: object Array with 0 items
+2025-07-30T20:28:42.243961867Z [info] ✅ After processing thornOptions: object Array with 0 items
+2025-07-30T20:28:42.243974641Z [info] 🔍 Processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:42.243986363Z [info] ✅ After processing selectedPassions: object Array with 0 items
+2025-07-30T20:28:42.243999072Z [info] 🔍 Processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:42.244010544Z [info] ✅ After processing claimedInnateTreeIds: object Array with 0 items
+2025-07-30T20:28:42.244022924Z [info] 🔍 Processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:42.244093224Z [info] ✅ After processing selfNerfs: object Array with 0 items
+2025-07-30T20:28:42.244106790Z [info] 🔍 Processing sharedWith: object Array with 0 items
+2025-07-30T20:28:42.244120151Z [info] ✅ After processing sharedWith: object Array with 0 items
+2025-07-30T20:28:42.244132385Z [info] 🔍 Processing factionChanges: object Array with 0 items
+2025-07-30T20:28:42.244144322Z [info] ✅ After processing factionChanges: object Array with 0 items
+2025-07-30T20:28:42.244155268Z [info] 🔍 Processing object stats: object
+2025-07-30T20:28:42.244167282Z [info] ✅ After processing object stats: object
+2025-07-30T20:28:42.244178932Z [info] 🔍 Processing object skills: object
+2025-07-30T20:28:42.244251832Z [info] ✅ After processing object skills: object
+2025-07-30T20:28:42.244264418Z [info] 🔍 Processing object powers: object
+2025-07-30T20:28:42.244275890Z [info] ✅ After processing object powers: object
+2025-07-30T20:28:42.244303073Z [info] 🔍 Processing object merits: object
+2025-07-30T20:28:42.244314582Z [info] ✅ After processing object merits: object
+2025-07-30T20:28:42.244327988Z [info] 🔄 Using raw MongoDB update for all character changes to prevent data corruption
+2025-07-30T20:28:42.244339912Z [info] 🧹 Processing advancementHistory field
+2025-07-30T20:28:42.244350622Z [info] 📤 Raw MongoDB update fields: {
+2025-07-30T20:28:42.244360191Z [info]   fieldCount: 39,
+2025-07-30T20:28:42.244369858Z [info]   hasStats: true,
+2025-07-30T20:28:42.244379044Z [info]   hasSkills: true,
+2025-07-30T20:28:42.244389718Z [info]   hasPowers: true,
+2025-07-30T20:28:42.244399155Z [info]   hasMerits: true,
+2025-07-30T20:28:42.244408195Z [info]   hasLores: true,
+2025-07-30T20:28:42.244418279Z [info]   hasAdvancementHistory: true,
+2025-07-30T20:28:42.244428520Z [info]   hasXpHistory: true
+2025-07-30T20:28:42.244439369Z [info] }
+2025-07-30T20:28:42.278488240Z [info] ✅ Raw MongoDB update successful: {
+2025-07-30T20:28:42.278502586Z [info]   acknowledged: true,
+2025-07-30T20:28:42.278516030Z [info]   modifiedCount: 1,
+2025-07-30T20:28:42.278528914Z [info]   upsertedId: null,
+2025-07-30T20:28:42.278539204Z [info]   upsertedCount: 0,
+2025-07-30T20:28:42.278555213Z [info]   matchedCount: 1
+2025-07-30T20:28:42.278564598Z [info] }
+2025-07-30T20:28:42.296351905Z [info] ✅ Character update completed successfully with raw MongoDB update
+2025-07-30T20:28:42.296383440Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:42 +0000] "PUT /api/characters/688a5972ac74c41cb63ba627 HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:50.155449332Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:50 +0000] "GET /api/characters HTTP/1.1" 200 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
+2025-07-30T20:28:50.284591170Z [info] 50.47.84.24 - - [30/Jul/2025:20:28:50 +0000] "GET /api/characters HTTP/1.1" 304 - "https://shadowaccordcharacterbuilder.up.railway.app/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"
