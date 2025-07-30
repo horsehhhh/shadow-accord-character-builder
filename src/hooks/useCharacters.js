@@ -324,6 +324,44 @@ export const useCharacters = () => {
     }
   };
 
+  // Sync all local changes to cloud (for manual sync)
+  const syncAllToCloud = async () => {
+    if (!isAuthenticated) {
+      throw new Error('Must be authenticated to sync to cloud');
+    }
+
+    try {
+      console.log('🔄 Syncing all local changes to cloud...');
+      
+      // First refresh from cloud to get latest data
+      await refreshFromCloud();
+      
+      // Then push any local-only characters or updates
+      const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      let syncCount = 0;
+      
+      for (const character of localOnlyCharacters) {
+        try {
+          const created = await charactersAPI.create(character);
+          setCharacters(prev => prev.map(c => 
+            c.id === character.id 
+              ? { ...created, id: `api_${created._id}` }
+              : c
+          ));
+          syncCount++;
+        } catch (createError) {
+          console.warn('Failed to sync character to cloud:', character.name, createError);
+        }
+      }
+      
+      console.log(`✅ Sync complete. Pushed ${syncCount} characters to cloud, refreshed from cloud`);
+      return { pushed: syncCount, refreshed: true };
+    } catch (err) {
+      console.error('Sync error:', err);
+      throw err;
+    }
+  };
+
   return {
     characters,
     setCharacters,
@@ -337,6 +375,7 @@ export const useCharacters = () => {
     deleteCharacter,
     migrateToAPI,
     refreshFromCloud,
+    syncAllToCloud,
     setIsAuthenticated
   };
 };

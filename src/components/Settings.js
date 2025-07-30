@@ -12,7 +12,7 @@ const Settings = ({
   lastSaved,
   characters
 }) => {
-  const { isAuthenticated, refreshFromCloud } = useCharacters();
+  const { isAuthenticated, syncAllToCloud } = useCharacters();
   const [syncStatus, setSyncStatus] = useState('idle');
   const [lastCloudSync, setLastCloudSync] = useState(null);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
@@ -44,8 +44,8 @@ const Settings = ({
         setSyncStatus('syncing');
         console.log('🔄 Auto-sync: Checking for cloud updates...');
         
-        // Force reload characters from cloud
-        await refreshFromCloud();
+        // Full bidirectional sync with cloud
+        await syncAllToCloud();
         
         setLastCloudSync(new Date().toISOString());
         setSyncStatus('success');
@@ -59,7 +59,7 @@ const Settings = ({
     }, syncInterval * 1000);
 
     return () => clearInterval(interval);
-  }, [autoSyncEnabled, isAuthenticated, isOnline, syncInterval, refreshFromCloud]);
+  }, [autoSyncEnabled, isAuthenticated, isOnline, syncInterval, syncAllToCloud]);
 
   const manualSync = async () => {
     if (!isAuthenticated) {
@@ -69,9 +69,9 @@ const Settings = ({
 
     try {
       setSyncStatus('syncing');
-      console.log('🔄 Manual sync: Pulling latest changes from cloud...');
+      console.log('🔄 Manual sync: Full bidirectional sync with cloud...');
       
-      await refreshFromCloud();
+      await syncAllToCloud();
       
       setLastCloudSync(new Date().toISOString());
       setSyncStatus('success');
