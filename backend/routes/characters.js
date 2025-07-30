@@ -313,23 +313,45 @@ router.put('/:id', [
       hasPowers: !!req.body.powers,
       hasMerits: !!req.body.merits,
       hasLores: !!req.body.lores,
+      hasAdvancementHistory: !!req.body.advancementHistory,
+      advancementHistoryType: typeof req.body.advancementHistory,
+      advancementHistoryValue: req.body.advancementHistory ? JSON.stringify(req.body.advancementHistory).substring(0, 200) + '...' : 'undefined',
       totalXP: req.body.totalXP,
       xpSpent: req.body.xpSpent
     });
 
-    // Preprocess data types before updating
+    // Preprocess data types before updating with robust JSON parsing
     const updateData = { ...req.body };
     
-    // Handle array fields that might be stringified
+    // Recursive function to parse any stringified JSON in nested data
+    function deepParseJSON(obj) {
+      if (typeof obj === 'string') {
+        try {
+          const parsed = JSON.parse(obj);
+          return deepParseJSON(parsed); // Recursively parse in case of double-stringification
+        } catch (e) {
+          return obj; // Return original if not valid JSON
+        }
+      } else if (Array.isArray(obj)) {
+        return obj.map(deepParseJSON);
+      } else if (obj && typeof obj === 'object') {
+        const result = {};
+        for (const [key, value] of Object.entries(obj)) {
+          result[key] = deepParseJSON(value);
+        }
+        return result;
+      }
+      return obj;
+    }
+    
+    // Handle array fields that might be stringified (including nested)
     const arrayFields = ['advancementHistory', 'xpHistory', 'lores', 'innateTreeIds', 'fundamentalPowers', 'thornOptions', 'selectedPassions', 'claimedInnateTreeIds', 'selfNerfs', 'sharedWith', 'factionChanges'];
     
     arrayFields.forEach(field => {
-      if (updateData[field] && typeof updateData[field] === 'string') {
-        try {
-          updateData[field] = JSON.parse(updateData[field]);
-        } catch (e) {
-          console.warn(`Failed to parse ${field} as JSON:`, updateData[field]);
-        }
+      if (updateData[field] !== undefined) {
+        console.log(`🔍 Processing ${field}:`, typeof updateData[field], Array.isArray(updateData[field]) ? `Array with ${updateData[field].length} items` : 'Not array');
+        updateData[field] = deepParseJSON(updateData[field]);
+        console.log(`✅ After processing ${field}:`, typeof updateData[field], Array.isArray(updateData[field]) ? `Array with ${updateData[field].length} items` : 'Not array');
       }
     });
     
@@ -337,12 +359,10 @@ router.put('/:id', [
     const objectFields = ['stats', 'skills', 'powers', 'merits'];
     
     objectFields.forEach(field => {
-      if (updateData[field] && typeof updateData[field] === 'string') {
-        try {
-          updateData[field] = JSON.parse(updateData[field]);
-        } catch (e) {
-          console.warn(`Failed to parse ${field} as JSON:`, updateData[field]);
-        }
+      if (updateData[field] !== undefined) {
+        console.log(`🔍 Processing object ${field}:`, typeof updateData[field]);
+        updateData[field] = deepParseJSON(updateData[field]);
+        console.log(`✅ After processing object ${field}:`, typeof updateData[field]);
       }
     });
 
