@@ -366,164 +366,93 @@ router.put('/:id', [
       }
     });
 
-    // Apply processed data to character with explicit field assignment
-    // Don't use Object.assign for complex fields to avoid reference issues
-    for (const [key, value] of Object.entries(updateData)) {
-      if (arrayFields.includes(key) || objectFields.includes(key)) {
-        // Log state before assignment
-        if (key === 'advancementHistory') {
-          console.log(`🔍 Before assignment - character.${key}:`, 
-            Array.isArray(character[key]) ? `Array[${character[key].length}]` : typeof character[key],
-            character[key] && typeof character[key] === 'string' ? character[key].substring(0, 100) + '...' : ''
-          );
-          console.log(`🔍 Value to assign:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
-        }
-        
-        // Force repair corrupted advancementHistory field in database
-        if (key === 'advancementHistory') {
-          console.log('🧹 Repairing corrupted advancementHistory field in database');
-          
-          // Ensure the value is a proper array with proper objects
-          let cleanedValue = [];
-          if (Array.isArray(value)) {
-            cleanedValue = value.map(item => {
-              if (typeof item === 'string') {
-                try {
-                  return JSON.parse(item);
-                } catch (e) {
-                  return item;
-                }
-              }
-              return item;
-            });
-          } else if (typeof value === 'string') {
-            try {
-              cleanedValue = JSON.parse(value);
-              if (!Array.isArray(cleanedValue)) {
-                cleanedValue = [];
-              }
-            } catch (e) {
-              cleanedValue = [];
-            }
-          }
-          
-          // Use raw MongoDB driver to bypass Mongoose validation and update everything at once
-          try {
-            // Prepare all update fields for raw MongoDB update
-            const mongoUpdateFields = {
-              advancementHistory: cleanedValue,
-              xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || [],
-              lastModified: new Date()
-            };
-            
-            // Add all other update fields to the raw MongoDB update
-            for (const [remainingKey, remainingValue] of Object.entries(updateData)) {
-              if (remainingKey !== 'advancementHistory' && 
-                  remainingKey !== 'xpHistory' && 
-                  remainingKey !== '__v' && 
-                  remainingKey !== '_id') {
-                mongoUpdateFields[remainingKey] = remainingValue;
-              }
-            }
-            
-            const result = await character.collection.updateOne(
-              { _id: character._id },
-              { 
-                $set: mongoUpdateFields,
-                $inc: { __v: 1 } // Increment version to avoid conflicts
-              }
-            );
-            console.log('✅ Raw MongoDB update successful:', result);
-            
-            // Return fresh data from database instead of using stale Mongoose document
-            const updatedCharacter = await Character.findById(character._id);
-            console.log('✅ Character update completed successfully with raw MongoDB update');
-            
-            res.json({
-              success: true,
-              message: 'Character updated successfully',
-              character: updatedCharacter
-            });
-            return;
-          } catch (rawError) {
-            console.error('❌ Raw MongoDB update failed:', rawError);
-            throw rawError;
-          }
-        }
-        
-        // Directly assign complex fields to ensure proper type casting
-        character.set(key, value);  // Use .set() instead of direct assignment
-        character.markModified(key); // Explicitly mark as modified
-        console.log(`📝 Directly assigned ${key}:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
-        
-        // Verify assignment worked
-        if (key === 'advancementHistory') {
-          console.log(`✅ After assignment - character.${key}:`, 
-            Array.isArray(character[key]) ? `Array[${character[key].length}]` : typeof character[key]
-          );
-        }
-      } else {
-        // Use normal assignment for simple fields
-        character[key] = value;
-      }
-    }
-    
-    // Validate critical array fields before saving
-    if (character.advancementHistory && !Array.isArray(character.advancementHistory)) {
-      console.error('❌ advancementHistory is not an array after processing:', typeof character.advancementHistory);
-      // Try one more parsing attempt
-      if (typeof character.advancementHistory === 'string') {
-        try {
-          character.advancementHistory = JSON.parse(character.advancementHistory);
-          console.log('🔄 Emergency parse successful for advancementHistory');
-        } catch (e) {
-          console.error('💥 Emergency parse failed, setting to empty array');
-          character.advancementHistory = [];
-        }
-      }
-    }
+    // Use raw MongoDB driver for ALL character updates to avoid Mongoose validation issues
+    console.log('🔄 Using raw MongoDB update for all character changes to prevent data corruption');
     
     try {
-      await character.save();
-      console.log('✅ Character update successful:', {
-        characterId: character._id,
-        name: character.name,
-        totalXP: character.totalXP,
-        skillsCount: Object.keys(character.skills || {}).length,
-        powersCount: Object.keys(character.powers || {}).length,
-        meritsCount: Object.keys(character.merits || {}).length,
-        loresCount: (character.lores || []).length
-      });
-    } catch (saveError) {
-      console.error('💥 Character save failed with detailed error:', {
-        errorName: saveError.name,
-        errorMessage: saveError.message,
-        validationErrors: saveError.errors ? Object.keys(saveError.errors) : 'none',
-        characterId: character._id,
-        characterData: {
-          name: character.name,
-          advancementHistoryLength: character.advancementHistory?.length,
-          advancementHistoryType: Array.isArray(character.advancementHistory) ? 'Array' : typeof character.advancementHistory,
-          xpHistoryLength: character.xpHistory?.length,
-          xpHistoryType: Array.isArray(character.xpHistory) ? 'Array' : typeof character.xpHistory
-        }
-      });
+      // Prepare all update fields for raw MongoDB update
+      const mongoUpdateFields = {
+        lastModified: new Date()
+      };
       
-      // Log specific validation errors
-      if (saveError.errors) {
-        for (const [field, error] of Object.entries(saveError.errors)) {
-          console.error(`❌ Validation error for ${field}:`, error.message);
+      // Clean advancementHistory if it exists
+      if (updateData.advancementHistory !== undefined) {
+        console.log('🧹 Processing advancementHistory field');
+        let cleanedValue = [];
+        if (Array.isArray(updateData.advancementHistory)) {
+          cleanedValue = updateData.advancementHistory.map(item => {
+            if (typeof item === 'string') {
+              try {
+                return JSON.parse(item);
+              } catch (e) {
+                return item;
+              }
+            }
+            return item;
+          });
+        } else if (typeof updateData.advancementHistory === 'string') {
+          try {
+            cleanedValue = JSON.parse(updateData.advancementHistory);
+            if (!Array.isArray(cleanedValue)) {
+              cleanedValue = [];
+            }
+          } catch (e) {
+            cleanedValue = [];
+          }
+        }
+        mongoUpdateFields.advancementHistory = cleanedValue;
+      }
+      
+      // Handle xpHistory
+      if (updateData.xpHistory !== undefined) {
+        mongoUpdateFields.xpHistory = Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || [];
+      }
+      
+      // Add all other update fields to the raw MongoDB update
+      for (const [key, value] of Object.entries(updateData)) {
+        if (key !== 'advancementHistory' && 
+            key !== 'xpHistory' && 
+            key !== '__v' && 
+            key !== '_id' &&
+            key !== 'lastModified') {
+          mongoUpdateFields[key] = value;
         }
       }
       
-      throw saveError; // Re-throw to trigger the main error handler
+      console.log('📤 Raw MongoDB update fields:', {
+        fieldCount: Object.keys(mongoUpdateFields).length,
+        hasStats: !!mongoUpdateFields.stats,
+        hasSkills: !!mongoUpdateFields.skills,
+        hasPowers: !!mongoUpdateFields.powers,
+        hasMerits: !!mongoUpdateFields.merits,
+        hasLores: !!mongoUpdateFields.lores,
+        hasAdvancementHistory: !!mongoUpdateFields.advancementHistory,
+        hasXpHistory: !!mongoUpdateFields.xpHistory
+      });
+      
+      const result = await character.collection.updateOne(
+        { _id: character._id },
+        { 
+          $set: mongoUpdateFields,
+          $inc: { __v: 1 } // Increment version to avoid conflicts
+        }
+      );
+      console.log('✅ Raw MongoDB update successful:', result);
+      
+      // Return fresh data from database instead of using stale Mongoose document
+      const updatedCharacter = await Character.findById(character._id);
+      console.log('✅ Character update completed successfully with raw MongoDB update');
+      
+      res.json({
+        success: true,
+        message: 'Character updated successfully',
+        character: updatedCharacter
+      });
+      return;
+    } catch (rawError) {
+      console.error('❌ Raw MongoDB update failed:', rawError);
+      throw rawError;
     }
-
-    res.json({
-      success: true,
-      message: 'Character updated successfully',
-      character
-    });
   } catch (error) {
     console.error('Character update error:', error);
     res.status(500).json({
