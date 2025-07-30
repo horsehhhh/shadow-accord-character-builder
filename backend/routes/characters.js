@@ -28,7 +28,7 @@ router.get('/', auth, async (req, res) => {
     
     // Try both ObjectId and string comparison with $expr to force evaluation
     const userObjectId = new mongoose.Types.ObjectId(req.user.id);
-    const query = {
+    const userQuery = {
       $or: [
         { userId: userObjectId },
         { userId: req.user.id },
@@ -36,19 +36,34 @@ router.get('/', auth, async (req, res) => {
       ]
     };
     
+    // Build the main query with user filtering as base
+    const query = { ...userQuery };
+    
     console.log('🔍 Using comprehensive query with ObjectId, string, and $expr comparison');
+    
+    // Add additional filters with $and to preserve user filtering
+    const additionalFilters = [];
     
     // Add faction filter
     if (faction) {
-      query.faction = faction;
+      additionalFilters.push({ faction: faction });
     }
     
-    // Add search filter
+    // Add search filter without overwriting user filter
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { player: { $regex: search, $options: 'i' } }
-      ];
+      additionalFilters.push({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { player: { $regex: search, $options: 'i' } }
+        ]
+      });
+    }
+    
+    // Combine user query with additional filters using $and
+    if (additionalFilters.length > 0) {
+      query.$and = [userQuery, ...additionalFilters];
+      // Remove the top-level $or since it's now inside $and
+      delete query.$or;
     }
     
     console.log('🔍 MongoDB query (converting string to ObjectId to match database storage):', {
