@@ -19,14 +19,17 @@ router.get('/', auth, async (req, res) => {
       hasUser: !!req.user,
       userObjectId: req.user._id,
       userIdVsObjectId: req.user.id === req.user._id.toString(),
+      userIdType: typeof req.user.id,
+      userObjectIdType: typeof req.user._id,
+      userIdString: req.user.id.toString(),
       queryParams: { page, limit, faction, search, sort },
-      timestamp: new Date().toISOString() // Force Railway redeploy
+      timestamp: new Date().toISOString()
     });
     
-    // Convert string userId to ObjectId to match actual database format
-    const query = { userId: new mongoose.Types.ObjectId(req.user.id) };
+    // Use string userId - characters store userId as strings, req.user.id should be a string
+    const query = { userId: req.user.id.toString() }; // Ensure it's a string
     
-    console.log('✅ Converting string userId to ObjectId to match database format');
+    console.log('✅ Using string userId to match database format (characters store userId as strings)');
     
     // Add faction filter
     if (faction) {
@@ -41,11 +44,11 @@ router.get('/', auth, async (req, res) => {
       ];
     }
     
-    console.log('🔍 MongoDB query (converting string to ObjectId to match database):', {
+    console.log('🔍 MongoDB query (using string userId to match database):', {
       originalUserId: req.user.id,
       userIdType: typeof req.user.id,
-      convertedUserId: query.userId,
-      convertedType: query.userId.constructor.name,
+      queryUserId: query.userId,
+      queryUserIdType: typeof query.userId,
       query: query
     });
     
@@ -241,7 +244,7 @@ router.post('/', [
 
     let characterData = {
       ...req.body,
-      userId: new mongoose.Types.ObjectId(req.user.id)  // Convert to ObjectId to match database format
+      userId: req.user.id.toString()  // Store as string to match database format
     };
 
     // Preprocess data types before creating (same as update)
@@ -614,7 +617,7 @@ router.post('/:id/clone', [
     delete cloneData.updatedAt;
     
     cloneData.name = req.body.name;
-    cloneData.userId = new mongoose.Types.ObjectId(req.user.id);  // Convert to ObjectId to match database format
+    cloneData.userId = req.user.id.toString();  // Store as string to match database format
     cloneData.isPublic = false;
     cloneData.sharedWith = [];
     cloneData.campaignId = null;
