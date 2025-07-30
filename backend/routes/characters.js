@@ -26,10 +26,10 @@ router.get('/', auth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
     
-    // Convert string userId to ObjectId to match actual database storage format
-    const query = { userId: new mongoose.Types.ObjectId(req.user.id) };
+    // Use string comparison since ObjectId direct comparison is failing
+    const query = { userId: req.user.id };
     
-    console.log('✅ Converting string userId to ObjectId to match database storage format');
+    console.log('✅ Using string userId - direct ObjectId query was failing despite matching data');
     
     // Add faction filter
     if (faction) {
