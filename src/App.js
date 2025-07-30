@@ -9956,15 +9956,13 @@ Your character is ready to play!`;
                                       </div>
                                       {hasLevel && (
                                         <button
-                                          onClick={() => {
+                                          onClick={async () => {
                                             const updated = reduceCharacter(character, {
                                               type: 'power',
                                               itemId: treeId,
                                               level: level
                                             });
-                                            const newCharacters = [...characters];
-                                            newCharacters[currentCharacterIndex] = updated;
-                                            setCharacters(newCharacters);
+                                            await updateCurrentCharacter(updated);
                                           }}
                                           className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                                         >
@@ -10082,16 +10080,14 @@ Your character is ready to play!`;
                                                 </span>
                                               )}
                                               <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                   const updated = advanceCharacter(character, {
                                                     type: 'power',
                                                     itemId: treeId,
                                                     level,
                                                     cost
                                                   });
-                                                  const newCharacters = [...characters];
-                                                  newCharacters[currentCharacterIndex] = updated;
-                                                  setCharacters(newCharacters);
+                                                  await updateCurrentCharacter(updated);
                                                 }}
                                                 className={`px-4 py-2 rounded font-medium text-sm transition-all ${
                                                   canAdvanceNow
