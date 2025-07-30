@@ -29,19 +29,29 @@ router.get('/', auth, async (req, res) => {
     
     // Migration: Convert any string userIds to ObjectIds for security
     try {
+      console.log('🔄 Starting migration check...');
       const stringUserIdQuery = { userId: req.user.id }; // String format
+      console.log('🔍 Looking for characters with string userId:', stringUserIdQuery);
       const charactersWithStringUserId = await Character.find(stringUserIdQuery);
+      console.log('🔍 Found characters with string userId:', charactersWithStringUserId.length);
       
       if (charactersWithStringUserId.length > 0) {
         console.log(`🔄 Migrating ${charactersWithStringUserId.length} characters from string userId to ObjectId`);
+        console.log('📝 Character names to migrate:', charactersWithStringUserId.map(c => c.name));
         
         // Update characters to use proper ObjectId
-        await Character.updateMany(
+        const updateResult = await Character.updateMany(
           stringUserIdQuery,
           { $set: { userId: userObjectId } }
         );
         
-        console.log('✅ Migration completed: String userIds converted to ObjectIds');
+        console.log('✅ Migration completed:', {
+          matchedCount: updateResult.matchedCount,
+          modifiedCount: updateResult.modifiedCount,
+          stringUserIds: updateResult.acknowledged
+        });
+      } else {
+        console.log('✅ No migration needed - no characters found with string userIds');
       }
     } catch (migrationError) {
       console.warn('⚠️ Migration warning (non-critical):', migrationError.message);
@@ -62,7 +72,12 @@ router.get('/', auth, async (req, res) => {
     
     console.log('🔍 MongoDB query (using proper ObjectId):', {
       userObjectId: userObjectId.toString(),
-      query: JSON.stringify(query, null, 2)
+      userObjectIdType: typeof userObjectId,
+      isObjectId: userObjectId instanceof mongoose.Types.ObjectId,
+      queryUserId: query.userId,
+      queryUserIdType: typeof query.userId,
+      queryUserIdIsObjectId: query.userId instanceof mongoose.Types.ObjectId,
+      fullQuery: query
     });
     
     const options = {
