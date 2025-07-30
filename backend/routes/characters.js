@@ -407,41 +407,39 @@ router.put('/:id', [
             }
           }
           
-          // Use raw MongoDB driver to bypass Mongoose validation
+          // Use raw MongoDB driver to bypass Mongoose validation and update everything at once
           try {
+            // Prepare all update fields for raw MongoDB update
+            const mongoUpdateFields = {
+              advancementHistory: cleanedValue,
+              xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || [],
+              lastModified: new Date()
+            };
+            
+            // Add all other update fields to the raw MongoDB update
+            for (const [remainingKey, remainingValue] of Object.entries(updateData)) {
+              if (remainingKey !== 'advancementHistory' && remainingKey !== 'xpHistory') {
+                mongoUpdateFields[remainingKey] = remainingValue;
+              }
+            }
+            
             const result = await character.collection.updateOne(
               { _id: character._id },
               { 
-                $set: { 
-                  advancementHistory: cleanedValue,
-                  xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || [],
-                  lastModified: new Date()
-                }
+                $set: mongoUpdateFields,
+                $inc: { __v: 1 } // Increment version to avoid conflicts
               }
             );
             console.log('✅ Raw MongoDB update successful:', result);
             
-            // Update other fields normally but skip advancementHistory and xpHistory
-            delete updateData.advancementHistory;
-            delete updateData.xpHistory;
-            
-            // Apply remaining updates
-            for (const [remainingKey, remainingValue] of Object.entries(updateData)) {
-              if (arrayFields.includes(remainingKey) || objectFields.includes(remainingKey)) {
-                character.set(remainingKey, remainingValue);
-                character.markModified(remainingKey);
-              } else {
-                character[remainingKey] = remainingValue;
-              }
-            }
-            
-            await character.save();
-            console.log('✅ Character update completed successfully after raw MongoDB repair');
+            // Return fresh data from database instead of using stale Mongoose document
+            const updatedCharacter = await Character.findById(character._id);
+            console.log('✅ Character update completed successfully with raw MongoDB update');
             
             res.json({
               success: true,
               message: 'Character updated successfully',
-              character: await Character.findById(character._id) // Return fresh data
+              character: updatedCharacter
             });
             return;
           } catch (rawError) {
