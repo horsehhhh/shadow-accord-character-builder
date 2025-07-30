@@ -217,16 +217,22 @@ const ShadowAccordComplete = () => {
       version: '0.3.1',
       date: '2025-07-29',
       changes: [
-        '🔧 CLOUD SYNC FIXES: Resolved major cloud synchronization issues for character storage',
+        '🔧 MAJOR CLOUD SYNC FIXES: Resolved all critical cloud synchronization issues for character storage',
+        '🚨 Fixed Character Creation Integration - App was only saving to local state, never calling cloud functions',
         '🛠️ Fixed API Data Format - Corrected character creation API to send data in expected backend format',
         '📊 Fixed Character Data Retrieval - Backend now returns complete character objects instead of limited fields',
+        '⚠️ Removed Required Field Validation - Backend validation was blocking character creation with empty initial values',
+        '🔄 Added Cloud Save Calls - Character creation now properly calls cloudCreateCharacter() after local save',
+        '🔄 Added Cloud Update Calls - Faction changes now properly call cloudUpdateCharacter() for existing characters',
         '🔍 Enhanced Debugging - Added comprehensive logging to API requests, responses, and character operations',
         '💾 Improved Data Structure - Character loading now properly retrieves stats, skills, powers, merits, and all character data',
         '🚀 Backend API Improvements - Fixed character list endpoint to return full character data for proper frontend display',
         '🔐 Authentication Token Logging - Added request/response tracking to identify authentication issues',
         '⚡ Character Creation Debugging - Added detailed logging for cloud save attempts and fallback behavior',
         '🌐 API Error Handling - Enhanced error reporting with detailed response data for troubleshooting',
-        '✅ Complete Character Sync - Characters should now properly sync to cloud storage and be accessible across devices'
+        '✅ Complete Character Sync - Characters now properly sync to cloud storage and are accessible across devices',
+        '🔒 Backend Model Updates - Made name, player, faction, subfaction optional with default empty values',
+        '📝 Comprehensive Error Logging - Added backend logging for character creation requests and validation errors'
       ]
     },
     {

@@ -21,28 +21,39 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [v0.3.1] - 2025-07-29
 
-### 🔧 Cloud Synchronization Fixes
+### 🔧 Major Cloud Synchronization Fixes
 
-#### Fixed
+#### Fixed - Critical Issues
+- **Character Creation Integration**: App was only saving characters to local state, never calling cloud save functions
+- **Required Field Validation Blocking**: Backend validation required non-empty name, player, faction, subfaction but characters start with empty values
 - **API Data Format Issue**: Corrected character creation API to send character data in the format expected by backend validation
 - **Character Data Retrieval**: Fixed backend character list endpoint to return complete character objects instead of limited field selection
 - **Missing Character Components**: Backend now properly returns stats, skills, powers, merits, and all nested character data structures
 - **Cloud Save Failures**: Resolved character creation failures by properly spreading character data instead of nesting in `characterData` field
-- **Data Structure Mismatch**: Fixed disconnect between frontend character object structure and backend API expectations
+- **Data Structure Mismatch**: Fixed fundamental disconnect between frontend character object structure and backend API expectations
 
-#### Enhanced
-- **Comprehensive Debugging**: Added detailed logging throughout API service layer for request/response tracking
+#### Added - Cloud Integration
+- **Character Creation Cloud Calls**: Added `cloudCreateCharacter()` call after local character creation to sync to cloud storage
+- **Faction Change Cloud Updates**: Added `cloudUpdateCharacter()` call for faction changes to update existing cloud characters
+- **Error Handling**: Comprehensive try/catch blocks with detailed logging for cloud save attempts and failures
+- **Fallback Behavior**: Cloud save failures fall back gracefully to local storage with user notification
+
+#### Enhanced - Debugging & Monitoring
+- **Comprehensive API Debugging**: Added detailed logging throughout API service layer for request/response tracking
 - **Authentication Token Monitoring**: Enhanced logging to track token presence and authentication state during API calls
 - **Character Operation Logging**: Added detailed console output for character creation, loading, and error scenarios
+- **Backend Request Logging**: Added server-side logging for character creation requests, validation, and database operations
 - **API Error Reporting**: Improved error handling with full response data logging for easier troubleshooting
 - **Cloud Sync Visibility**: Added detailed console logs to track character sync attempts and success/failure states
 
 #### Technical Details
-- Fixed `charactersAPI.create()` to spread character data directly instead of wrapping in nested object
-- Removed `.select()` filtering from backend character list route to return complete character data
-- Added comprehensive request/response interceptors in API service for debugging
-- Enhanced error reporting in `useCharacters.js` hook with detailed API error information
-- Improved authentication state tracking and token validation logging
+- **Backend Model Updates**: Made name, player, faction, subfaction optional with default empty string values in Character schema
+- **API Route Validation**: Changed validation from `.notEmpty()` to `.optional()` for character creation fields
+- **Character List Query**: Removed `.select()` filtering from backend character list route to return complete character data
+- **API Service Fixes**: Fixed `charactersAPI.create()` to spread character data directly instead of wrapping in nested object
+- **Request Interceptors**: Added comprehensive request/response interceptors in API service for debugging
+- **Hook Integration**: Enhanced error reporting in `useCharacters.js` hook with detailed API error information
+- **Authentication Tracking**: Improved authentication state tracking and token validation logging
 
 ---
 
