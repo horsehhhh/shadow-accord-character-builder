@@ -23,39 +23,11 @@ router.get('/', auth, async (req, res) => {
       timestamp: new Date().toISOString() // Force Railway redeploy
     });
     
-    // Properly use ObjectId for user relationships (security best practice)
-    const userObjectId = new mongoose.Types.ObjectId(req.user.id);
-    const query = { userId: userObjectId };
+    // Use string userId to match database format (characters store userId as strings)
+    const query = { userId: req.user.id }; // Keep as string - this is the correct format
     
-    // Migration: Convert any string userIds to ObjectIds for security
-    try {
-      console.log('🔄 Starting migration check...');
-      const stringUserIdQuery = { userId: req.user.id }; // String format
-      console.log('🔍 Looking for characters with string userId:', stringUserIdQuery);
-      const charactersWithStringUserId = await Character.find(stringUserIdQuery);
-      console.log('🔍 Found characters with string userId:', charactersWithStringUserId.length);
-      
-      if (charactersWithStringUserId.length > 0) {
-        console.log(`🔄 Migrating ${charactersWithStringUserId.length} characters from string userId to ObjectId`);
-        console.log('📝 Character names to migrate:', charactersWithStringUserId.map(c => c.name));
-        
-        // Update characters to use proper ObjectId
-        const updateResult = await Character.updateMany(
-          stringUserIdQuery,
-          { $set: { userId: userObjectId } }
-        );
-        
-        console.log('✅ Migration completed:', {
-          matchedCount: updateResult.matchedCount,
-          modifiedCount: updateResult.modifiedCount,
-          stringUserIds: updateResult.acknowledged
-        });
-      } else {
-        console.log('✅ No migration needed - no characters found with string userIds');
-      }
-    } catch (migrationError) {
-      console.warn('⚠️ Migration warning (non-critical):', migrationError.message);
-    }
+    // Remove migration code - characters are correctly stored with string userIds
+    console.log('✅ Using string userId format as designed for database compatibility');
     
     // Add faction filter
     if (faction) {
@@ -70,14 +42,10 @@ router.get('/', auth, async (req, res) => {
       ];
     }
     
-    console.log('🔍 MongoDB query (using proper ObjectId):', {
-      userObjectId: userObjectId.toString(),
-      userObjectIdType: typeof userObjectId,
-      isObjectId: userObjectId instanceof mongoose.Types.ObjectId,
-      queryUserId: query.userId,
-      queryUserIdType: typeof query.userId,
-      queryUserIdIsObjectId: query.userId instanceof mongoose.Types.ObjectId,
-      fullQuery: query
+    console.log('🔍 MongoDB query (using string userId as designed):', {
+      userId: req.user.id,
+      userIdType: typeof req.user.id,
+      query: query
     });
     
     const options = {
@@ -99,9 +67,21 @@ router.get('/', auth, async (req, res) => {
       { $limit: 10 }
     ]);
     
+    // Enhanced debugging: Get actual character documents to see userId format
+    const sampleCharacters = await Character.find({}).limit(3).select('name userId');
+    console.log('🔍 Sample character userIds from database:', sampleCharacters.map(c => ({
+      name: c.name,
+      userId: c.userId,
+      userIdType: typeof c.userId,
+      userIdConstructor: c.userId?.constructor?.name,
+      userIdString: c.userId?.toString(),
+      isObjectId: c.userId instanceof mongoose.Types.ObjectId,
+      matchesCurrentUser: c.userId?.toString() === req.user.id
+    })));
+    
     console.log('🔍 GET Characters result:', {
       currentUserAuthenticated: req.user._id.toString(),
-      searchingForUserId: userObjectId.toString(),
+      searchingForUserId: req.user.id,
       foundCharacters: characters.length,
       totalCount: total,
       characterNames: characters.map(c => c.name),
@@ -260,7 +240,7 @@ router.post('/', [
 
     let characterData = {
       ...req.body,
-      userId: new mongoose.Types.ObjectId(req.user.id)  // Convert to ObjectId
+      userId: req.user.id  // Keep as string to match database design
     };
 
     // Preprocess data types before creating (same as update)
@@ -633,7 +613,7 @@ router.post('/:id/clone', [
     delete cloneData.updatedAt;
     
     cloneData.name = req.body.name;
-    cloneData.userId = new mongoose.Types.ObjectId(req.user.id);  // Convert to ObjectId
+    cloneData.userId = req.user.id;  // Keep as string to match database design
     cloneData.isPublic = false;
     cloneData.sharedWith = [];
     cloneData.campaignId = null;
