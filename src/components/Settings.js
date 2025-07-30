@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, Sync } from 'lucide-react';
+import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
 
 const Settings = ({ 
@@ -149,7 +149,7 @@ const Settings = ({
               disabled={syncStatus === 'syncing' || !isAuthenticated || !isOnline}
               className={`${themeClasses.button} text-white px-3 py-1 rounded text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              <Sync className="w-3 h-3" />
+              <RotateCw className="w-3 h-3" />
               Sync Now
             </button>
           </div>
