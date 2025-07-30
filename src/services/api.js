@@ -5,8 +5,17 @@ import axios from 'axios';
 const isProduction = process.env.NODE_ENV === 'production';
 const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
 
+console.log('🔍 API Environment Detection:', {
+  isProduction,
+  isCapacitor,
+  userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
+  platform: typeof window !== 'undefined' && window.Capacitor ? 'Capacitor/Mobile' : 'Web'
+});
+
 const API_BASE = process.env.REACT_APP_API_URL || 
   (isProduction || isCapacitor ? 'https://shadowaccordapi.up.railway.app/api' : 'http://localhost:5000/api');
+
+console.log('🌐 API Base URL:', API_BASE);
 
 // Create axios instance with default config
 const api = axios.create({

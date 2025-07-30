@@ -12,12 +12,23 @@ export const useCharacters = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const hasToken = migrationUtils.isAuthenticated();
+      const platform = typeof window !== 'undefined' && window.Capacitor ? 'Android/Capacitor' : 'Web';
+      
+      console.log('🔐 Authentication Check:', {
+        platform,
+        hasToken: !!hasToken,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) + '...' : 'N/A'
+      });
+      
       if (hasToken) {
         try {
           // Verify token is valid by making a test API call
+          console.log('📡 Testing API connection on', platform, '...');
           await charactersAPI.getAll();
+          console.log('✅ Authentication successful on', platform);
           setIsAuthenticated(true);
         } catch (error) {
+          console.error('❌ Authentication failed on', platform, ':', error);
           console.warn('Authentication token invalid, switching to offline mode:', error.message);
           setIsAuthenticated(false);
           // Clear invalid token
@@ -25,6 +36,7 @@ export const useCharacters = () => {
           localStorage.removeItem('user');
         }
       } else {
+        console.log('📱 No auth token found on', platform, ', using offline mode');
         setIsAuthenticated(false);
       }
     };
