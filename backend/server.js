@@ -21,6 +21,9 @@ const { notFound } = require('./middleware/notFound');
 
 const app = express();
 
+// Trust proxy for Railway deployment (required for rate limiting)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(compression());
@@ -43,7 +46,10 @@ app.use(cors(corsOptions));
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  trustProxy: true // Trust proxy headers for Railway
 });
 app.use('/api/', limiter);
 
