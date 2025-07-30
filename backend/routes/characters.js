@@ -26,10 +26,17 @@ router.get('/', auth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
     
-    // Use string comparison since ObjectId direct comparison is failing
-    const query = { userId: req.user.id };
+    // Try both ObjectId and string comparison with $expr to force evaluation
+    const userObjectId = new mongoose.Types.ObjectId(req.user.id);
+    const query = {
+      $or: [
+        { userId: userObjectId },
+        { userId: req.user.id },
+        { $expr: { $eq: [{ $toString: "$userId" }, req.user.id] } }
+      ]
+    };
     
-    console.log('✅ Using string userId - direct ObjectId query was failing despite matching data');
+    console.log('🔍 Using comprehensive query with ObjectId, string, and $expr comparison');
     
     // Add faction filter
     if (faction) {
