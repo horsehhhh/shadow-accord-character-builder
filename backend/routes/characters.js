@@ -49,11 +49,18 @@ router.get('/', auth, async (req, res) => {
     
     const total = await Character.countDocuments(query);
     
+    // Debug: Let's also check what characters exist in the database regardless of userId
+    const allCharacters = await Character.find({}).limit(10);
+    console.log('🔍 All characters in database (first 10):', 
+      allCharacters.map(c => ({ id: c._id, name: c.name, userId: c.userId, userIdType: typeof c.userId }))
+    );
+    
     console.log('🔍 Characters query result:', {
       foundCharacters: characters.length,
       totalCount: total,
       characterIds: characters.map(c => ({ id: c._id, name: c.name, userId: c.userId })),
-      queryUserId: req.user.id
+      queryUserId: req.user.id,
+      queryUserIdType: typeof req.user.id
     });
     
     res.json({
