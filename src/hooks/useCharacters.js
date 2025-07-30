@@ -337,7 +337,7 @@ export const useCharacters = () => {
       const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
       
       // First refresh from cloud to get latest data
-      const refreshedCharacters = await refreshFromCloud();
+      await refreshFromCloud();
       
       // Then push any local-only characters
       let syncCount = 0;
