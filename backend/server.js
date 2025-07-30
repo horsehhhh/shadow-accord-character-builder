@@ -13,6 +13,7 @@ const characterRoutes = require('./routes/characters');
 const gamedataRoutes = require('./routes/gamedata');
 const campaignRoutes = require('./routes/campaigns');
 const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
 
 // Import middleware
 const { errorHandler } = require('./middleware/errorHandler');
@@ -65,6 +66,7 @@ app.use('/api/characters', characterRoutes);
 app.use('/api/gamedata', gamedataRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

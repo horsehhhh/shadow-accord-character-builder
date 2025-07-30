@@ -25,6 +25,14 @@ const userSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't include password in queries by default
   },
+  passwordResetToken: {
+    type: String,
+    select: false
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
+  },
   role: {
     type: String,
     enum: ['player', 'gm', 'admin'],
@@ -80,6 +88,26 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 userSchema.methods.updateLastLogin = function() {
   this.lastLogin = new Date();
   return this.save();
+};
+
+// Generate password reset token
+userSchema.methods.createPasswordResetToken = function() {
+  const crypto = require('crypto');
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.passwordResetExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+  
+  return resetToken;
+};
+
+// Check if password reset token is valid
+userSchema.methods.isPasswordResetTokenValid = function(token) {
+  const crypto = require('crypto');
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  
+  return this.passwordResetToken === hashedToken && 
+         this.passwordResetExpires > Date.now();
 };
 
 module.exports = mongoose.model('User', userSchema);
