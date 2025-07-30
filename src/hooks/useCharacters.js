@@ -139,52 +139,71 @@ export const useCharacters = () => {
     }
   };
 
-  // Update character function with automatic cloud sync
+  // Update character function with immediate cloud sync
   const updateCharacter = async (characterIndex, updatedCharacter) => {
     try {
       const character = characters[characterIndex];
       if (!character) throw new Error('Character not found');
 
-      // Always update local state first for immediate UI response
-      const updatedWithId = { ...updatedCharacter, id: character.id, lastModified: new Date().toISOString() };
-      setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithId : c));
+      console.log('🔄 Updating character:', character.name, 'at index', characterIndex);
+      const updatedWithTimestamp = { 
+        ...updatedCharacter, 
+        id: character.id, 
+        lastModified: new Date().toISOString() 
+      };
 
-      // Sync to cloud if authenticated
+      // If authenticated and this is an API character, sync to cloud immediately
       if (isAuthenticated && character.id.startsWith('api_')) {
         try {
-          console.log('🔄 Auto-syncing character update to cloud:', character.name);
-          const updated = await charactersAPI.update(character.id.replace('api_', ''), updatedCharacter);
-          const cloudUpdatedWithId = { ...updated, id: `api_${updated._id}` };
-          setCharacters(prev => prev.map((c, i) => i === characterIndex ? cloudUpdatedWithId : c));
+          console.log('🔄 Syncing API character update to cloud:', character.name);
+          const cloudUpdated = await charactersAPI.update(character.id.replace('api_', ''), updatedWithTimestamp);
+          const cloudCharacterWithId = { ...cloudUpdated, id: `api_${cloudUpdated._id}` };
+          
+          // Update local state with cloud response
+          setCharacters(prev => prev.map((c, i) => i === characterIndex ? cloudCharacterWithId : c));
           console.log('✅ Character successfully synced to cloud');
-          return cloudUpdatedWithId;
+          return cloudCharacterWithId;
         } catch (apiError) {
-          console.warn('⚠️ Cloud sync failed, keeping local changes:', apiError.message);
-          // Don't set authentication to false here - might be temporary network issue
-          // Fall through to localStorage backup
+          console.error('❌ Cloud sync failed:', apiError.message);
+          // Update local state anyway for offline functionality
+          setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c));
+          return updatedWithTimestamp;
         }
-      } else if (isAuthenticated && !character.id.startsWith('api_')) {
-        // Try to create this character in the cloud for the first time
+      } 
+      
+      // If authenticated but local character, try to create in cloud
+      else if (isAuthenticated && !character.id.startsWith('api_')) {
         try {
-          console.log('🔄 Creating character in cloud for first time:', character.name);
-          const created = await charactersAPI.create(updatedCharacter);
+          console.log('🔄 Creating local character in cloud:', character.name);
+          const created = await charactersAPI.create(updatedWithTimestamp);
           const newCloudCharacter = { ...created, id: `api_${created._id}` };
+          
+          // Replace the local character with the cloud version
           setCharacters(prev => prev.map((c, i) => i === characterIndex ? newCloudCharacter : c));
           console.log('✅ Character successfully created in cloud');
           return newCloudCharacter;
         } catch (apiError) {
           console.warn('⚠️ Failed to create character in cloud:', apiError.message);
-          // Fall through to localStorage backup
+          // Update local state anyway
+          setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c));
+          return updatedWithTimestamp;
         }
+      } 
+      
+      // Not authenticated - just update locally
+      else {
+        setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c));
+        console.log('📱 Character updated locally only (not authenticated)');
+        
+        // Save to localStorage as backup when not authenticated
+        const savedData = localStorage.getItem('shadowAccordPhase8');
+        const data = savedData ? JSON.parse(savedData) : {};
+        data.characters = characters.map((c, i) => i === characterIndex ? updatedWithTimestamp : c);
+        localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+        
+        return updatedWithTimestamp;
       }
       
-      // Update localStorage as backup (either not authenticated, not API character, or API failed)
-      const savedData = localStorage.getItem('shadowAccordPhase8');
-      const data = savedData ? JSON.parse(savedData) : {};
-      data.characters = characters.map((c, i) => i === characterIndex ? updatedWithId : c);
-      localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
-      
-      return updatedWithId;
     } catch (err) {
       console.error('Error updating character:', err);
       setError(err.message);
@@ -324,97 +343,48 @@ export const useCharacters = () => {
     }
   };
 
-  // Sync all local changes to cloud (for manual sync)
+  // Sync all local changes to cloud (simplified approach)
   const syncAllToCloud = useCallback(async () => {
     if (!isAuthenticated) {
       throw new Error('Must be authenticated to sync to cloud');
     }
 
     try {
-      console.log('🔄 Syncing all local changes to cloud...');
+      console.log('🔄 Full bidirectional sync starting...');
       
-      // Get current local-only characters and API characters that might need updates
+      // Step 1: Refresh from cloud to get latest server state
+      console.log('📥 Pulling latest data from cloud...');
+      await refreshFromCloud();
+      
+      // Step 2: Since updateCharacter now handles immediate cloud sync,
+      // we don't need complex logic here. Just ensure any remaining local-only 
+      // characters get created in the cloud.
       const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
-      const localApiCharacters = characters.filter(c => c.id.startsWith('api_'));
-      console.log(`Found ${localOnlyCharacters.length} local-only characters to sync:`, localOnlyCharacters.map(c => c.name));
-      console.log(`Found ${localApiCharacters.length} API characters to check for updates:`, localApiCharacters.map(c => c.name));
+      console.log(`Found ${localOnlyCharacters.length} local-only characters to create in cloud`);
       
-      // First refresh from cloud to get latest data
-      const refreshedCharacters = await refreshFromCloud();
-      console.log(`Refreshed ${refreshedCharacters.length} total characters (API + local)`);
-      
-      // Filter to get only API characters from the refresh
-      const cloudApiCharacters = refreshedCharacters.filter(c => c.id.startsWith('api_'));
-      console.log(`Found ${cloudApiCharacters.length} API characters in cloud`);
-      
-      // Check for API characters that need updates
-      let updateCount = 0;
-      for (const localChar of localApiCharacters) {
-        const cloudChar = cloudApiCharacters.find(c => c.id === localChar.id);
-        if (cloudChar) {
-          // Compare lastModified timestamps to see if local version is newer
-          const localModified = new Date(localChar.lastModified || 0);
-          const cloudModified = new Date(cloudChar.lastModified || 0);
-          
-          if (localModified > cloudModified) {
-            try {
-              console.log(`Updating cloud character: ${localChar.name} (local: ${localModified.toISOString()}, cloud: ${cloudModified.toISOString()})`);
-              const updated = await charactersAPI.update(localChar.id.replace('api_', ''), localChar);
-              console.log(`Successfully updated character in cloud:`, updated);
-              
-              // Update local state with the updated cloud version
-              setCharacters(prev => prev.map(c => 
-                c.id === localChar.id 
-                  ? { ...updated, id: `api_${updated._id}` }
-                  : c
-              ));
-              updateCount++;
-            } catch (updateError) {
-              console.warn('Failed to update character in cloud:', localChar.name, updateError);
-            }
-          }
-        }
-      }
-      
-      // Then push any local-only characters that weren't already synced
-      let syncCount = 0;
-      
+      let createdCount = 0;
       for (const character of localOnlyCharacters) {
-        // Check if this character was already synced in the refresh
-        const alreadySynced = cloudApiCharacters.some(c => 
-          c.name === character.name && 
-          c.player === character.player &&
-          c.faction === character.faction
-        );
-        
-        if (alreadySynced) {
-          console.log(`Skipping ${character.name} - already exists in cloud`);
-          // Remove the local duplicate
-          setCharacters(prev => prev.filter(c => c.id !== character.id));
-          continue;
-        }
-        
         try {
-          console.log(`Syncing character: ${character.name}`);
+          console.log(`Creating character in cloud: ${character.name}`);
           const created = await charactersAPI.create(character);
-          console.log(`Successfully created character in cloud:`, created);
+          const newCloudCharacter = { ...created, id: `api_${created._id}` };
           
-          // Update state with the new API character
+          // Replace local character with cloud version
           setCharacters(prev => prev.map(c => 
-            c.id === character.id 
-              ? { ...created, id: `api_${created._id}` }
-              : c
+            c.id === character.id ? newCloudCharacter : c
           ));
-          syncCount++;
+          createdCount++;
+          console.log(`✅ Created ${character.name} in cloud`);
         } catch (createError) {
-          console.warn('Failed to sync character to cloud:', character.name, createError);
+          console.warn(`❌ Failed to create ${character.name} in cloud:`, createError.message);
         }
       }
       
-      console.log(`✅ Sync complete. Updated ${updateCount} characters, pushed ${syncCount} new characters to cloud, refreshed from cloud`);
-      return { updated: updateCount, pushed: syncCount, refreshed: true };
+      console.log(`✅ Sync complete. Created ${createdCount} new characters in cloud`);
+      return { created: createdCount, refreshed: true };
+      
     } catch (err) {
-      console.error('Sync error:', err);
+      console.error('❌ Sync error:', err);
       throw err;
     }
   }, [isAuthenticated, characters, refreshFromCloud]);
