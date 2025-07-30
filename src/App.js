@@ -139,9 +139,7 @@ const ShadowAccordComplete = () => {
   // Cloud features (optional)
   const { 
     loading: cloudLoading, 
-    createCharacter: cloudCreateCharacter, 
-    isAuthenticated,
-    currentUser 
+    createCharacter: cloudCreateCharacter
   } = useCharacters();
   
   // Lore Search State
