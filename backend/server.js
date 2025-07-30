@@ -26,7 +26,10 @@ app.use(compression());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+  origin: process.env.CORS_ORIGINS?.split(',') || [
+    'http://localhost:3000',
+    'https://front-end-production-a8cc.up.railway.app'
+  ],
   credentials: true,
   optionsSuccessStatus: 200
 };
