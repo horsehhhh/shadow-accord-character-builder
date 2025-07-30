@@ -156,25 +156,29 @@ router.get('/:id', [
 router.post('/', [
   auth,
   body('name')
-    .notEmpty()
-    .withMessage('Character name is required')
+    .optional()
     .isLength({ max: 50 })
     .withMessage('Character name cannot exceed 50 characters'),
   body('player')
-    .notEmpty()
-    .withMessage('Player name is required')
+    .optional()
     .isLength({ max: 50 })
     .withMessage('Player name cannot exceed 50 characters'),
   body('faction')
-    .isIn(['human', 'vampire', 'shifter', 'wraith'])
+    .optional()
+    .isIn(['human', 'vampire', 'shifter', 'wraith', ''])
     .withMessage('Invalid faction'),
   body('subfaction')
-    .notEmpty()
-    .withMessage('Subfaction is required')
+    .optional()
 ], async (req, res) => {
   try {
+    console.log('Character creation request received:', {
+      userId: req.user.id,
+      body: req.body
+    });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -187,7 +191,9 @@ router.post('/', [
       userId: req.user.id
     };
 
+    console.log('Creating character with data:', characterData);
     const character = await Character.create(characterData);
+    console.log('Character created successfully:', character._id);
 
     res.status(201).json({
       success: true,

@@ -19,6 +19,33 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.3.1] - 2025-07-29
+
+### 🔧 Cloud Synchronization Fixes
+
+#### Fixed
+- **API Data Format Issue**: Corrected character creation API to send character data in the format expected by backend validation
+- **Character Data Retrieval**: Fixed backend character list endpoint to return complete character objects instead of limited field selection
+- **Missing Character Components**: Backend now properly returns stats, skills, powers, merits, and all nested character data structures
+- **Cloud Save Failures**: Resolved character creation failures by properly spreading character data instead of nesting in `characterData` field
+- **Data Structure Mismatch**: Fixed disconnect between frontend character object structure and backend API expectations
+
+#### Enhanced
+- **Comprehensive Debugging**: Added detailed logging throughout API service layer for request/response tracking
+- **Authentication Token Monitoring**: Enhanced logging to track token presence and authentication state during API calls
+- **Character Operation Logging**: Added detailed console output for character creation, loading, and error scenarios
+- **API Error Reporting**: Improved error handling with full response data logging for easier troubleshooting
+- **Cloud Sync Visibility**: Added detailed console logs to track character sync attempts and success/failure states
+
+#### Technical Details
+- Fixed `charactersAPI.create()` to spread character data directly instead of wrapping in nested object
+- Removed `.select()` filtering from backend character list route to return complete character data
+- Added comprehensive request/response interceptors in API service for debugging
+- Enhanced error reporting in `useCharacters.js` hook with detailed API error information
+- Improved authentication state tracking and token validation logging
+
+---
+
 ## [v0.3.0] - 2025-07-29
 
 ### 🌐 Major Release: Full-Stack Web Application

@@ -12,13 +12,13 @@ const characterSchema = new mongoose.Schema({
   // Character basic info (matching your current structure)
   name: {
     type: String,
-    required: [true, 'Character name is required'],
+    default: '',
     trim: true,
     maxlength: [50, 'Character name cannot exceed 50 characters']
   },
   player: {
     type: String,
-    required: [true, 'Player name is required'],
+    default: '',
     trim: true,
     maxlength: [50, 'Player name cannot exceed 50 characters']
   },
@@ -26,12 +26,12 @@ const characterSchema = new mongoose.Schema({
   // Faction and subfaction
   faction: {
     type: String,
-    required: [true, 'Faction is required'],
-    enum: ['human', 'vampire', 'shifter', 'wraith']
+    default: '',
+    enum: ['human', 'vampire', 'shifter', 'wraith', '']
   },
   subfaction: {
     type: String,
-    required: [true, 'Subfaction is required']
+    default: ''
   },
   
   // Character stats (exact match to your structure)

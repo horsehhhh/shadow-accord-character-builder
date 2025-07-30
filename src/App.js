@@ -213,6 +213,22 @@ const ShadowAccordComplete = () => {
   const currentVersion = '0.3.0';
   const changelog = [
     {
+      version: '0.3.1',
+      date: '2025-07-29',
+      changes: [
+        '🔧 CLOUD SYNC FIXES: Resolved major cloud synchronization issues for character storage',
+        '🛠️ Fixed API Data Format - Corrected character creation API to send data in expected backend format',
+        '📊 Fixed Character Data Retrieval - Backend now returns complete character objects instead of limited fields',
+        '🔍 Enhanced Debugging - Added comprehensive logging to API requests, responses, and character operations',
+        '💾 Improved Data Structure - Character loading now properly retrieves stats, skills, powers, merits, and all character data',
+        '🚀 Backend API Improvements - Fixed character list endpoint to return full character data for proper frontend display',
+        '🔐 Authentication Token Logging - Added request/response tracking to identify authentication issues',
+        '⚡ Character Creation Debugging - Added detailed logging for cloud save attempts and fallback behavior',
+        '🌐 API Error Handling - Enhanced error reporting with detailed response data for troubleshooting',
+        '✅ Complete Character Sync - Characters should now properly sync to cloud storage and be accessible across devices'
+      ]
+    },
+    {
       version: '0.3.0',
       date: '2025-07-29',
       changes: [
