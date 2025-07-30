@@ -219,14 +219,40 @@ router.put('/:id', [
     .optional()
     .isLength({ max: 50 })
     .withMessage('Character name cannot exceed 50 characters'),
+  body('player')
+    .optional()
+    .isLength({ max: 50 })
+    .withMessage('Player name cannot exceed 50 characters'),
   body('notes')
     .optional()
     .isLength({ max: 5000 })
-    .withMessage('Notes cannot exceed 5000 characters')
+    .withMessage('Notes cannot exceed 5000 characters'),
+  body('faction')
+    .optional()
+    .isIn(['human', 'vampire', 'shifter', 'wraith', ''])
+    .withMessage('Invalid faction'),
+  body('totalXP')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Total XP must be a non-negative integer'),
+  body('xpSpent')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('XP spent must be a non-negative integer'),
+  body('checkInCount')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Check-in count must be a non-negative integer')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.error('Character update validation failed:', {
+        characterId: req.params.id,
+        userId: req.user?.id,
+        errors: errors.array(),
+        bodyKeys: Object.keys(req.body)
+      });
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -269,7 +295,7 @@ router.put('/:id', [
     Object.assign(character, req.body);
     await character.save();
 
-    console.log('Character updated successfully:', {
+    console.log('✅ Character update successful:', {
       characterId: character._id,
       name: character.name,
       totalXP: character.totalXP,
