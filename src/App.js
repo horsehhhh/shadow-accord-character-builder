@@ -14,6 +14,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import PowerIndex from './PowerIndex';
 import AuthComponent from './components/AuthComponent';
 import SettingsComponent from './components/Settings';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useCharacters } from './hooks/useCharacters';
 
 // Helper function to load PDF files (works in web, Electron, and Capacitor)
@@ -11843,7 +11844,8 @@ Your character is ready to play!`;
   };
 
   return (
-    <div className="min-h-screen">
+    <ErrorBoundary>
+      <div className="min-h-screen">
       {currentMode === 'menu' && (
         <AuthComponent onAuthChange={async (isAuth) => {
           console.log('Auth changed:', isAuth);
@@ -12025,7 +12027,8 @@ Are you ready to proceed with the transformation and character creation?`;
           </div>
         </div>
           )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
   };
 
