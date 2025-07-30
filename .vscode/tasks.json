@@ -8,6 +8,18 @@
 			"group": "build",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Start Backend Server",
+			"type": "shell",
+			"command": "node",
+			"args": ["server.js"],
+			"options": {
+				"cwd": "${workspaceFolder}/backend"
+			},
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }
