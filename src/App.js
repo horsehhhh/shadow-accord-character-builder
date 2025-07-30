@@ -202,8 +202,19 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.2.2';
+  const currentVersion = '0.2.3';
   const changelog = [
+    {
+      version: '0.2.3',
+      date: '2025-07-30',
+      changes: [
+        'Fixed lore assignment system for Gifted Kinfolk characters during character creation',
+        'Enhanced lore assignment logic to properly handle both Fera and Garou tribal lore patterns',
+        'Gifted Kinfolk now correctly receive Shifter Lore plus appropriate tribal/fera lore based on selected tribal tree',
+        'Fixed issue where Fera subfactions (Ananasi, Bubasti, Corax, etc.) were not getting their specific lore during automatic assignment',
+        'Improved lore assignment debugging with comprehensive console logging for troubleshooting'
+      ]
+    },
     {
       version: '0.2.2',
       date: '2025-07-28',
@@ -1001,20 +1012,29 @@ pleasure,Pleasure,Joy|excitement|comfort`
   const assignFreeLore = (character) => {
     const freeLoreIds = [];
     
+    // Debug logging
+    console.log('assignFreeLore called for character:', {
+      faction: character.faction,
+      subfaction: character.subfaction,
+      innateTreeIds: character.innateTreeIds
+    });
+    
     // Assign faction lore if available
     const factionLoreId = `general_${character.faction}`;
     const factionLore = gameData.lores.find(lore => lore.lore_id === factionLoreId);
     if (factionLore) {
       freeLoreIds.push(factionLoreId);
+      console.log('Added faction lore:', factionLoreId);
     }
     
     // Assign subfaction-specific lore
     if (character.subfaction) {
-      // Check for tribal lore (shifter tribes)
+      // Check for tribal lore (Garou tribes)
       const tribalLoreId = `tribe_${character.subfaction}`;
       const tribalLore = gameData.lores.find(lore => lore.lore_id === tribalLoreId);
       if (tribalLore) {
         freeLoreIds.push(tribalLoreId);
+        console.log('Added tribal lore:', tribalLoreId);
       }
       
       // Check for clan lore (vampire clans)
@@ -1022,13 +1042,15 @@ pleasure,Pleasure,Joy|excitement|comfort`
       const clanLore = gameData.lores.find(lore => lore.lore_id === clanLoreId);
       if (clanLore) {
         freeLoreIds.push(clanLoreId);
+        console.log('Added clan lore:', clanLoreId);
       }
       
-      // Check for other specific subfaction lores
-      const subfactionLoreId = `${character.subfaction}_lore`;
-      const subfactionLore = gameData.lores.find(lore => lore.lore_id === subfactionLoreId);
-      if (subfactionLore) {
-        freeLoreIds.push(subfactionLoreId);
+      // Check for Fera lore (uses {fera_name}_lore pattern)
+      const feraLoreId = `${character.subfaction}_lore`;
+      const feraLore = gameData.lores.find(lore => lore.lore_id === feraLoreId);
+      if (feraLore) {
+        freeLoreIds.push(feraLoreId);
+        console.log('Added fera lore:', feraLoreId);
       }
       
       // Special cases for specific subfactions
@@ -1039,10 +1061,44 @@ pleasure,Pleasure,Joy|excitement|comfort`
           const fellowshipLore = gameData.lores.find(lore => lore.lore_id === fellowshipLoreId);
           if (fellowshipLore) {
             freeLoreIds.push(fellowshipLoreId);
+            console.log('Added fellowship lore:', fellowshipLoreId);
           }
           
           // Also give Mage Lore when a fellowship is selected
           freeLoreIds.push('general_mage');
+          console.log('Added mage lore for sorcerer');
+        }
+      }
+      
+      // Special case for Gifted Kinfolk - they get tribal lore from their selected tribe
+      if (character.subfaction === 'kinfolk') {
+        // Gifted Kinfolk get Shifter Lore automatically (they're human but need shifter knowledge)
+        freeLoreIds.push('general_shifter');
+        console.log('Added shifter lore for kinfolk');
+        
+        // Find the tribal tree they selected (excluding 'homid' which all kinfolk get)
+        if (character.innateTreeIds) {
+          const tribalTreeId = character.innateTreeIds.find(treeId => treeId !== 'homid');
+          console.log('Kinfolk tribal tree found:', tribalTreeId);
+          if (tribalTreeId) {
+            // Handle Fera lore (e.g., 'bubasti_gift' -> 'bubasti_lore')
+            const feraLoreId = `${tribalTreeId.replace('_gift', '')}_lore`;
+            const feraLore = gameData.lores.find(lore => lore.lore_id === feraLoreId);
+            if (feraLore) {
+              freeLoreIds.push(feraLoreId);
+              console.log('Added kinfolk fera lore:', feraLoreId);
+            } else {
+              // Handle Garou tribal lore (e.g., 'black_fury_gift' -> 'tribe_black_fury')
+              const tribalLoreId = `tribe_${tribalTreeId.replace('_gift', '')}`;
+              const tribalLore = gameData.lores.find(lore => lore.lore_id === tribalLoreId);
+              if (tribalLore) {
+                freeLoreIds.push(tribalLoreId);
+                console.log('Added kinfolk tribal lore:', tribalLoreId);
+              } else {
+                console.log('No lore found for tribal tree:', tribalTreeId);
+              }
+            }
+          }
         }
       }
       
@@ -1100,6 +1156,13 @@ pleasure,Pleasure,Joy|excitement|comfort`
     const newLores = freeLoreIds
       .filter(loreId => !existingLoreIds.includes(loreId))
       .map(loreId => ({ lore_id: loreId }));
+    
+    console.log('Final lore assignment:', {
+      freeLoreIds,
+      existingLoreIds,
+      newLores,
+      finalLores: [...existingLores, ...newLores]
+    });
     
     return {
       ...character,
@@ -7963,21 +8026,20 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 {!factionChangeCreationMode && (() => {
                   // Calculate what free lore will be assigned
                   const previewCharacter = assignFreeLore(newCharacter);
-                  const freeLores = previewCharacter.lores;
-                  const freeLoreEntries = Object.entries(freeLores || {}).filter(([_, count]) => count > 0);
+                  const freeLores = previewCharacter.lores || [];
                   
-                  return freeLoreEntries.length > 0 && (
+                  return freeLores.length > 0 && (
                     <div className={`${themeClasses.card} p-3 md:col-span-2`}>
                       <h4 className="font-bold mb-2">🎁 Free Lore (Automatic)</h4>
                       <p className="text-gray-400 text-sm mb-3">
                         Based on your faction and subfaction choices, you'll automatically receive these lore pieces at character creation:
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {freeLoreEntries.map(([loreId, count]) => {
-                          const lore = gameData.lores.find(l => l.lore_id === loreId);
+                        {freeLores.map((loreEntry, index) => {
+                          const lore = gameData.lores.find(l => l.lore_id === loreEntry.lore_id);
                           return (
-                            <span key={loreId} className="px-3 py-1 bg-green-600 rounded text-sm">
-                              {lore?.lore_name || loreId} {count > 1 ? `(x${count})` : ''}
+                            <span key={`${loreEntry.lore_id}-${index}`} className="px-3 py-1 bg-green-600 rounded text-sm">
+                              {lore?.lore_name || loreEntry.lore_id}
                             </span>
                           );
                         })}
