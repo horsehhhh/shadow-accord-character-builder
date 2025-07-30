@@ -74,24 +74,30 @@ const characterSchema = new mongoose.Schema({
   xpSpent: { type: Number, default: 0, min: 0 },
   checkInCount: { type: Number, default: 0, min: 0 },
   
-  xpHistory: [{
-    timestamp: { type: Date, default: Date.now },
-    type: { type: String, enum: ['gain', 'loss'], required: true },
-    amount: { type: Number, required: true },
-    reason: { type: String, required: true },
-    previousTotal: { type: Number, required: true },
-    newTotal: { type: Number, required: true }
-  }],
+  xpHistory: {
+    type: [{
+      timestamp: { type: Date, default: Date.now },
+      type: { type: String, enum: ['gain', 'loss'], required: true },
+      amount: { type: Number, required: true },
+      reason: { type: String, required: true },
+      previousTotal: { type: Number, required: true },
+      newTotal: { type: Number, required: true }
+    }],
+    default: []
+  },
   
-  advancementHistory: [{
-    checkIn: Number,
-    type: String,
-    itemId: String,
-    level: Number,
-    cost: Number,
-    timestamp: { type: Date, default: Date.now },
-    redundant: { type: Boolean, default: false }
-  }],
+  advancementHistory: {
+    type: [{
+      checkIn: Number,
+      type: String,
+      itemId: String,
+      level: Number,
+      cost: Number,
+      timestamp: { type: Date, default: Date.now },
+      redundant: { type: Boolean, default: false }
+    }],
+    default: []
+  },
   
   // Special character features
   innateTreeIds: [String],

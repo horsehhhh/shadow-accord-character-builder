@@ -366,8 +366,34 @@ router.put('/:id', [
       }
     });
 
-    // Update character
-    Object.assign(character, updateData);
+    // Apply processed data to character with explicit field assignment
+    // Don't use Object.assign for complex fields to avoid reference issues
+    for (const [key, value] of Object.entries(updateData)) {
+      if (arrayFields.includes(key) || objectFields.includes(key)) {
+        // Directly assign complex fields to ensure proper type casting
+        character[key] = value;
+        console.log(`📝 Directly assigned ${key}:`, Array.isArray(value) ? `Array[${value.length}]` : typeof value);
+      } else {
+        // Use normal assignment for simple fields
+        character[key] = value;
+      }
+    }
+    
+    // Validate critical array fields before saving
+    if (character.advancementHistory && !Array.isArray(character.advancementHistory)) {
+      console.error('❌ advancementHistory is not an array after processing:', typeof character.advancementHistory);
+      // Try one more parsing attempt
+      if (typeof character.advancementHistory === 'string') {
+        try {
+          character.advancementHistory = JSON.parse(character.advancementHistory);
+          console.log('🔄 Emergency parse successful for advancementHistory');
+        } catch (e) {
+          console.error('💥 Emergency parse failed, setting to empty array');
+          character.advancementHistory = [];
+        }
+      }
+    }
+    
     await character.save();
 
     console.log('✅ Character update successful:', {
