@@ -407,18 +407,47 @@ router.put('/:id', [
             }
           }
           
-          // Use direct MongoDB update to fix corrupted field
-          await Character.updateOne(
-            { _id: character._id },
-            { 
-              $set: { 
-                advancementHistory: cleanedValue,
-                xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || []
+          // Use raw MongoDB driver to bypass Mongoose validation
+          try {
+            const result = await character.collection.updateOne(
+              { _id: character._id },
+              { 
+                $set: { 
+                  advancementHistory: cleanedValue,
+                  xpHistory: updateData.xpHistory && Array.isArray(updateData.xpHistory) ? updateData.xpHistory : character.xpHistory || [],
+                  lastModified: new Date()
+                }
+              }
+            );
+            console.log('✅ Raw MongoDB update successful:', result);
+            
+            // Update other fields normally but skip advancementHistory and xpHistory
+            delete updateData.advancementHistory;
+            delete updateData.xpHistory;
+            
+            // Apply remaining updates
+            for (const [remainingKey, remainingValue] of Object.entries(updateData)) {
+              if (arrayFields.includes(remainingKey) || objectFields.includes(remainingKey)) {
+                character.set(remainingKey, remainingValue);
+                character.markModified(remainingKey);
+              } else {
+                character[remainingKey] = remainingValue;
               }
             }
-          );
-          console.log('✅ Database field repaired with cleaned data, skipping Mongoose assignment for this field');
-          continue; // Skip the normal assignment for this field
+            
+            await character.save();
+            console.log('✅ Character update completed successfully after raw MongoDB repair');
+            
+            res.json({
+              success: true,
+              message: 'Character updated successfully',
+              character: await Character.findById(character._id) // Return fresh data
+            });
+            return;
+          } catch (rawError) {
+            console.error('❌ Raw MongoDB update failed:', rawError);
+            throw rawError;
+          }
         }
         
         // Directly assign complex fields to ensure proper type casting

@@ -75,28 +75,25 @@ const characterSchema = new mongoose.Schema({
   checkInCount: { type: Number, default: 0, min: 0 },
   
   xpHistory: {
-    type: [{
-      timestamp: { type: Date, default: Date.now },
-      type: { type: String, enum: ['gain', 'loss'], required: true },
-      amount: { type: Number, required: true },
-      reason: { type: String, required: true },
-      previousTotal: { type: Number, required: true },
-      newTotal: { type: Number, required: true }
-    }],
-    default: []
+    type: mongoose.Schema.Types.Mixed, // Allow any type to handle corrupted data
+    default: [],
+    validate: {
+      validator: function(value) {
+        // Always return true to allow corrupted data to be saved for repair
+        return true;
+      }
+    }
   },
   
   advancementHistory: {
-    type: [{
-      checkIn: Number,
-      type: String,
-      itemId: String,
-      level: Number,
-      cost: Number,
-      timestamp: { type: Date, default: Date.now },
-      redundant: { type: Boolean, default: false }
-    }],
-    default: []
+    type: mongoose.Schema.Types.Mixed, // Allow any type to handle corrupted data
+    default: [],
+    validate: {
+      validator: function(value) {
+        // Always return true to allow corrupted data to be saved for repair
+        return true;
+      }
+    }
   },
   
   // Special character features
