@@ -66,14 +66,14 @@ router.get('/', auth, async (req, res) => {
       delete query.$or;
     }
     
-    console.log('🔍 MongoDB query (converting string to ObjectId to match database storage):', {
+    console.log('🔍 MongoDB query structure:', {
       originalUserId: req.user.id,
       userIdType: typeof req.user.id,
-      queryUserId: query.userId,
-      queryUserIdType: typeof query.userId,
-      queryUserIdConstructor: query.userId.constructor.name,
-      queryUserIdString: query.userId.toString(),
-      query: query
+      userObjectId: userObjectId,
+      userObjectIdType: typeof userObjectId,
+      hasAdditionalFilters: additionalFilters.length > 0,
+      additionalFiltersCount: additionalFilters.length,
+      queryStructure: query
     });
     
     // Test the query directly to see what's happening

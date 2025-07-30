@@ -13,7 +13,7 @@ console.log('🔍 API Environment Detection:', {
 });
 
 const API_BASE = process.env.REACT_APP_API_URL || 
-  (isProduction || isCapacitor ? 'https://shadowaccordapi.up.railway.app/api' : 'http://localhost:5000/api');
+  (isProduction || isCapacitor ? 'https://shadowaccordcharacterbuilder.up.railway.app/api' : 'http://localhost:5000/api');
 
 console.log('🌐 API Base URL:', API_BASE);
 
