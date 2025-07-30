@@ -88,18 +88,19 @@ export const charactersAPI = {
 
   // Create new character
   create: async (characterData) => {
-    const response = await api.post('/characters', { 
+    const response = await api.post('/characters', {
+      ...characterData,
       name: characterData.name || 'New Character',
+      player: characterData.player || 'Unknown Player',
       faction: characterData.faction || 'human',
-      subfaction: characterData.subfaction || 'commoner',
-      characterData 
+      subfaction: characterData.subfaction || 'commoner'
     });
     return response.data.character;
   },
 
   // Update existing character
   update: async (id, characterData) => {
-    const response = await api.put(`/characters/${id}`, { characterData });
+    const response = await api.put(`/characters/${id}`, characterData);
     return response.data.character;
   },
 
