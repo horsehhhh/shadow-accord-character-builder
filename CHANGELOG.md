@@ -5,6 +5,64 @@ All notable changes to the Shadow Accord Character Builder will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] - 2025-07-29
+
+### 🌐 Major Release: Full-Stack Web Application
+
+#### Added
+- **Cloud Character Storage**: Complete backend with Node.js/Express, MongoDB Atlas database, and JWT authentication
+- **Cross-Device Synchronization**: Characters automatically sync across all devices when logged in
+- **Web Application Deployment**: Live at [shadowaccordcharacterbuilder.up.railway.app](https://shadowaccordcharacterbuilder.up.railway.app)
+- **API Backend**: RESTful API deployed at [shadowaccordapi.up.railway.app](https://shadowaccordapi.up.railway.app)
+- **User Authentication System**: Secure registration, login, logout, and password reset functionality
+- **Hybrid Storage Model**: Smart system using localStorage for offline access and cloud storage for cross-device sync
+- **Smart Environment Detection**: Automatically detects and adapts API endpoints for production, development, and mobile platforms
+- **Railway Hosting**: Professional deployment on Railway platform with custom domains
+
+#### Enhanced User Experience
+- **Minimizable Authentication Panel**: Toggle-able auth interface that can be collapsed to stay out of the way
+- **Right-Side Positioning**: Moved authentication components to top-right corner for less intrusive experience
+- **Home Screen Only Authentication**: Login interface only appears on main menu, hidden during character creation/editing
+- **Improved Visual Design**: Subtle, less imposing authentication interface with transparency and refined styling
+- **System Status Dashboard**: Comprehensive status information moved to Settings section with detailed storage info
+
+#### Backend Infrastructure
+- **Express.js API Server**: Complete REST API with character CRUD operations, user management, and authentication
+- **MongoDB Atlas Integration**: Cloud database with proper indexing and data validation
+- **JWT Security**: Secure token-based authentication with 24-hour expiration and refresh capabilities
+- **Password Security**: bcryptjs hashing with salt rounds for secure password storage
+- **CORS Configuration**: Proper cross-origin resource sharing for frontend-backend communication
+- **Error Handling**: Comprehensive error responses and logging for debugging and monitoring
+
+#### Developer Experience
+- **Environment Variables**: Secure configuration management for database connections and JWT secrets
+- **Git Workflow**: Proper version control with meaningful commits and deployment automation
+- **API Documentation**: RESTful endpoints for authentication and character management
+- **Cross-Platform Compatibility**: Backend works seamlessly with web, Electron, and mobile versions
+
+#### Migration & Data Safety
+- **Automatic Migration System**: Seamlessly migrates existing localStorage characters to cloud storage
+- **Data Validation**: Server-side validation ensures data integrity during cloud operations
+- **Backup Preservation**: Local storage preserved as fallback while cloud sync is active
+- **Character Conflict Resolution**: Smart handling of character updates across multiple devices
+
+### Fixed
+- **Authentication Flow**: Resolved CORS issues and callback errors during user registration/login
+- **Domain Configuration**: Fixed Railway deployment issues with custom domain setup
+- **API Response Handling**: Improved error handling for network failures and server issues
+
+### Changed
+- **Storage Architecture**: Upgraded from localStorage-only to hybrid local/cloud storage model
+- **Authentication UI**: Redesigned for better user experience with minimize/maximize functionality
+- **Settings Organization**: Consolidated system status and cloud sync information into Settings panel
+- **Application Scope**: Evolved from local tool to full-featured web application with cloud capabilities
+
+### Technical Improvements
+- **API Service Layer**: Clean separation of concerns with dedicated API service module
+- **Authentication State Management**: Improved state handling across components with proper context
+- **Network Resilience**: Graceful fallback to local storage when cloud services are unavailable
+- **Performance Optimization**: Efficient API calls and data synchronization to minimize bandwidth usage
+
 ## [v0.1.9] - 2025-07-24
 
 ### Fixed

@@ -56,17 +56,18 @@ const AuthComponent = ({ onAuthChange }) => {
         <div style={{
           position: 'fixed',
           top: '10px',
-          left: '10px',
+          right: '10px',
           background: '#28a745',
           color: 'white',
           border: 'none',
-          padding: '8px 12px',
-          borderRadius: '20px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          padding: '6px 10px',
+          borderRadius: '15px',
+          boxShadow: '0 1px 5px rgba(0,0,0,0.1)',
           zIndex: 9999,
           cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: 'bold'
+          fontSize: '12px',
+          fontWeight: 'normal',
+          opacity: '0.8'
         }}
         onClick={() => setIsMinimized(false)}
         title="Click to expand"
@@ -80,14 +81,15 @@ const AuthComponent = ({ onAuthChange }) => {
       <div style={{
         position: 'fixed',
         top: '10px',
-        left: '10px',
+        right: '10px',
         background: 'white',
-        border: '2px solid #28a745',
-        padding: '15px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        border: '1px solid #28a745',
+        padding: '12px',
+        borderRadius: '6px',
+        boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
         zIndex: 9999,
-        minWidth: '250px'
+        minWidth: '220px',
+        opacity: '0.95'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <h4 style={{ margin: 0 }}>👤 Welcome, {user?.username}!</h4>
@@ -133,17 +135,18 @@ const AuthComponent = ({ onAuthChange }) => {
       <div style={{
         position: 'fixed',
         top: '10px',
-        left: '10px',
-        background: '#007bff',
+        right: '10px',
+        background: '#6c757d',
         color: 'white',
         border: 'none',
-        padding: '8px 12px',
-        borderRadius: '20px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        padding: '6px 10px',
+        borderRadius: '15px',
+        boxShadow: '0 1px 5px rgba(0,0,0,0.1)',
         zIndex: 9999,
         cursor: 'pointer',
-        fontSize: '14px',
-        fontWeight: 'bold'
+        fontSize: '12px',
+        fontWeight: 'normal',
+        opacity: '0.7'
       }}
       onClick={() => setIsMinimized(false)}
       title="Click to expand login"
@@ -157,14 +160,15 @@ const AuthComponent = ({ onAuthChange }) => {
     <div style={{
       position: 'fixed',
       top: '10px',
-      left: '10px',
+      right: '10px',
       background: 'white',
-      border: '2px solid #007bff',
-      padding: '15px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+      border: '1px solid #6c757d',
+      padding: '12px',
+      borderRadius: '6px',
+      boxShadow: '0 1px 8px rgba(0,0,0,0.08)',
       zIndex: 9999,
-      minWidth: '300px'
+      minWidth: '280px',
+      opacity: '0.95'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <h4 style={{ margin: 0 }}>🔐 {isLogin ? 'Login' : 'Register'}</h4>

@@ -212,8 +212,30 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.2.3';
+  const currentVersion = '0.3.0';
   const changelog = [
+    {
+      version: '0.3.0',
+      date: '2025-07-29',
+      changes: [
+        '🌐 MAJOR RELEASE: Full-Stack Web Application - Live at shadowaccordcharacterbuilder.up.railway.app',
+        '☁️ Cloud Character Storage - MongoDB Atlas database with JWT authentication for cross-device character sync',
+        '🔐 Complete Authentication System - Secure user registration, login, logout, and password reset functionality',
+        '🔄 Hybrid Storage Architecture - Smart localStorage + cloud storage system for offline access and online sync',
+        '🚀 Professional Deployment - Node.js/Express API backend deployed on Railway platform with custom domains',
+        '🎨 Redesigned Authentication UI - Minimizable, right-positioned login interface that stays out of the way',
+        '📱 Smart Environment Detection - Automatic API endpoint selection for production, development, and mobile platforms',
+        '🏠 Home Screen Only Authentication - Login interface only appears on main menu for cleaner user experience',
+        '⚙️ Enhanced Settings Panel - System status dashboard moved to Settings with comprehensive storage information',
+        '�️ Security Infrastructure - bcryptjs password hashing, JWT tokens, CORS configuration, and protected endpoints',
+        '💾 Seamless Character Migration - Automatic migration of existing localStorage characters to cloud storage',
+        '� Backend Architecture - RESTful API with character CRUD operations, user management, and data validation',
+        '📊 Improved Data Management - Enhanced backup system with both local export and cloud synchronization options',
+        '🌍 Cross-Platform Compatibility - Backend works seamlessly with web, Electron desktop, and mobile versions',
+        '⚡ Performance Optimization - Efficient API calls and data synchronization to minimize bandwidth usage',
+        '🔒 Data Safety Features - Both local backup preservation and secure cloud storage with conflict resolution'
+      ]
+    },
     {
       version: '0.2.3',
       date: '2025-07-30',
@@ -11836,6 +11858,37 @@ Your character is ready to play!`;
               >
                 Export Backup
               </button>
+              
+              {/* System Status */}
+              <div className="mt-6 pt-4 border-t border-gray-600">
+                <h4 className="text-lg font-semibold mb-3">System Status</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span>Characters stored locally:</span>
+                    <span className="text-green-400">✅ Always available offline</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Cloud sync:</span>
+                    <span className="text-green-400">✅ Automatic when online</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Manual backup:</span>
+                    <span className="text-green-400">✅ Export/import anytime</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Application version:</span>
+                    <span className="text-blue-400">0.3.0</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Storage location:</span>
+                    <span className="text-gray-300">Browser localStorage</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Cloud storage:</span>
+                    <span className="text-gray-300">MongoDB Atlas (when authenticated)</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -11973,20 +12026,21 @@ Your character is ready to play!`;
 
   return (
     <div className="min-h-screen">
-      <AuthComponent onAuthChange={async (isAuth) => {
-        console.log('Auth changed:', isAuth);
-        if (isAuth && characters.length > 0) {
-          // When user logs in, offer to sync existing characters to cloud
-          const shouldSync = window.confirm(
-            `Found ${characters.length} character(s) saved locally. Would you like to sync them to cloud storage so you can access them on any device?`
-          );
-          if (shouldSync) {
-            try {
-              // Sync characters to cloud
-              for (const char of characters) {
-                await cloudCreateCharacter(char);
-              }
-              alert('Characters successfully synced to cloud storage!');
+      {currentMode === 'menu' && (
+        <AuthComponent onAuthChange={async (isAuth) => {
+          console.log('Auth changed:', isAuth);
+          if (isAuth && characters.length > 0) {
+            // When user logs in, offer to sync existing characters to cloud
+            const shouldSync = window.confirm(
+              `Found ${characters.length} character(s) saved locally. Would you like to sync them to cloud storage so you can access them on any device?`
+            );
+            if (shouldSync) {
+              try {
+                // Sync characters to cloud
+                for (const char of characters) {
+                  await cloudCreateCharacter(char);
+                }
+                alert('Characters successfully synced to cloud storage!');
             } catch (error) {
               console.error('Error syncing characters:', error);
               alert('Some characters may not have synced. They remain saved locally.');
@@ -11994,14 +12048,15 @@ Your character is ready to play!`;
           }
         }
       }} />
+      )}
       
-      {/* User Status (Optional Cloud Features) */}
-      {cloudLoading && (
+      {/* User Status (Optional Cloud Features) - Only on home screen */}
+      {currentMode === 'menu' && cloudLoading && (
         <div className="fixed top-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
           💾 Syncing to cloud...
         </div>
       )}
-      {isAuthenticated && currentUser && (
+      {currentMode === 'menu' && isAuthenticated && currentUser && (
         <div className="fixed top-10 left-10 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
           ☁️ Cloud sync active: {currentUser.username}
         </div>
