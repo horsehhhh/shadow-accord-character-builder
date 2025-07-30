@@ -19,7 +19,8 @@ router.get('/', auth, async (req, res) => {
       hasUser: !!req.user,
       userObjectId: req.user._id,
       userIdVsObjectId: req.user.id === req.user._id.toString(),
-      queryParams: { page, limit, faction, search, sort }
+      queryParams: { page, limit, faction, search, sort },
+      timestamp: new Date().toISOString() // Force Railway redeploy
     });
     
     // Properly use ObjectId for user relationships (security best practice)
