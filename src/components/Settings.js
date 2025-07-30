@@ -16,7 +16,7 @@ const Settings = ({
   const [syncStatus, setSyncStatus] = useState('idle');
   const [lastCloudSync, setLastCloudSync] = useState(null);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
-  const [syncInterval, setSyncInterval] = useState(30); // seconds
+  const [syncInterval, setSyncInterval] = useState(5); // seconds
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   // Monitor online status

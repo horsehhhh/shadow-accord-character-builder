@@ -335,16 +335,39 @@ export const useCharacters = () => {
       
       // Get current local-only characters before refreshing
       const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      console.log(`Found ${localOnlyCharacters.length} local-only characters to sync:`, localOnlyCharacters.map(c => c.name));
       
       // First refresh from cloud to get latest data
-      await refreshFromCloud();
+      const refreshedCharacters = await refreshFromCloud();
+      console.log(`Refreshed ${refreshedCharacters.length} total characters (API + local)`);
       
-      // Then push any local-only characters using the fresh state
+      // Filter to get only API characters from the refresh
+      const apiCharacters = refreshedCharacters.filter(c => c.id.startsWith('api_'));
+      console.log(`Found ${apiCharacters.length} API characters in cloud`);
+      
+      // Then push any local-only characters that weren't already synced
       let syncCount = 0;
       
       for (const character of localOnlyCharacters) {
+        // Check if this character was already synced in the refresh
+        const alreadySynced = apiCharacters.some(c => 
+          c.name === character.name && 
+          c.player === character.player &&
+          c.faction === character.faction
+        );
+        
+        if (alreadySynced) {
+          console.log(`Skipping ${character.name} - already exists in cloud`);
+          // Remove the local duplicate
+          setCharacters(prev => prev.filter(c => c.id !== character.id));
+          continue;
+        }
+        
         try {
+          console.log(`Syncing character: ${character.name}`);
           const created = await charactersAPI.create(character);
+          console.log(`Successfully created character in cloud:`, created);
+          
           // Update state with the new API character
           setCharacters(prev => prev.map(c => 
             c.id === character.id 
