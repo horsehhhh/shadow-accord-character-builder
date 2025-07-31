@@ -9014,7 +9014,7 @@ Your character is ready to play!`;
                           
                           <div className="flex gap-2">
                             <button
-                              onClick={() => {
+                              onClick={async () => {
                                 const additionalXp = selectedCheckInActivities.reduce((total, activity) => total + activity.xp, 0);
                                 const totalXp = 3 + additionalXp;
                                 
@@ -9039,9 +9039,7 @@ Your character is ready to play!`;
                                   lastModified: new Date().toISOString()
                                 };
                                 
-                                const newCharacters = [...characters];
-                                newCharacters[currentCharacterIndex] = updated;
-                                setCharacters(newCharacters);
+                                await updateCurrentCharacter(updated);
                                 
                                 setSelectedCheckInActivities([]);
                                 setShowCheckInDropdown(false);
@@ -9487,14 +9485,12 @@ Your character is ready to play!`;
                           <div className="flex gap-2">
                             {character.stats.energy > 1 && (
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   const updated = reduceCharacter(character, {
                                     type: 'energy',
                                     itemId: 'energy'
                                   });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
+                                  await updateCurrentCharacter(updated);
                                 }}
                                 className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                               >
@@ -9568,14 +9564,12 @@ Your character is ready to play!`;
                           <div className="flex gap-2">
                             {character.stats.willpower > 1 && (
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   const updated = reduceCharacter(character, {
                                     type: 'willpower',
                                     itemId: 'willpower'
                                   });
-                                  const newCharacters = [...characters];
-                                  newCharacters[currentCharacterIndex] = updated;
-                                  setCharacters(newCharacters);
+                                  await updateCurrentCharacter(updated);
                                 }}
                                 className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                               >
@@ -9665,7 +9659,7 @@ Your character is ready to play!`;
                               <>
                                 {character.stats.virtue > 0 && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const cost = 2; // Cost XP to reduce Angst
                                       if (character.totalXP >= cost) {
                                         const updated = reduceCharacter(character, {
@@ -9686,9 +9680,7 @@ Your character is ready to play!`;
                                             newTotal: character.totalXP - cost
                                           }
                                         ];
-                                        const newCharacters = [...characters];
-                                        newCharacters[currentCharacterIndex] = updated;
-                                        setCharacters(newCharacters);
+                                        await updateCurrentCharacter(updated);
                                       }
                                     }}
                                     className={`px-3 py-2 rounded font-medium text-sm ${
@@ -9839,14 +9831,12 @@ Your character is ready to play!`;
                               <div className="flex gap-2">
                                 {hasMerit && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       const updated = reduceCharacter(character, {
                                         type: 'merit',
                                         itemId: merit.merit_id
                                       });
-                                      const newCharacters = [...characters];
-                                      newCharacters[currentCharacterIndex] = updated;
-                                      setCharacters(newCharacters);
+                                      await updateCurrentCharacter(updated);
                                     }}
                                     className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                                   >
@@ -10326,16 +10316,14 @@ Your character is ready to play!`;
                                                 </span>
                                               )}
                                               <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                   const updated = advanceCharacter(character, {
                                                     type: 'power',
                                                     itemId: tree.tree_id,
                                                     level,
                                                     cost
                                                   });
-                                                  const newCharacters = [...characters];
-                                                  newCharacters[currentCharacterIndex] = updated;
-                                                  setCharacters(newCharacters);
+                                                  await updateCurrentCharacter(updated);
                                                 }}
                                                 className={`px-4 py-2 rounded font-medium text-sm transition-all ${
                                                   canAdvanceNow
@@ -10439,7 +10427,7 @@ Your character is ready to play!`;
                                             </div>
                                             {!hasLevel && (
                                               <button
-                                                onClick={() => {
+                                                onClick={async () => {
                                                   const updated = advanceCharacter(character, {
                                                     type: 'power',
                                                     itemId: treeId,
@@ -10447,9 +10435,7 @@ Your character is ready to play!`;
                                                     cost: isRedundant ? 0 : cost,
                                                     redundant: isRedundant
                                                   });
-                                                  const newCharacters = [...characters];
-                                                  newCharacters[currentCharacterIndex] = updated;
-                                                  setCharacters(newCharacters);
+                                                  await updateCurrentCharacter(updated);
                                                 }}
                                                 className={`px-4 py-2 rounded font-medium text-sm transition-all ${
                                                   canAdvanceNow
@@ -10578,7 +10564,7 @@ Your character is ready to play!`;
                                               </div>
                                               {!hasLevel && (
                                                 <button
-                                                  onClick={() => {
+                                                  onClick={async () => {
                                                     const updated = advanceCharacter(character, {
                                                       type: 'power',
                                                       itemId: tree.tree_id,
@@ -10586,9 +10572,7 @@ Your character is ready to play!`;
                                                       cost: isRedundant ? 0 : cost,
                                                       redundant: isRedundant
                                                     });
-                                                    const newCharacters = [...characters];
-                                                    newCharacters[currentCharacterIndex] = updated;
-                                                    setCharacters(newCharacters);
+                                                    await updateCurrentCharacter(updated);
                                                   }}
                                                   className={`px-4 py-2 rounded font-medium text-sm transition-all ${
                                                     canAdvanceNow
@@ -10962,7 +10946,7 @@ Your character is ready to play!`;
                     
                     <div className="flex gap-2">
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (xpAdjustment.amount > 0 && xpAdjustment.reason.trim()) {
                             const adjustment = xpAdjustment.type === 'gain' ? xpAdjustment.amount : -xpAdjustment.amount;
                             const newTotalXP = Math.max(0, character.totalXP + adjustment);
@@ -10983,9 +10967,7 @@ Your character is ready to play!`;
                               lastModified: new Date().toISOString()
                             };
                             
-                            const newCharacters = [...characters];
-                            newCharacters[currentCharacterIndex] = updated;
-                            setCharacters(newCharacters);
+                            await updateCurrentCharacter(updated);
                             
                             // Reset form
                             setXpAdjustment({
@@ -11271,7 +11253,7 @@ Your character is ready to play!`;
                                     </div>
                                     {!hasLevel && character.tempFactionChangePowers > 0 && (
                                       <button
-                                        onClick={() => {
+                                        onClick={async () => {
                                           const updated = {
                                             ...character,
                                             powers: {
@@ -11284,9 +11266,7 @@ Your character is ready to play!`;
                                             tempFactionChangePowers: character.tempFactionChangePowers - 1
                                           };
                                           
-                                          const newCharacters = [...characters];
-                                          newCharacters[currentCharacterIndex] = updated;
-                                          setCharacters(newCharacters);
+                                          await updateCurrentCharacter(updated);
                                         }}
                                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
                                       >
