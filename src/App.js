@@ -10754,15 +10754,13 @@ Your character is ready to play!`;
                                 <span className="text-green-400 font-bold">{calculateXPCost(character, 'lore', loreData.lore_id)} XP</span>
                                 {canRemove && (
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       if (window.confirm(`Remove ${loreData.lore_name}? You will gain ${refund} XP.`)) {
                                         const updatedCharacter = reduceCharacter(character, {
                                           type: 'lore',
                                           itemId: lore.lore_id
                                         });
-                                        const newCharacters = [...characters];
-                                        newCharacters[currentCharacterIndex] = updatedCharacter;
-                                        setCharacters(newCharacters);
+                                        await updateCurrentCharacter(updatedCharacter);
                                       }
                                     }}
                                     className="text-red-400 hover:text-red-300 p-1"
@@ -10836,7 +10834,7 @@ Your character is ready to play!`;
                             <div className="flex items-center space-x-2 ml-4">
                               <span className={`font-bold ${getTextColor(loreCategory)}`}>{cost} XP</span>
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   if (canAfford) {
                                     const advancement = {
                                       type: 'lore',
@@ -10844,9 +10842,7 @@ Your character is ready to play!`;
                                       cost
                                     };
                                     const updatedCharacter = advanceCharacter(character, advancement);
-                                    const newCharacters = [...characters];
-                                    newCharacters[currentCharacterIndex] = updatedCharacter;
-                                    setCharacters(newCharacters);
+                                    await updateCurrentCharacter(updatedCharacter);
                                   }
                                 }}
                                 disabled={!canAfford}
@@ -11339,10 +11335,8 @@ Your character is ready to play!`;
                 <h3 className="text-2xl font-bold mb-4 text-red-300">Add New Limitation</h3>
                 <SelfNerfForm
                   character={character}
-                  onUpdate={(updatedCharacter) => {
-                    const newCharacters = [...characters];
-                    newCharacters[currentCharacterIndex] = updatedCharacter;
-                    setCharacters(newCharacters);
+                  onUpdate={async (updatedCharacter) => {
+                    await updateCurrentCharacter(updatedCharacter);
                   }}
                 />
               </div>
@@ -11372,14 +11366,12 @@ Your character is ready to play!`;
                             )}
                           </div>
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               const updated = {
                                 ...character,
                                 selfNerfs: character.selfNerfs.filter((_, i) => i !== index)
                               };
-                              const newCharacters = [...characters];
-                              newCharacters[currentCharacterIndex] = updated;
-                              setCharacters(newCharacters);
+                              await updateCurrentCharacter(updated);
                             }}
                             className="ml-4 px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
                           >
