@@ -231,8 +231,33 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.3.0';
+  const currentVersion = '0.3.2';
   const changelog = [
+    {
+      version: '0.3.2',
+      date: '2025-07-30',
+      changes: [
+        '🎯 COMPLETE POWER & ADVANCEMENT SYSTEM OVERHAUL: Systematic conversion of all character advancement buttons to cloud sync',
+        '✅ Power Learning Persistence - All power advancement buttons now properly save to database instead of only updating local state',
+        '✅ Merit Management - Merit addition and removal buttons now sync to cloud with proper XP calculation',
+        '✅ Stat Advancement - Energy, Willpower, and other stat modification buttons now persist to database',
+        '✅ XP System Integration - Check-in XP, manual XP adjustments, and all XP-related changes now save to cloud',
+        '✅ Lore System - Lore purchase and removal buttons now properly sync with database',
+        '✅ Character Limitations - Self-nerf form and limitation removal now persist to cloud',
+        '✅ Faction Change Powers - Free faction change power selections now save correctly',
+        '🔒 Search Filter Security - Fixed critical bug where search filters were overwriting user authentication',
+        '🔍 ObjectId Query Optimization - Implemented comprehensive $and query structure for MongoDB compatibility',
+        '⚡ Authentication Preservation - Search and faction filters now preserve user authentication instead of destroying it',
+        '🚫 500 Error Resolution - Fixed undefined reference errors in backend logging that were causing server crashes',
+        '🌐 API URL Correction - Fixed API base URL from shadowaccordapi to shadowaccordcharacterbuilder for proper connectivity',
+        '🔧 Character Deletion - Fixed character deletion functionality to properly call cloud API instead of local-only removal',
+        '📡 Railway Deployment - Established Railway CLI access for real-time debugging and deployment monitoring',
+        '🔄 Error Handling - Improved cloud sync error handling with proper fallback mechanisms',
+        '⚡ Systematic Pattern Conversion - Converted 15+ advancement buttons from local-only to cloud sync pattern',
+        '🛡️ Security Hardening - All user queries now use secure $and structure to prevent authentication bypass',
+        '📊 Database Operations - All character modifications now properly call charactersAPI.update() for cloud persistence'
+      ]
+    },
     {
       version: '0.3.1',
       date: '2025-07-29',

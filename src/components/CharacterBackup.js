@@ -4,7 +4,7 @@ const CharacterBackup = ({ characters }) => {
   const exportCharacters = () => {
     const backup = {
       exportDate: new Date().toISOString(),
-      version: "0.3.0",
+      version: "0.3.2",
       characters: characters
     };
     

@@ -19,6 +19,49 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.3.2] - 2025-07-30
+
+### 🎯 Complete Power & Advancement System Overhaul
+
+#### Fixed - Power Saving System
+- **✅ Complete Cloud Sync Conversion**: Systematically converted all character advancement buttons from local-only state updates to cloud synchronization
+- **✅ Power Learning Persistence**: All power advancement buttons now properly save to database instead of only updating local state
+- **✅ Merit Management**: Merit addition and removal buttons now sync to cloud with proper XP calculation
+- **✅ Stat Advancement**: Energy, Willpower, and other stat modification buttons now persist to database
+- **✅ XP System Integration**: Check-in XP, manual XP adjustments, and all XP-related changes now save to cloud
+- **✅ Lore System**: Lore purchase and removal buttons now properly sync with database
+- **✅ Character Limitations**: Self-nerf form and limitation removal now persist to cloud
+- **✅ Faction Change Powers**: Free faction change power selections now save correctly
+
+#### Fixed - Database Query Security & Performance
+- **🔒 Search Filter Security**: Fixed critical bug where search filters were overwriting user authentication, preventing cross-user data contamination
+- **🔍 ObjectId Query Optimization**: Implemented comprehensive `$and` query structure to handle MongoDB ObjectId vs string comparisons
+- **⚡ Authentication Preservation**: Search and faction filters now preserve user authentication instead of destroying it
+- **🚫 500 Error Resolution**: Fixed undefined reference errors in backend logging that were causing server crashes
+
+#### Fixed - API & Infrastructure
+- **🌐 API URL Correction**: Fixed API base URL from `shadowaccordapi` to `shadowaccordcharacterbuilder` for proper connectivity
+- **🔧 Character Deletion**: Fixed character deletion functionality to properly call cloud API instead of local-only removal
+- **📡 Railway Deployment**: Established Railway CLI access for real-time debugging and deployment monitoring
+- **🔄 Error Handling**: Improved cloud sync error handling with proper fallback mechanisms
+
+#### Technical Improvements
+- **⚡ Systematic Pattern Conversion**: Converted ~15+ advancement buttons from `newCharacters[currentCharacterIndex] = updated; setCharacters(newCharacters)` pattern to `await updateCurrentCharacter(updated)` pattern
+- **🛡️ Security Hardening**: All user queries now use secure `$and` structure to prevent authentication bypass
+- **📊 Database Operations**: All character modifications now properly call `charactersAPI.update()` for cloud persistence
+- **🎮 User Experience**: Character changes now persist across sessions and page refreshes
+
+#### Validated Functionality
+- **✅ All 17 characters load correctly** from cloud database
+- **✅ Character deletion works** via cloud API
+- **✅ Power advancement saves** to database permanently  
+- **✅ Merit changes persist** across sessions
+- **✅ XP adjustments sync** to cloud properly
+- **✅ Search and filtering secure** without data leakage
+- **✅ No cross-user data contamination** confirmed
+
+---
+
 ## [v0.3.1] - 2025-07-29
 
 ### 🔧 Major Cloud Synchronization Fixes
