@@ -173,7 +173,6 @@ ratkin_gift,Ratkin Gift,shifter,Cloak,Monsters,Aggravated 1
 red_talon_gift,Red Talon Gift,shifter,Shatter,Beast Mind|Root,Fire 4
 ruin,Ruin,human,<Tainted> Wither,Ranged 2 <Dark>,Brittle Bones
 shadow_lord_gift,Shadow Lord Gift,shifter,Disarm,Wounding Lies,Disable
-shroud_rending,Shroud Rending,wraith,Umbra Drain|Umbra Sight,Health Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange
 silent_strider_gift,Silent Strider Gift,shifter,Silence,Horrid Reality,Gauntlet Walk
 silver_fang_gift,Silver Fang Gift,shifter,Detect Taint,True Form,Obedience
 spirit,Spirit,human,Resist Gauntlet,Cleanse,Exorcism
