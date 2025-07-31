@@ -255,7 +255,12 @@ const ShadowAccordComplete = () => {
         '🔄 Error Handling - Improved cloud sync error handling with proper fallback mechanisms',
         '⚡ Systematic Pattern Conversion - Converted 15+ advancement buttons from local-only to cloud sync pattern',
         '🛡️ Security Hardening - All user queries now use secure $and structure to prevent authentication bypass',
-        '📊 Database Operations - All character modifications now properly call charactersAPI.update() for cloud persistence'
+        '📊 Database Operations - All character modifications now properly call charactersAPI.update() for cloud persistence',
+        '🔒 Email Privacy Protection - User emails are now hidden from all API responses except user\'s own profile',
+        '🛡️ Admin Route Security - Admin endpoints now require proper authentication and role verification',
+        '🔐 Stronger Password Requirements - Minimum 8 characters with letter + number/special character requirement',
+        '📱 Optional Login - Login is completely optional, only required if you want cloud save functionality across devices',
+        '💾 Hybrid Storage - App works fully offline with localStorage, cloud sync available when logged in'
       ]
     },
     {

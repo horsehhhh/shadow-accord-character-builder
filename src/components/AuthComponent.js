@@ -187,6 +187,26 @@ const AuthComponent = ({ onAuthChange }) => {
           ➖
         </button>
       </div>
+      
+      {/* Optional Login Information */}
+      <div style={{ 
+        backgroundColor: '#e7f3ff', 
+        border: '1px solid #b3d9ff',
+        borderRadius: '4px',
+        padding: '8px',
+        marginBottom: '12px',
+        fontSize: '11px',
+        color: '#0066cc'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '3px' }}>ℹ️ Account Optional</div>
+        <div>The app works fully without an account! Only create one if you want:</div>
+        <div style={{ marginTop: '2px' }}>
+          • 💾 Cloud sync across devices<br/>
+          • 🔄 Character backup & restore<br/>
+          • 🚀 Access from anywhere
+        </div>
+      </div>
+      
       <form onSubmit={handleSubmit}>
         {!isLogin && (
           <div style={{ marginBottom: '10px' }}>

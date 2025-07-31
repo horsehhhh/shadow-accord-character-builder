@@ -45,6 +45,18 @@ All game mechanics, character data, and rulebook references implemented in this 
 - **📡 Railway Deployment**: Established Railway CLI access for real-time debugging and deployment monitoring
 - **🔄 Error Handling**: Improved cloud sync error handling with proper fallback mechanisms
 
+#### Added - Security & Privacy Enhancements
+- **🔒 Email Privacy Protection**: User emails are now hidden from all API responses except user's own profile
+- **🛡️ Admin Route Security**: Admin endpoints now require proper authentication and role verification
+- **🔐 Stronger Password Requirements**: Minimum 8 characters with letter + number/special character requirement
+- **🚫 Password Protection**: Passwords are bcrypt hashed and never exposed in any API response
+- **📧 Privacy Compliance**: Only usernames visible to other users, emails remain private
+
+#### User Experience
+- **📱 Optional Login**: Login is completely optional - only required if you want cloud save functionality across devices
+- **💾 Hybrid Storage**: App works fully offline with localStorage, cloud sync available when logged in
+- **🔄 Seamless Experience**: All character creation and management works without an account
+
 #### Technical Improvements
 - **⚡ Systematic Pattern Conversion**: Converted ~15+ advancement buttons from `newCharacters[currentCharacterIndex] = updated; setCharacters(newCharacters)` pattern to `await updateCurrentCharacter(updated)` pattern
 - **🛡️ Security Hardening**: All user queries now use secure `$and` structure to prevent authentication bypass
