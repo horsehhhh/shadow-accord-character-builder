@@ -27,8 +27,10 @@ router.post('/register', [
     .withMessage('Please provide a valid email')
     .normalizeEmail(),
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters')
+    .matches(/^(?=.*[A-Za-z])(?=.*[\d@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain at least one letter and one number or special character')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -71,7 +73,7 @@ router.post('/register', [
       user: {
         id: user._id,
         username: user.username,
-        email: user.email,
+        // Email hidden for privacy
         role: user.role,
         settings: user.settings
       }
@@ -153,7 +155,7 @@ router.post('/login', [
       user: {
         id: user._id,
         username: user.username,
-        email: user.email,
+        // Email hidden for privacy
         role: user.role,
         settings: user.settings,
         lastLogin: user.lastLogin
