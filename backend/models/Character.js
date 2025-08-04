@@ -119,7 +119,7 @@ const characterSchema = new mongoose.Schema({
   
   // Self-imposed limitations
   selfNerfs: [{
-    id: Number,
+    id: mongoose.Schema.Types.Mixed, // Allow both Number and String for compatibility
     name: String,
     type: String,
     category: String,
