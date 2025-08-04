@@ -276,14 +276,20 @@ router.post('/', [
     .optional()
 ], async (req, res) => {
   try {
-    console.log('Character creation request received:', {
+    console.log('🚀 Character creation request received:', {
       userId: req.user.id,
-      body: req.body
+      bodyKeys: Object.keys(req.body),
+      hasName: !!req.body.name,
+      hasFaction: !!req.body.faction,
+      hasSelfNerfs: !!req.body.selfNerfs,
+      selfNerfsType: typeof req.body.selfNerfs,
+      selfNerfsLength: Array.isArray(req.body.selfNerfs) ? req.body.selfNerfs.length : 'not array',
+      selfNerfsPreview: req.body.selfNerfs ? (Array.isArray(req.body.selfNerfs) ? req.body.selfNerfs.slice(0, 2) : req.body.selfNerfs) : 'none'
     });
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -296,6 +302,8 @@ router.post('/', [
       userId: new mongoose.Types.ObjectId(req.user.id)  // Store as ObjectId to match database storage format
     };
 
+    console.log('🔄 Processing array and object fields...');
+    
     // Preprocess data types before creating (same as update)
     const arrayFields = ['advancementHistory', 'xpHistory', 'lores', 'innateTreeIds', 'fundamentalPowers', 'thornOptions', 'selectedPassions', 'claimedInnateTreeIds', 'selfNerfs', 'sharedWith', 'factionChanges'];
     
@@ -303,8 +311,9 @@ router.post('/', [
       if (characterData[field] && typeof characterData[field] === 'string') {
         try {
           characterData[field] = JSON.parse(characterData[field]);
+          console.log(`✅ Parsed ${field} from string to array/object:`, characterData[field]);
         } catch (e) {
-          console.warn(`Failed to parse ${field} as JSON during creation:`, characterData[field]);
+          console.warn(`❌ Failed to parse ${field} as JSON during creation:`, characterData[field], 'Error:', e.message);
         }
       }
     });
@@ -316,16 +325,76 @@ router.post('/', [
       if (characterData[field] && typeof characterData[field] === 'string') {
         try {
           characterData[field] = JSON.parse(characterData[field]);
+          console.log(`✅ Parsed ${field} from string to object:`, Object.keys(characterData[field] || {}));
         } catch (e) {
-          console.warn(`Failed to parse ${field} as JSON during creation:`, characterData[field]);
+          console.warn(`❌ Failed to parse ${field} as JSON during creation:`, characterData[field], 'Error:', e.message);
         }
       }
     });
 
-    console.log('Creating character with processed data:', characterData);
+    // Enhanced selfNerfs validation and processing
+    if (characterData.selfNerfs) {
+      console.log('🔍 Processing selfNerfs:', {
+        originalType: typeof characterData.selfNerfs,
+        isArray: Array.isArray(characterData.selfNerfs),
+        length: Array.isArray(characterData.selfNerfs) ? characterData.selfNerfs.length : 'not array',
+        content: characterData.selfNerfs
+      });
+      
+      // Ensure selfNerfs is an array and properly structured
+      if (Array.isArray(characterData.selfNerfs)) {
+        characterData.selfNerfs = characterData.selfNerfs.map((nerf, index) => {
+          console.log(`🔍 Processing selfNerf[${index}]:`, nerf);
+          if (typeof nerf === 'object' && nerf !== null) {
+            // Ensure all required fields are strings
+            const cleanNerf = {
+              id: nerf.id ? String(nerf.id) : '',
+              name: nerf.name ? String(nerf.name) : '',
+              type: nerf.type ? String(nerf.type) : '',
+              category: nerf.category ? String(nerf.category) : '',
+              description: nerf.description ? String(nerf.description) : '',
+              source: nerf.source ? String(nerf.source) : ''
+            };
+            console.log(`✅ Cleaned selfNerf[${index}]:`, cleanNerf);
+            return cleanNerf;
+          } else {
+            console.warn(`❌ Invalid selfNerf[${index}], not an object:`, nerf);
+            return null;
+          }
+        }).filter(nerf => nerf !== null); // Remove any null entries
+        
+        console.log('✅ Final processed selfNerfs:', characterData.selfNerfs);
+      }
+    }
+
+    console.log('🔄 Creating character with processed data...', {
+      hasUserId: !!characterData.userId,
+      hasName: !!characterData.name,
+      hasFaction: !!characterData.faction,
+      selfNerfsCount: Array.isArray(characterData.selfNerfs) ? characterData.selfNerfs.length : 0
+    });
     
     // Create character with explicit write concern to ensure immediate consistency
-    const character = await Character.create(characterData);
+    let character;
+    try {
+      character = await Character.create(characterData);
+      console.log('✅ Character.create() successful:', {
+        id: character._id,
+        name: character.name,
+        selfNerfsCount: character.selfNerfs ? character.selfNerfs.length : 0
+      });
+    } catch (createError) {
+      console.error('❌ Character.create() failed:', {
+        error: createError.message,
+        errorName: createError.name,
+        errorCode: createError.code,
+        stack: createError.stack,
+        validationErrors: createError.errors ? Object.keys(createError.errors) : 'none',
+        characterDataKeys: Object.keys(characterData),
+        selfNerfsData: characterData.selfNerfs
+      });
+      throw createError; // Re-throw to be caught by outer try-catch
+    }
     
     // Wait for the document to be available for queries (fixes new user indexing delay)
     await character.save({ writeConcern: { w: 'majority', wtimeout: 1000 } });
@@ -356,7 +425,31 @@ router.post('/', [
       character
     });
   } catch (error) {
-    console.error('Character creation error:', error);
+    console.error('❌ Character creation error (outer catch):', {
+      error: error.message,
+      errorName: error.name,
+      errorCode: error.code,
+      stack: error.stack,
+      userId: req.user?.id,
+      requestBodyKeys: Object.keys(req.body || {}),
+      hasBody: !!req.body,
+      timestamp: new Date().toISOString()
+    });
+    
+    // More specific error response based on error type
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.keys(error.errors || {}).map(key => ({
+        field: key,
+        message: error.errors[key].message
+      }));
+      console.error('❌ Mongoose validation errors:', validationErrors);
+      return res.status(400).json({
+        success: false,
+        message: 'Character validation failed',
+        errors: validationErrors
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Server error creating character'
