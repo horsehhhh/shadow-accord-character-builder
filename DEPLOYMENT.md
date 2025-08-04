@@ -5,7 +5,7 @@
 ### 1. MongoDB Atlas Setup
 1. Go to [mongodb.com/atlas](https://mongodb.com/atlas)
 2. Create free cluster
-3. Get connection string: `mongodb+srv://username:password@cluster.mongodb.net/shadow-accord`
+3. Get connection string: `mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/shadow-accord`
 4. Whitelist all IPs (0.0.0.0/0) for production
 
 ### 2. Push to GitHub

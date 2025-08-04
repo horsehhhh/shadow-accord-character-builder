@@ -95,7 +95,8 @@ router.get('/', auth, async (req, res) => {
     const characters = await Character.find(query)
       .sort(options.sort)
       .limit(options.limit * 1)
-      .skip((options.page - 1) * options.limit);
+      .skip((options.page - 1) * options.limit)
+      .lean(); // Use lean() for better performance
     
     console.log('🔍 Character.find() raw result:', {
       queryUsed: query,
@@ -322,12 +323,32 @@ router.post('/', [
     });
 
     console.log('Creating character with processed data:', characterData);
+    
+    // Create character with explicit write concern to ensure immediate consistency
     const character = await Character.create(characterData);
+    
+    // Wait for the document to be available for queries (fixes new user indexing delay)
+    await character.save({ writeConcern: { w: 'majority', wtimeout: 1000 } });
+    
     console.log('✅ Character created successfully:', {
       id: character._id,
       name: character.name,
       userId: character.userId
     });
+
+    // Verify the character can be found immediately (helps with first-character indexing)
+    const verifyQuery = { 
+      $or: [
+        { _id: character._id },
+        { userId: new mongoose.Types.ObjectId(req.user.id) }
+      ]
+    };
+    
+    const verification = await Character.findOne(verifyQuery);
+    if (!verification) {
+      console.warn('⚠️ Character created but not immediately queryable, waiting 1 second...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 
     res.status(201).json({
       success: true,

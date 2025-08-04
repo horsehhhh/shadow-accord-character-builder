@@ -104,23 +104,91 @@ const downloadFile = async (data, filename, mimeType = 'application/octet-stream
       alert(`File saved to Documents folder: ${filename}`);
       console.log(`Successfully saved file via Capacitor: ${filename}`);
     } else {
-      // Fallback to web/Electron download using blob
+      // Enhanced web/mobile browser download with better mobile support
       console.log(`Downloading file via web/Electron: ${filename}`);
       const blob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
+      a.style.display = 'none';
+      
+      // Add to document temporarily
       document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      console.log(`Successfully downloaded file: ${filename}`);
+      
+      // Use a small delay to ensure the element is in the DOM
+      setTimeout(() => {
+        try {
+          a.click();
+          
+          // Clean up with a delay to ensure download starts
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+          
+          console.log(`Successfully downloaded file: ${filename}`);
+        } catch (clickError) {
+          console.error('Error clicking download link:', clickError);
+          // Fallback: try opening in new window
+          window.open(url, '_blank');
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 1000);
+        }
+      }, 10);
     }
   } catch (error) {
     console.error(`Error downloading file ${filename}:`, error);
     throw error;
   }
+};
+
+// Mobile-optimized button click handler
+const createMobileOptimizedHandler = (handler) => {
+  return async (event) => {
+    // Prevent double-tap zoom and other mobile quirks
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Add visual feedback
+    const button = event.currentTarget;
+    const originalText = button.textContent;
+    
+    try {
+      // Show loading state
+      button.style.opacity = '0.7';
+      button.disabled = true;
+      
+      // Add small delay to ensure UI updates
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Execute the actual handler
+      await handler(event);
+      
+      // Show success feedback briefly
+      button.style.backgroundColor = '#10b981'; // green
+      setTimeout(() => {
+        button.style.backgroundColor = '';
+        button.style.opacity = '';
+        button.disabled = false;
+      }, 500);
+      
+    } catch (error) {
+      console.error('Handler error:', error);
+      
+      // Show error feedback
+      button.style.backgroundColor = '#ef4444'; // red
+      setTimeout(() => {
+        button.style.backgroundColor = '';
+        button.style.opacity = '';
+        button.disabled = false;
+      }, 1000);
+      
+      throw error;
+    }
+  };
 };
 
 // ==========================================
@@ -231,8 +299,29 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.3.2';
+  const currentVersion = '0.3.3';
   const changelog = [
+    {
+      version: '0.3.3',
+      date: '2025-08-04',
+      changes: [
+        '🎨 MAJOR UI ENHANCEMENTS: Comprehensive improvements to character builder interface and functionality',
+        '🌟 Dark Arcanoi Power System - Complete implementation with special UI indicators, cost calculations, and XP integration',
+        '⚠️ Natus Mandatory Flaw System - Fixed character creation validation to require flaw selection for Natus subfaction',
+        '📱 Mobile Export Optimization - Enhanced export buttons with touch-friendly design and improved user experience',
+        '🛡️ Error Boundary Improvements - Fixed null reference crashes with componentStack error display',
+        '🔧 Character ID Type Safety - Resolved startsWith() errors while preserving numeric ID storage system',
+        '💾 String Conversion Wrapper - Implemented String() wrapper approach for API compatibility without breaking storage',
+        '✅ Export Button Enhancement - Added mobile-optimized touch handling with proper event propagation',
+        '🚀 Settings Panel Upgrade - Improved Settings component with enhanced export functionality and cloud sync status',
+        '🔍 API Character Detection - Fixed character type detection with proper String conversion for both local and cloud IDs',
+        '⚡ Hook Integration Fixes - Enhanced useCharacters hook with robust ID type handling across all operations',
+        '🛠️ Code Quality Improvements - Resolved all ESLint parsing errors and compilation issues',
+        '🎯 User Experience Polish - Streamlined character creation flow with better validation feedback',
+        '📊 Export System Reliability - Improved JSON, CSV, and individual character export with proper error handling',
+        '🔄 Cloud Sync Compatibility - Maintained backward compatibility while enhancing type safety for all ID operations'
+      ]
+    },
     {
       version: '0.3.2',
       date: '2025-07-30',
@@ -427,7 +516,7 @@ const ShadowAccordComplete = () => {
       changes: [
         'Enhanced Natus Mandatory Flaw System: Redesigned to match derangement system patterns used by other subfactions',
         'Added 7 new vampire power trees: Deimos, Thaumaturgy: Rego Aquam, and 5 Dark Thaumaturgy paths',
-        'Implemented automatic Permatainted effects for power advancement from corrupt trees (Death, Demonology, Wyrm gifts, Dark Thaumaturgy, Daimoinon)',
+        'Implemented automatic Permatainted effects for power advancement from corrupt trees (Death, Demonology, Wyrm gifts, Dark Thaumaturgy, Daimoinon, Dark Arcanoi)',
         'Added automatic derangement requirement for Wyrm Madness gift advancement',
         'Implemented fundamental Permatainted status for Drone, Gorgon, and Fomori claimed characters',
         'Updated Tremere clan to have Thaumaturgy: Rego Vitae as innate instead of generic Thaumaturgy',
@@ -756,7 +845,7 @@ ratkin_gift,Ratkin Gift,shifter,Cloak,Monsters,Aggravated 1
 red_talon_gift,Red Talon Gift,shifter,Shatter,Beast Mind|Root,Fire 4
 ruin,Ruin,human,<Tainted> Wither,Ranged 2 <Dark>,Brittle Bones
 shadow_lord_gift,Shadow Lord Gift,shifter,Disarm,Wounding Lies,Disable
-shroud_rending,Shroud Rending,wraith,Umbra Drain|Umbra Sight,Health Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange
+tempest_weaving,Tempest Weaving,wraith,Cloak,Meld,Form of Vapor
 silent_strider_gift,Silent Strider Gift,shifter,Silence,Horrid Reality,Gauntlet Walk
 silver_fang_gift,Silver Fang Gift,shifter,Detect Taint,True Form,Obedience
 spirit,Spirit,human,Resist Gauntlet,Cleanse,Exorcism
@@ -852,9 +941,9 @@ lore_faction,6,0,Faction Lore costs 6 XP
 lore_rare,9,0,Rare Lore costs 9 XP
 lore_uncommon,6,0,Uncommon Lore costs 6 XP
 merit,3,1,3 XP + 3 per Merit Level (first merit FREE for humans)
-power_innate_level_1,3,0,Level 1 Innate/Corrupt Powers cost 3 XP
-power_innate_level_2,6,0,Level 2 Innate/Corrupt Powers cost 6 XP
-power_innate_level_3,9,0,Level 3 Innate/Corrupt Powers cost 9 XP
+power_innate_level_1,3,0,Level 1 Innate/Corrupt Powers cost 3 XP (includes Dark Arcanoi for Wraiths)
+power_innate_level_2,6,0,Level 2 Innate/Corrupt Powers cost 6 XP (includes Dark Arcanoi for Wraiths)
+power_innate_level_3,9,0,Level 3 Innate/Corrupt Powers cost 9 XP (includes Dark Arcanoi for Wraiths)
 power_learned_level_1,6,0,Level 1 Learned Powers cost 6 XP
 power_learned_level_2,9,0,Level 2 Learned Powers cost 9 XP
 power_learned_level_3,12,0,Level 3 Learned Powers cost 12 XP
@@ -1694,6 +1783,12 @@ pleasure,Pleasure,Joy|excitement|comfort`
       if (character.faction === 'shifter' && 
           ['corruption', 'cunning', 'defiling', 'fear', 'madness_wyrm', 'strength'].includes(itemId)) {
         isInnate = true; // All Wyrm gifts use innate pricing for shifters
+      }
+      
+      // For Wraiths: all Dark Arcanoi use innate pricing (corrupt trees)
+      if (character.faction === 'wraith' && 
+          ['contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'].includes(itemId)) {
+        isInnate = true; // All Dark Arcanoi use innate pricing for wraiths
       }
       
       // For Sorcerers: fellowship powers are treated as learned powers, not innate
@@ -3146,7 +3241,9 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 'corruption', 'cunning', 'defiling', 'fear', 'madness_wyrm', 'strength',
                 'death', 'demonology', 'daimoinon', 'dark_thaumaturgy', 'thaumaturgy_dark_path_1',
                 'thaumaturgy_dark_path_2', 'thaumaturgy_dark_path_3', 'thaumaturgy_dark_path_4',
-                'thaumaturgy_dark_path_5'
+                'thaumaturgy_dark_path_5',
+                // Dark Arcanoi (wraith corrupt trees)
+                'contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'
               ];
               
               // Map checkboxes 1-45 to learned powers (fields 4-48)
@@ -3948,8 +4045,8 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               {/* Wraith Tree Selection */}
               {newCharacter.faction === 'wraith' && (
                 <div className={`${themeClasses.card} p-5 mt-5`}>
-                  <h4 className="text-xl font-bold mb-2">Select 3 Innate Power Trees</h4>
-                  <p className="text-gray-400 mb-2">Choose exactly 3 power trees that will be your innate disciplines.</p>
+                  <h4 className="text-xl font-bold mb-2">Select 3 Innate Power Trees (Arcanoi)</h4>
+                  <p className="text-gray-400 mb-4">Choose exactly 3 power trees that will be your innate disciplines. Dark Arcanoi are marked with a red border and use innate XP costs (3/6/9).</p>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
                     {gameData.powerTrees
@@ -3958,6 +4055,9 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
                         const canSelect = !isSelected && newCharacter.innateTreeIds.length < 3;
                         const canDeselect = isSelected;
+                        
+                        // Check if this is a Dark Arcanoi (corrupt tree)
+                        const isDarkArcanoi = ['contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'].includes(tree.tree_id);
                         
                         return (
                           <button
@@ -3981,13 +4081,22 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                               isSelected
                                 ? 'border-green-500 bg-green-500 bg-opacity-20'
                                 : canSelect
-                                  ? 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                                  ? isDarkArcanoi
+                                    ? 'border-red-500 hover:border-red-400 cursor-pointer bg-red-500 bg-opacity-10'
+                                    : 'border-gray-600 hover:border-gray-400 cursor-pointer'
                                   : 'border-gray-700 opacity-50 cursor-not-allowed'
                             }`}
                             disabled={!canSelect && !canDeselect}
                           >
                             <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
+                              <div className="flex items-center">
+                                <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
+                                {isDarkArcanoi && (
+                                  <span className="ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded-full">
+                                    Dark Arcanoi
+                                  </span>
+                                )}
+                              </div>
                               {isSelected && (
                                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                   <span className="text-white text-sm">✓</span>
@@ -8675,8 +8784,9 @@ Your character is ready to play!`;
                     Edit
                   </button>
                   <button
-                    onClick={() => exportCharacter(character, 'pdf')}
-                    className="text-green-400 hover:text-green-300"
+                    onClick={createMobileOptimizedHandler(() => exportCharacter(character, 'pdf'))}
+                    className="text-green-400 hover:text-green-300 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation"
+                    style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
                   >
                     <Download className="w-4 h-4" />
                   </button>
@@ -8758,7 +8868,7 @@ Your character is ready to play!`;
         ]
       };
 
-      const addSelfNerf = (type, category, derangementName = null) => {
+      const addSelfNerf = async (type, category, derangementName = null) => {
         let name = category;
         let description = `Character has the ${category.toLowerCase()} ${type}.`;
         
@@ -8798,7 +8908,7 @@ Your character is ready to play!`;
           selfNerfs: [...(character.selfNerfs || []), selfNerfToAdd]
         };
 
-        onUpdate(updatedCharacter);
+        await updateCurrentCharacter(updatedCharacter);
         
         // Reset selections
         setSelectedType(null);
@@ -8960,8 +9070,9 @@ Your character is ready to play!`;
                   Back
                 </button>
               <button
-                onClick={() => exportCharacter(character, 'pdf')}
-                className={themeClasses.button}
+                onClick={createMobileOptimizedHandler(() => exportCharacter(character, 'pdf'))}
+                className={`${themeClasses.button} min-h-[44px] touch-manipulation`}
+                style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
               >
                 <Download className="w-4 h-4 mr-2 inline" />
                 Export
@@ -11781,6 +11892,8 @@ Your character is ready to play!`;
           setAutoSave={setAutoSave}
           lastSaved={lastSaved}
           characters={characters}
+          exportCharacter={exportCharacter}
+          currentVersion={currentVersion}
         />
       </div>
     </div>

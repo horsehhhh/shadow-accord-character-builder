@@ -247,7 +247,7 @@ useEffect(() => {
 ```env
 NODE_ENV=production
 PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/shadow-accord
+MONGODB_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net/shadow-accord
 JWT_SECRET=super-secure-random-string-at-least-32-characters-long
 CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 ```

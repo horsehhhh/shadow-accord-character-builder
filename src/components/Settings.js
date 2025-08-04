@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw } from 'lucide-react';
+import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, Download, Upload, FileText, Database, FileSpreadsheet } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
 
 const Settings = ({ 
@@ -10,7 +10,9 @@ const Settings = ({
   autoSave, 
   setAutoSave,
   lastSaved,
-  characters
+  characters,
+  exportCharacter,
+  currentVersion
 }) => {
   const { isAuthenticated, syncAllToCloud } = useCharacters();
   const [syncStatus, setSyncStatus] = useState('idle');
@@ -18,6 +20,46 @@ const Settings = ({
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
   const [syncInterval, setSyncInterval] = useState(5); // seconds
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  // Mobile-optimized handler for export buttons
+  const createMobileHandler = (handler) => {
+    return async (event) => {
+      if (!event || !event.currentTarget) return;
+      
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const button = event.currentTarget;
+      const originalStyle = {
+        opacity: button.style.opacity || '',
+        backgroundColor: button.style.backgroundColor || ''
+      };
+      
+      try {
+        button.style.opacity = '0.7';
+        button.disabled = true;
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+        await handler();
+        
+        button.style.backgroundColor = '#10b981';
+        setTimeout(() => {
+          button.style.backgroundColor = originalStyle.backgroundColor;
+          button.style.opacity = originalStyle.opacity;
+          button.disabled = false;
+        }, 500);
+        
+      } catch (error) {
+        console.error('Export error:', error);
+        button.style.backgroundColor = '#ef4444';
+        setTimeout(() => {
+          button.style.backgroundColor = originalStyle.backgroundColor;
+          button.style.opacity = originalStyle.opacity;
+          button.disabled = false;
+        }, 1000);
+      }
+    };
+  };
 
   // Monitor online status
   useEffect(() => {
@@ -212,8 +254,8 @@ const Settings = ({
             <div className={`p-2 rounded text-center ${isOnline ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}`}>
               {isOnline ? '✓ Online' : '✗ Offline'}
             </div>
-            <div className={`p-2 rounded text-center ${characters.some(c => c.id.startsWith('api_')) ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
-              {characters.some(c => c.id.startsWith('api_')) ? '✓ Cloud Characters' : '⚠ Local Only'}
+            <div className={`p-2 rounded text-center ${characters.some(c => c.id && String(c.id).startsWith('api_')) ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+              {characters.some(c => c.id && String(c.id).startsWith('api_')) ? '✓ Cloud Characters' : '⚠ Local Only'}
             </div>
           </div>
         </div>
@@ -298,6 +340,170 @@ const Settings = ({
           </div>
         )}
       </div>
+
+      {/* Data Management Section */}
+      {characters && characters.length > 0 && (
+        <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Database className="w-4 h-4" />
+            Data Management
+          </h3>
+          
+          <div className="space-y-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Export your character data in various formats:
+            </div>
+            
+            {/* Export Format Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* JSON Export */}
+              <button
+                onClick={createMobileHandler(() => {
+                  try {
+                    const exportData = {
+                      characters: characters || [],
+                      exported: new Date().toISOString(),
+                      version: currentVersion || '1.0.0'
+                    };
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], 
+                      { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'shadow_accord_backup.json';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    
+                    setTimeout(() => {
+                      a.click();
+                      setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }, 100);
+                    }, 10);
+                  } catch (error) {
+                    console.error('JSON export failed:', error);
+                    alert('Export failed: ' + error.message);
+                  }
+                })}
+                className={`${themeClasses.button} text-white px-3 py-2 rounded text-sm flex items-center gap-2 justify-center min-h-[44px] touch-manipulation`}
+                style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+              >
+                <FileText className="w-4 h-4" />
+                Export JSON
+              </button>
+
+              {/* CSV Export */}
+              <button
+                onClick={createMobileHandler(() => {
+                  try {
+                    const csvHeaders = ['Name', 'Player', 'Faction', 'Subfaction', 'Available XP', 'XP Spent', 'Campaign', 'Created'];
+                    const csvRows = (characters || []).map(char => [
+                      char.name || '',
+                      char.player || '',
+                      char.faction || '',
+                      char.subfaction || '',
+                      char.totalXP || 0,
+                      char.xpSpent || 0,
+                      char.campaign || '',
+                      char.created ? new Date(char.created).toLocaleDateString() : ''
+                    ]);
+                    
+                    const csvContent = [csvHeaders, ...csvRows]
+                      .map(row => row.map(field => `"${field}"`).join(','))
+                      .join('\n');
+                    
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'shadow_accord_characters.csv';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    
+                    setTimeout(() => {
+                      a.click();
+                      setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }, 100);
+                    }, 10);
+                  } catch (error) {
+                    console.error('CSV export failed:', error);
+                    alert('Export failed: ' + error.message);
+                  }
+                })}
+                className={`${themeClasses.button} text-white px-3 py-2 rounded text-sm flex items-center gap-2 justify-center min-h-[44px] touch-manipulation`}
+                style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                Export CSV
+              </button>
+
+              {/* Individual Character Export */}
+              <div className="relative">
+                <select
+                  onChange={(e) => {
+                    try {
+                      if (e.target.value && exportCharacter && characters) {
+                        const character = characters.find(c => c && c.id && String(c.id) === e.target.value);
+                        if (character) {
+                          exportCharacter(character, 'json');
+                        }
+                      }
+                      e.target.value = ''; // Reset selection
+                    } catch (error) {
+                      console.error('Individual export failed:', error);
+                      alert('Export failed: ' + error.message);
+                    }
+                  }}
+                  className={`${themeClasses.input} w-full px-3 py-2 rounded text-sm`}
+                  defaultValue=""
+                >
+                  <option value="" disabled>Export Single Character</option>
+                  {(characters || []).map(char => (
+                    <option key={char.id || Math.random()} value={char.id || ''}>
+                      {char.name || 'Unnamed Character'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Export Info */}
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>• <strong>JSON</strong>: Complete backup of all characters with full data</div>
+              <div>• <strong>CSV</strong>: Character summary for spreadsheet applications</div>
+              <div>• <strong>Single Character</strong>: Export individual character as JSON</div>
+            </div>
+
+            {/* Character Count */}
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              {(characters || []).length} character{(characters || []).length !== 1 ? 's' : ''} available for export
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Debug: Show export section even with no characters */}
+      {(!characters || characters.length === 0) && (
+        <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Database className="w-4 h-4" />
+            Data Management (Debug)
+          </h3>
+          
+          <div className="space-y-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              No characters found. Characters data: {JSON.stringify({ characters, length: characters?.length })}
+            </div>
+            
+            <div className="text-sm text-red-600 dark:text-red-400">
+              This debug section shows because no characters were detected. Create a character first to see export options.
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

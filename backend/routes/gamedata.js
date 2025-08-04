@@ -149,6 +149,7 @@ lupus,Lupus,shifter,Snarl,Resilience,Frenzy Control
 madness,Madness,human,<Tainted> Monsters,Derange,Horrid Reality
 maleficence,Maleficence,wraith,Detect Taint|Scion of Evil,<Tainted> Silence,<Tainted> Horrid Reality
 mind,Mind,human,Confusion,Telepathy,Obedience
+mind,Mind,human,Confusion,Telepathy,Obedience
 mnemosynis,Mnemosynis,wraith,Forgetful Mind,Telepathy,Obedience
 moliate,Moliate,wraith,Weaponry,Imitate,Resilience|Powerful Form
 mortis,Mortis,vampire,Wither,Meld,Decay
@@ -173,7 +174,7 @@ ratkin_gift,Ratkin Gift,shifter,Cloak,Monsters,Aggravated 1
 red_talon_gift,Red Talon Gift,shifter,Shatter,Beast Mind|Root,Fire 4
 ruin,Ruin,human,<Tainted> Wither,Ranged 2 <Dark>,Brittle Bones
 shadow_lord_gift,Shadow Lord Gift,shifter,Disarm,Wounding Lies,Disable
-shroud_rending,Shroud Rending,wraith,Umbra Drain|Umbra Sight,Health Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange
+tempest_weaving,Tempest Weaving,wraith,Cloak,Meld,Form of Vapor
 silent_strider_gift,Silent Strider Gift,shifter,Silence,Horrid Reality,Gauntlet Walk
 silver_fang_gift,Silver Fang Gift,shifter,Detect Taint,True Form,Obedience
 spirit,Spirit,human,Resist Gauntlet,Cleanse,Exorcism
@@ -269,9 +270,9 @@ lore_faction,6,0,Faction Lore costs 6 XP
 lore_rare,9,0,Rare Lore costs 9 XP
 lore_uncommon,6,0,Uncommon Lore costs 6 XP
 merit,3,1,3 XP + 3 per Merit Level (first merit FREE for humans)
-power_innate_level_1,3,0,Level 1 Innate/Corrupt Powers cost 3 XP
-power_innate_level_2,6,0,Level 2 Innate/Corrupt Powers cost 6 XP
-power_innate_level_3,9,0,Level 3 Innate/Corrupt Powers cost 9 XP
+power_innate_level_1,3,0,Level 1 Innate/Corrupt Powers cost 3 XP (includes Dark Arcanoi for Wraiths)
+power_innate_level_2,6,0,Level 2 Innate/Corrupt Powers cost 6 XP (includes Dark Arcanoi for Wraiths)
+power_innate_level_3,9,0,Level 3 Innate/Corrupt Powers cost 9 XP (includes Dark Arcanoi for Wraiths)
 power_learned_level_1,6,0,Level 1 Learned Powers cost 6 XP
 power_learned_level_2,9,0,Level 2 Learned Powers cost 9 XP
 power_learned_level_3,12,0,Level 3 Learned Powers cost 12 XP

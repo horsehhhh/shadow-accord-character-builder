@@ -164,7 +164,7 @@ export const useCharacters = () => {
       };
 
       // If authenticated and this is an API character, sync to cloud immediately
-      if (isAuthenticated && character.id.startsWith('api_')) {
+      if (isAuthenticated && character.id && String(character.id).startsWith('api_')) {
         try {
           console.log('🔄 Syncing API character update to cloud:', character.name);
           console.log('📤 Character data being sent:', {
@@ -254,7 +254,7 @@ export const useCharacters = () => {
       } 
       
       // If authenticated but local character, try to create in cloud
-      else if (isAuthenticated && !character.id.startsWith('api_')) {
+      else if (isAuthenticated && character.id && !String(character.id).startsWith('api_')) {
         try {
           console.log('🔄 Creating local character in cloud:', character.name);
           const created = await charactersAPI.create(updatedWithTimestamp);
@@ -302,7 +302,7 @@ export const useCharacters = () => {
     try {
       if (isAuthenticated) {
         // Save to API
-        if (character.id && character.id.startsWith('api_')) {
+        if (character.id && String(character.id).startsWith('api_')) {
           // Update existing API character
           const updated = await charactersAPI.update(character.id.replace('api_', ''), character);
           setCharacters(prev => prev.map(c => c.id === character.id ? { ...updated, id: `api_${updated._id}` } : c));
@@ -343,7 +343,7 @@ export const useCharacters = () => {
   // Delete character function
   const deleteCharacter = async (characterId) => {
     try {
-      if (isAuthenticated && characterId.startsWith('api_')) {
+      if (isAuthenticated && String(characterId).startsWith('api_')) {
         // Delete from API
         await charactersAPI.delete(characterId.replace('api_', ''));
       }
@@ -385,7 +385,7 @@ export const useCharacters = () => {
       }));
       
       // Merge with local-only characters
-      const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      const localOnlyCharacters = characters.filter(c => c && c.id && !String(c.id).startsWith('api_'));
       const allCharacters = [...charactersWithId, ...localOnlyCharacters];
       
       setCharacters(allCharacters);
@@ -410,7 +410,7 @@ export const useCharacters = () => {
       await refreshFromCloud();
       
       // Then migrate any local-only characters
-      const localStorageCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      const localStorageCharacters = characters.filter(c => c && c.id && !String(c.id).startsWith('api_'));
       
       for (const character of localStorageCharacters) {
         try {
@@ -452,7 +452,7 @@ export const useCharacters = () => {
       // Step 2: Since updateCharacter now handles immediate cloud sync,
       // we don't need complex logic here. Just ensure any remaining local-only 
       // characters get created in the cloud.
-      const localOnlyCharacters = characters.filter(c => !c.id.startsWith('api_'));
+      const localOnlyCharacters = characters.filter(c => c && c.id && !String(c.id).startsWith('api_'));
       console.log(`Found ${localOnlyCharacters.length} local-only characters to create in cloud`);
       
       let createdCount = 0;

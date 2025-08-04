@@ -227,4 +227,10 @@ characterSchema.methods.addXP = function(amount, reason) {
   return this.save();
 };
 
+// Indexes for better query performance
+characterSchema.index({ userId: 1, lastModified: -1 }); // Compound index for user queries with sorting
+characterSchema.index({ userId: 1, created: -1 }); // For creation date sorting 
+characterSchema.index({ userId: 1, name: 1 }); // For name-based searches within user's characters
+characterSchema.index({ 'sharedWith.userId': 1 }); // For shared character queries
+
 module.exports = mongoose.model('Character', characterSchema);
