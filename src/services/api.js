@@ -105,14 +105,35 @@ export const charactersAPI = {
 
   // Create new character
   create: async (characterData) => {
-    const response = await api.post('/characters', {
+    const dataToSend = {
       ...characterData,
       name: characterData.name || 'New Character',
       player: characterData.player || 'Unknown Player',
       faction: characterData.faction || 'human',
       subfaction: characterData.subfaction || 'commoner'
+    };
+    
+    console.log('📤 API create - sending character data:', {
+      name: dataToSend.name,
+      faction: dataToSend.faction,
+      selfNerfsCount: dataToSend.selfNerfs?.length || 0,
+      selfNerfsPreview: dataToSend.selfNerfs?.slice(0, 2) || [],
+      dataSize: JSON.stringify(dataToSend).length
     });
-    return response.data.character;
+    
+    try {
+      const response = await api.post('/characters', dataToSend);
+      console.log('📥 API create - received response:', response.data);
+      return response.data.character;
+    } catch (error) {
+      console.error('❌ API create - failed:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      throw error;
+    }
   },
 
   // Update existing character
