@@ -154,7 +154,6 @@ const createMobileOptimizedHandler = (handler) => {
     
     // Add visual feedback
     const button = event.currentTarget;
-    const originalText = button.textContent;
     
     try {
       // Show loading state

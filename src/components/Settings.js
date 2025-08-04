@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, Download, Upload, FileText, Database, FileSpreadsheet } from 'lucide-react';
+import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, FileText, Database, FileSpreadsheet } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
 
 const Settings = ({ 
