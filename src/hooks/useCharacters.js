@@ -126,7 +126,12 @@ export const useCharacters = () => {
           return newCharacter;
         } catch (apiError) {
           console.error('API character creation failed, falling back to localStorage:', apiError);
-          console.error('Error details:', apiError.response?.data || apiError.message);
+          console.error('API Error details:', {
+            status: apiError.response?.status,
+            statusText: apiError.response?.statusText,
+            data: apiError.response?.data,
+            message: apiError.message
+          });
           // If API fails (token invalid, server down, etc.), fall back to localStorage
           setIsAuthenticated(false); // Update auth status
           // Fall through to localStorage creation

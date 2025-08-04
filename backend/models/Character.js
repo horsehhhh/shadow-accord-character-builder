@@ -119,6 +119,8 @@ const characterSchema = new mongoose.Schema({
   
   // Self-imposed limitations
   selfNerfs: [{
+    id: Number,
+    name: String,
     type: String,
     category: String,
     description: String,
