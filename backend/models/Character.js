@@ -5,8 +5,8 @@ const characterSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
+    // Remove index: true to avoid duplication with compound indexes below
   },
   
   // Character basic info (matching your current structure)
@@ -161,11 +161,10 @@ const characterSchema = new mongoose.Schema({
 });
 
 // Indexes for performance
-characterSchema.index({ userId: 1, name: 1 });
 characterSchema.index({ userId: 1, faction: 1 });
 characterSchema.index({ campaignId: 1 });
 characterSchema.index({ isPublic: 1 });
-characterSchema.index({ 'sharedWith.userId': 1 });
+// userId+name and sharedWith.userId indexes moved to bottom with other compound indexes
 
 // Middleware to update lastModified
 characterSchema.pre('save', function(next) {
