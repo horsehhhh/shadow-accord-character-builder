@@ -118,14 +118,10 @@ const characterSchema = new mongoose.Schema({
   claimedInnateTreeIds: [String],
   
   // Self-imposed limitations (flaws, derangements, mutations, permataint)
-  selfNerfs: [{
-    id: mongoose.Schema.Types.Mixed, // Allow both Number and String for compatibility
-    name: String,
-    type: String,
-    category: String,
-    description: String,
-    source: String
-  }],
+  selfNerfs: {
+    type: mongoose.Schema.Types.Mixed,
+    default: []
+  },
   
   // Character notes
   notes: { type: String, maxlength: [5000, 'Notes cannot exceed 5000 characters'] },
@@ -166,9 +162,27 @@ characterSchema.index({ campaignId: 1 });
 characterSchema.index({ isPublic: 1 });
 // userId+name and sharedWith.userId indexes moved to bottom with other compound indexes
 
-// Middleware to update lastModified
+// Middleware to update lastModified and process selfNerfs
 characterSchema.pre('save', function(next) {
   this.lastModified = new Date();
+  
+  // Ensure selfNerfs is properly structured
+  if (this.selfNerfs && Array.isArray(this.selfNerfs)) {
+    this.selfNerfs = this.selfNerfs.map(nerf => {
+      if (typeof nerf === 'object' && nerf !== null) {
+        return {
+          id: nerf.id || '',
+          name: nerf.name || '',
+          type: nerf.type || '',
+          category: nerf.category || '',
+          description: nerf.description || '',
+          source: nerf.source || ''
+        };
+      }
+      return null;
+    }).filter(nerf => nerf !== null);
+  }
+  
   next();
 });
 
