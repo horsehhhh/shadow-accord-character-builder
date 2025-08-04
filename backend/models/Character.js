@@ -117,7 +117,7 @@ const characterSchema = new mongoose.Schema({
   selectedFomoriTree: String,
   claimedInnateTreeIds: [String],
   
-  // Self-imposed limitations
+  // Self-imposed limitations (flaws, derangements, mutations, permataint)
   selfNerfs: [{
     id: mongoose.Schema.Types.Mixed, // Allow both Number and String for compatibility
     name: String,
@@ -154,7 +154,7 @@ const characterSchema = new mongoose.Schema({
   }],
   
   // Version and metadata
-  version: { type: String, default: '0.2.3' },
+  version: { type: String, default: '0.3.3' }, // Updated to match frontend version
   lastModified: { type: Date, default: Date.now }
 }, {
   timestamps: true
