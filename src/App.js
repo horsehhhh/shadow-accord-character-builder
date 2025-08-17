@@ -298,8 +298,26 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.3.3';
+  const currentVersion = '0.3.4';
   const changelog = [
+    {
+      version: '0.3.4',
+      date: '2025-08-17',
+      changes: [
+        '🧙‍♂️ EXPANDED SORCERER POWER TREE ACCESS: Sorcerers can now advance in all power trees, not just basic ones',
+        '💀 Corrupted Tree Access - Added access to corrupted power trees (Death, Demonology, Madness, Ruin) for sorcerers',
+        '🤝 Fellowship Tree Access - Sorcerers can now learn from all fellowship trees (ahl_i_batin, craftmason, messianic_voices, old_faith, order_of_hermes, spirit_talkers, valdaermen, veneficti)',
+        '💰 XP Cost Structure - Sorcerers pay learned costs (6/9/12 XP) for corrupted and fellowship trees while maintaining innate costs (3/6/9 XP) for basic trees',
+        '� CLAIMED STATUS POWER RETENTION: Claimed characters (Gorgon, Drone, Fomori) now retain access to their original subfaction powers',
+        '🌟 Dual Heritage System - Claimed Sorcerers can still learn all sorcerer powers (basic, corrupted, fellowship) at original costs after transformation',
+        '🧠 Claimed Subfaction Compatibility - All human subfactions (Sorcerer, Ghoul, Kinfolk, Commoner) retain power access when claimed',
+        '⚖️ Cost Preservation - Original subfaction powers maintain their original XP costs after claiming transformation',
+        '📝 UI Updates - Updated character advancement interface descriptions to show both claimed and original power access',
+        '🔄 Power Tree Filtering - Enhanced filtering logic to include both claimed powers and original subfaction powers',
+        '📊 Cost Calculation - Maintained proper XP cost differentiation for dual heritage characters',
+        '🎮 User Experience - Enhanced advancement interface with clearer descriptions of available power trees for claimed characters'
+      ]
+    },
     {
       version: '0.3.3',
       date: '2025-08-04',
@@ -1779,6 +1797,54 @@ pleasure,Pleasure,Joy|excitement|comfort`
       if (character.faction === 'human' && character.subfaction === 'claimed_fomori' && 
           ['enticer', 'ferectori', 'gorehound', 'toad'].includes(itemId)) {
         isInnate = true; // All Fomori trees use innate pricing for Claimed Fomori
+      }
+      
+      // For Claimed Drone: all Weaver trees use innate pricing
+      if (character.faction === 'human' && character.subfaction === 'claimed_drone' && 
+          ['stasis', 'weaver', 'onesong'].includes(itemId)) {
+        isInnate = true; // All Weaver trees use innate pricing for Claimed Drone
+      }
+      
+      // For Claimed Gorgon: Gorgon tree uses innate pricing
+      if (character.faction === 'human' && character.subfaction === 'claimed_gorgon' && 
+          itemId === 'gorgon') {
+        isInnate = true; // Gorgon tree uses innate pricing for Claimed Gorgon
+      }
+      
+      // For Claimed characters: check if this is from their original subfaction
+      if (character.originalSubfaction && 
+          (character.subfaction === 'claimed_drone' || character.subfaction === 'claimed_fomori' || character.subfaction === 'claimed_gorgon')) {
+        
+        if (character.originalSubfaction === 'sorcerer') {
+          const isBasicSorcererPower = ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(itemId);
+          const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(itemId);
+          const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(itemId);
+          
+          if (isBasicSorcererPower) {
+            isInnate = true; // Original sorcerer basic powers remain innate
+          } else if (isCorruptedTree || isFellowshipTree) {
+            isInnate = false; // Original sorcerer corrupted/fellowship powers remain learned
+          }
+        } else if (character.originalSubfaction === 'ghoul') {
+          const vampireTrees = gameData.powerTrees.filter(tree => tree.faction === 'vampire').map(tree => tree.tree_id);
+          if (vampireTrees.includes(itemId)) {
+            isInnate = false; // Original ghoul powers remain learned (ghouls don't get innate vampire powers)
+          }
+        } else if (character.originalSubfaction === 'kinfolk') {
+          const shifterTrees = gameData.powerTrees.filter(tree => tree.faction === 'shifter').map(tree => tree.tree_id);
+          if (shifterTrees.includes(itemId) && character.innateTreeIds.includes(itemId)) {
+            isInnate = true; // Original kinfolk innate trees remain innate
+          } else if (shifterTrees.includes(itemId)) {
+            isInnate = false; // Original kinfolk non-innate shifter powers remain learned
+          }
+        } else if (character.originalSubfaction === 'commoner') {
+          const talentTrees = ['brash', 'brawny', 'inquisitive', 'sturdy'];
+          if (talentTrees.includes(itemId) && character.innateTreeIds.includes(itemId)) {
+            isInnate = true; // Original commoner innate talent remains innate
+          } else if (talentTrees.includes(itemId)) {
+            isInnate = false; // Original commoner non-innate talents remain learned
+          }
+        }
       }
       
       // For Shifters: all Wyrm gifts use innate pricing (corrupt trees)
@@ -10310,11 +10376,11 @@ Your character is ready to play!`;
                           : character.faction === 'human' && character.subfaction === 'faithful'
                             ? 'Faithful Bounty Powers (3/6/9 XP)'
                             : character.faction === 'human' && character.subfaction === 'claimed_drone'
-                              ? 'Claimed Drone Weaver Powers (All Trees Innate: 3/6/9 XP)'
+                              ? `Claimed Drone Powers (Weaver Trees: 3/6/9 XP${character.originalSubfaction ? `, Original ${formatDisplayText(character.originalSubfaction)} Powers: Original Costs` : ''})`
                               : character.faction === 'human' && character.subfaction === 'claimed_fomori'
-                              ? 'Claimed Fomori Bane Powers (Innate: 3/6/9 XP, Other: 6/9/12 XP)'
+                              ? `Claimed Fomori Powers (Bane Trees: 3/6/9 XP${character.originalSubfaction ? `, Original ${formatDisplayText(character.originalSubfaction)} Powers: Original Costs` : ''})`
                               : character.faction === 'human' && character.subfaction === 'claimed_gorgon'
-                              ? 'Claimed Gorgon Powers (3/6/9 XP)'
+                              ? `Claimed Gorgon Powers (Gorgon Tree: 3/6/9 XP${character.originalSubfaction ? `, Original ${formatDisplayText(character.originalSubfaction)} Powers: Original Costs` : ''})`
                               : character.faction === 'human' && character.subfaction === 'commoner'
                               ? 'Commoner Talent Powers (Innate: 3/6/9 XP, Other: 6/9/12 XP)'
                               : 'Faction Powers (6/9/12 XP)'
@@ -10344,21 +10410,21 @@ Your character is ready to play!`;
                     {character.faction === 'human' && character.subfaction === 'claimed_drone' && (
                       <div className="mb-2 p-3 bg-cyan-600 bg-opacity-20 rounded-lg">
                         <div className="text-cyan-300 text-sm">
-                          🕷️ <strong>Claimed Drone:</strong> Pattern Web binding gives you access to all Weaver paradigms (Stasis, Weaver, Onesong) as innate trees. All Weaver powers cost 3/6/9 XP.
+                          🕷️ <strong>Claimed Drone:</strong> Pattern Web binding gives you access to all Weaver paradigms (Stasis, Weaver, Onesong) as innate trees costing 3/6/9 XP. {character.originalSubfaction ? `You retain access to your original ${formatDisplayText(character.originalSubfaction)} powers at their original costs.` : 'If you had prior supernatural heritage, that would also remain at its original costs.'}
                         </div>
                       </div>
                     )}
                     {character.faction === 'human' && character.subfaction === 'claimed_fomori' && (
                       <div className="mb-2 p-3 bg-red-600 bg-opacity-20 rounded-lg">
                         <div className="text-red-300 text-sm">
-                          👹 <strong>Claimed Fomori:</strong> Bane possession grants access to your chosen Bane manifestation ({character.innateTreeIds.length > 0 ? gameData.powerTrees.find(t => t.tree_id === character.innateTreeIds[0])?.tree_name || 'None' : 'None'}) at innate costs (3/6/9 XP), other Bane trees cost 6/9/12 XP. {character.mixedSubfaction ? `Your original ${character.mixedSubfaction === 'kinfolk' ? 'Gifted Kinfolk' : character.mixedSubfaction} heritage also remains at innate costs.` : 'If you had prior supernatural heritage, that would also remain at innate costs.'}
+                          👹 <strong>Claimed Fomori:</strong> Bane possession grants access to all Bane manifestations (Enticer, Ferectori, Gorehound, Toad) at innate costs (3/6/9 XP). {character.originalSubfaction ? `You retain access to your original ${formatDisplayText(character.originalSubfaction)} powers at their original costs.` : 'If you had prior supernatural heritage, that would also remain at its original costs.'}
                         </div>
                       </div>
                     )}
                     {character.faction === 'human' && character.subfaction === 'claimed_gorgon' && (
                       <div className="mb-2 p-3 bg-purple-600 bg-opacity-20 rounded-lg">
                         <div className="text-purple-300 text-sm">
-                          👁️ <strong>Claimed Gorgon:</strong> Dream reality binding grants access to Gorgon manifestation at innate costs (3/6/9 XP). {character.mixedSubfaction ? `Your original ${character.mixedSubfaction === 'kinfolk' ? 'Gifted Kinfolk' : character.mixedSubfaction} heritage also remains at innate costs.` : 'If you had prior supernatural heritage, that would also remain at innate costs.'}
+                          👁️ <strong>Claimed Gorgon:</strong> Dream reality binding grants access to Gorgon manifestation at innate costs (3/6/9 XP). {character.originalSubfaction ? `You retain access to your original ${formatDisplayText(character.originalSubfaction)} powers at their original costs.` : 'If you had prior supernatural heritage, that would also remain at its original costs.'}
                         </div>
                       </div>
                     )}
@@ -10389,17 +10455,68 @@ Your character is ready to play!`;
                           if (character.faction === 'human' && character.subfaction === 'faithful') {
                             return character.innateTreeIds.includes(tree.tree_id);
                           }
-                          // Special handling for Drones - they can learn from any Technocratic tree
+                          // Special handling for Claimed Drones - they can learn from Technocratic trees AND their original subfaction
                           if (character.faction === 'human' && character.subfaction === 'claimed_drone') {
-                            return ['stasis', 'weaver', 'onesong'].includes(tree.tree_id);
+                            const isWeaverTree = ['stasis', 'weaver', 'onesong'].includes(tree.tree_id);
+                            // If they have an original subfaction, allow those powers too
+                            if (character.originalSubfaction) {
+                              if (character.originalSubfaction === 'sorcerer') {
+                                const isBasicSorcererPower = tree.faction === 'human' && 
+                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
+                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
+                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
+                                return isWeaverTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
+                              } else if (character.originalSubfaction === 'ghoul') {
+                                return isWeaverTree || tree.faction === 'vampire';
+                              } else if (character.originalSubfaction === 'kinfolk') {
+                                return isWeaverTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
+                              } else if (character.originalSubfaction === 'commoner') {
+                                return isWeaverTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
+                              }
+                            }
+                            return isWeaverTree;
                           }
-                          // Special handling for Fomori - they can learn from any Bane tree
+                          // Special handling for Claimed Fomori - they can learn from Bane trees AND their original subfaction
                           if (character.faction === 'human' && character.subfaction === 'claimed_fomori') {
-                            return ['enticer', 'ferectori', 'gorehound', 'toad'].includes(tree.tree_id);
+                            const isBaneTree = ['enticer', 'ferectori', 'gorehound', 'toad'].includes(tree.tree_id);
+                            // If they have an original subfaction, allow those powers too
+                            if (character.originalSubfaction) {
+                              if (character.originalSubfaction === 'sorcerer') {
+                                const isBasicSorcererPower = tree.faction === 'human' && 
+                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
+                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
+                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
+                                return isBaneTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
+                              } else if (character.originalSubfaction === 'ghoul') {
+                                return isBaneTree || tree.faction === 'vampire';
+                              } else if (character.originalSubfaction === 'kinfolk') {
+                                return isBaneTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
+                              } else if (character.originalSubfaction === 'commoner') {
+                                return isBaneTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
+                              }
+                            }
+                            return isBaneTree;
                           }
-                          // Special handling for Gorgon - they can only learn from the Gorgon tree
+                          // Special handling for Claimed Gorgon - they can learn from Gorgon tree AND their original subfaction
                           if (character.faction === 'human' && character.subfaction === 'claimed_gorgon') {
-                            return tree.tree_id === 'gorgon';
+                            const isGorgonTree = tree.tree_id === 'gorgon';
+                            // If they have an original subfaction, allow those powers too
+                            if (character.originalSubfaction) {
+                              if (character.originalSubfaction === 'sorcerer') {
+                                const isBasicSorcererPower = tree.faction === 'human' && 
+                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
+                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
+                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
+                                return isGorgonTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
+                              } else if (character.originalSubfaction === 'ghoul') {
+                                return isGorgonTree || tree.faction === 'vampire';
+                              } else if (character.originalSubfaction === 'kinfolk') {
+                                return isGorgonTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
+                              } else if (character.originalSubfaction === 'commoner') {
+                                return isGorgonTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
+                              }
+                            }
+                            return isGorgonTree;
                           }
                           // Special handling for Commoner - they can learn from any talent tree
                           if (character.faction === 'human' && character.subfaction === 'commoner') {

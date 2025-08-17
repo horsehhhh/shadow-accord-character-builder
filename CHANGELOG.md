@@ -19,6 +19,24 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.3.3] - 2025-08-17
+
+### 🧙‍♂️ Expanded Sorcerer Power Tree Access
+
+#### Enhanced - Character Advancement
+- **🌟 Sorcerer Tree Expansion**: Sorcerers can now advance in all power trees, not just basic ones
+- **💀 Corrupted Tree Access**: Added access to corrupted power trees (Death, Demonology, Madness, Ruin) for sorcerers
+- **🤝 Fellowship Tree Access**: Sorcerers can now learn from all fellowship trees (ahl_i_batin, craftmason, messianic_voices, old_faith, order_of_hermes, spirit_talkers, valdaermen, veneficti)
+- **💰 XP Cost Structure**: Sorcerers pay learned costs (6/9/12 XP) for corrupted and fellowship trees while maintaining innate costs (3/6/9 XP) for basic trees
+- **📝 UI Updates**: Updated character advancement interface descriptions and help text to reflect expanded tree access
+
+#### Technical Improvements
+- **🔄 Power Tree Filtering**: Modified power tree filtering logic in character advancement to include corrupted and fellowship trees for sorcerers
+- **📊 Cost Calculation**: Maintained proper XP cost differentiation between innate and learned trees
+- **🎮 User Experience**: Enhanced advancement interface with clearer descriptions of available power trees
+
+---
+
 ## [v0.3.2] - 2025-07-30
 
 ### 🎯 Complete Power & Advancement System Overhaul
