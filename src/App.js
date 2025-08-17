@@ -10306,7 +10306,7 @@ Your character is ready to play!`;
                       {character.faction === 'human' && character.subfaction === 'kinfolk' 
                         ? 'Shifter Powers (Innate: 3/6/9 XP, Learned: 6/9/12 XP)' 
                         : character.faction === 'human' && character.subfaction === 'sorcerer'
-                          ? 'Sorcerer Powers (Innate: 3/6/9 XP, Fellowship: 6/9/12 XP)'
+                        ? 'Sorcerer Powers (Basic: 3/6/9 XP, Corrupted Trees: 6/9/12 XP, Fellowship Trees: 6/9/12 XP)'
                           : character.faction === 'human' && character.subfaction === 'faithful'
                             ? 'Faithful Bounty Powers (3/6/9 XP)'
                             : character.faction === 'human' && character.subfaction === 'claimed_drone'
@@ -10330,7 +10330,7 @@ Your character is ready to play!`;
                     {character.faction === 'human' && character.subfaction === 'sorcerer' && (
                       <div className="mb-2 p-3 bg-purple-600 bg-opacity-20 rounded-lg">
                         <div className="text-purple-300 text-sm">
-                          💫 <strong>Sorcerer:</strong> Your chosen trees cost 3/6/9 XP as innate powers. Fellowship powers ({character.fellowship ? formatDisplayText(gameData.powerTrees.find(t => t.tree_id === character.fellowship)?.tree_name) || 'None' : 'None'}) cost 6/9/12 XP as learned powers.
+                          💫 <strong>Sorcerer:</strong> Your chosen basic trees cost 3/6/9 XP as innate powers. Corrupted trees (Death, Demonology, Madness, Ruin) and all fellowship trees cost 6/9/12 XP as learned powers. Fellowship powers ({character.fellowship ? formatDisplayText(gameData.powerTrees.find(t => t.tree_id === character.fellowship)?.tree_name) || 'None' : 'None'}) provide your specialized magical training.
                         </div>
                       </div>
                     )}
@@ -10377,12 +10377,13 @@ Your character is ready to play!`;
                             return tree.faction === 'shifter' && 
                                    !tree.tree_id.includes('sorcerer'); // Explicitly exclude sorcerer trees
                           }
-                          // Special handling for Sorcerers - they can learn their faction powers and fellowship powers
+                          // Special handling for Sorcerers - they can learn their faction powers, corrupted trees, and fellowship powers
                           if (character.faction === 'human' && character.subfaction === 'sorcerer') {
-                            const isFactionPower = tree.faction === character.faction && 
+                            const isBasicSorcererPower = tree.faction === character.faction && 
                               ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
-                            const isFellowshipPower = character.fellowship && tree.tree_id === character.fellowship;
-                            return isFactionPower || isFellowshipPower;
+                            const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
+                            const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
+                            return isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
                           }
                           // Special handling for Faithful - they can only learn from their chosen bounty tree
                           if (character.faction === 'human' && character.subfaction === 'faithful') {
