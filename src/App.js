@@ -10455,6 +10455,10 @@ Your character is ready to play!`;
                           if (character.faction === 'human' && character.subfaction === 'faithful') {
                             return character.innateTreeIds.includes(tree.tree_id);
                           }
+                          // Special handling for Ghouls - they can learn vampire powers
+                          if (character.faction === 'human' && character.subfaction === 'ghoul') {
+                            return tree.faction === 'vampire';
+                          }
                           // Special handling for Claimed Drones - they can learn from Technocratic trees AND their original subfaction
                           if (character.faction === 'human' && character.subfaction === 'claimed_drone') {
                             const isWeaverTree = ['stasis', 'weaver', 'onesong'].includes(tree.tree_id);
