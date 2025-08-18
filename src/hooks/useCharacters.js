@@ -7,33 +7,70 @@ export const useCharacters = () => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('🌐 Network status: Online');
+      setIsOnline(true);
+    };
+    const handleOffline = () => {
+      console.log('📱 Network status: Offline');
+      setIsOnline(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
       const hasToken = migrationUtils.isAuthenticated();
       const platform = typeof window !== 'undefined' && window.Capacitor ? 'Android/Capacitor' : 'Web';
+      const isOnline = navigator.onLine;
       
       console.log('🔐 Authentication Check:', {
         platform,
         hasToken: !!hasToken,
+        isOnline,
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) + '...' : 'N/A'
       });
       
       if (hasToken) {
+        // If we're offline, assume authentication is valid and don't test the API
+        if (!isOnline) {
+          console.log('📱 Offline mode detected, assuming valid authentication');
+          setIsAuthenticated(true);
+          return;
+        }
+        
         try {
-          // Verify token is valid by making a test API call
+          // Verify token is valid by making a test API call (only when online)
           console.log('📡 Testing API connection on', platform, '...');
           await charactersAPI.getAll();
           console.log('✅ Authentication successful on', platform);
           setIsAuthenticated(true);
         } catch (error) {
           console.error('❌ Authentication failed on', platform, ':', error);
-          console.warn('Authentication token invalid, switching to offline mode:', error.message);
-          setIsAuthenticated(false);
-          // Clear invalid token
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('user');
+          
+          // Only clear tokens if it's a definitive auth failure (401, 403), not network issues
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            console.warn('Authentication token invalid, clearing tokens:', error.message);
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            setIsAuthenticated(false);
+          } else {
+            // Network or server error - assume token is still valid but we're offline
+            console.warn('Network error during auth check, assuming valid authentication:', error.message);
+            setIsAuthenticated(true);
+          }
         }
       } else {
         console.log('📱 No auth token found on', platform, ', using offline mode');
@@ -52,8 +89,8 @@ export const useCharacters = () => {
       setError(null);
       
       try {
-        if (isAuthenticated) {
-          // Load from API if authenticated
+        if (isAuthenticated && navigator.onLine) {
+          // Load from API if authenticated and online
           console.log('📡 Loading characters from API...');
           const apiCharacters = await charactersAPI.getAll();
           console.log('📡 Raw API response:', apiCharacters);
@@ -68,8 +105,9 @@ export const useCharacters = () => {
           setCharacters(charactersWithId);
           console.log('✅ Characters loaded from API and set in state');
         } else {
-          // Fall back to localStorage if not authenticated
-          console.log('📱 Loading characters from localStorage (not authenticated)...');
+          // Fall back to localStorage if not authenticated or offline
+          const reason = !isAuthenticated ? 'not authenticated' : 'offline';
+          console.log(`📱 Loading characters from localStorage (${reason})...`);
           const savedData = localStorage.getItem('shadowAccordPhase8');
           if (savedData) {
             const data = JSON.parse(savedData);
@@ -93,13 +131,28 @@ export const useCharacters = () => {
         console.error('Error loading characters:', err);
         setError(err.message);
         
-        // Fall back to localStorage on API error
-        const savedData = localStorage.getItem('shadowAccordPhase8');
-        if (savedData) {
-          const data = JSON.parse(savedData);
-          if (data.characters) {
-            setCharacters(data.characters);
+        // Always fall back to localStorage on any error to prevent UI breaks
+        console.log('📱 Falling back to localStorage due to error...');
+        try {
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          if (savedData) {
+            const data = JSON.parse(savedData);
+            if (data.characters) {
+              const fallbackCharacters = data.characters.map(char => ({
+                ...char,
+                xpHistory: char.xpHistory || []
+              }));
+              setCharacters(fallbackCharacters);
+              console.log('✅ Successfully loaded characters from localStorage fallback');
+            } else {
+              setCharacters([]);
+            }
+          } else {
+            setCharacters([]);
           }
+        } catch (fallbackErr) {
+          console.error('Even localStorage fallback failed:', fallbackErr);
+          setCharacters([]);
         }
       } finally {
         setLoading(false);
@@ -115,7 +168,7 @@ export const useCharacters = () => {
       console.log('Creating character, isAuthenticated:', isAuthenticated);
       console.log('Character data being sent:', character);
       
-      if (isAuthenticated) {
+      if (isAuthenticated && navigator.onLine) {
         try {
           // Attempt to create new API character
           console.log('Attempting cloud save...');
@@ -169,7 +222,7 @@ export const useCharacters = () => {
       };
 
       // If authenticated and this is an API character, sync to cloud immediately
-      if (isAuthenticated && character.id && String(character.id).startsWith('api_')) {
+      if (isAuthenticated && character.id && String(character.id).startsWith('api_') && navigator.onLine) {
         try {
           console.log('🔄 Syncing API character update to cloud:', character.name);
           console.log('📤 Character data being sent:', {
@@ -254,6 +307,14 @@ export const useCharacters = () => {
           console.error('❌ Cloud sync failed:', apiError.message);
           // Update local state anyway for offline functionality
           setCharacters(prev => prev.map((c, i) => i === characterIndex ? updatedWithTimestamp : c));
+          
+          // Also update localStorage as backup when cloud sync fails
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          const data = savedData ? JSON.parse(savedData) : {};
+          const localCharacters = characters.map((c, i) => i === characterIndex ? updatedWithTimestamp : c);
+          data.characters = localCharacters.filter(c => !String(c.id).startsWith('api_')); // Only store local characters
+          localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+          
           return updatedWithTimestamp;
         }
       } 
@@ -493,6 +554,7 @@ export const useCharacters = () => {
     loading,
     error,
     isAuthenticated,
+    isOnline,
     currentUser: isAuthenticated ? { username: 'User' } : null, // TODO: Get real user info
     createCharacter,
     updateCharacter,
