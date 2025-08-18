@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { APP_VERSION, MIN_CLOUD_VERSION, isVersionSupported } from '../version';
 
 // API Configuration
 // Auto-detect environment and platform
@@ -33,6 +34,13 @@ const api = axios.create({
 
 // Add authentication token to requests
 api.interceptors.request.use((config) => {
+  // Check version compatibility for cloud API requests
+  if (!isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION)) {
+    const error = new Error(`This version (${APP_VERSION}) is too old for cloud connectivity. Please update to version ${MIN_CLOUD_VERSION} or later.`);
+    error.isVersionError = true;
+    throw error;
+  }
+  
   const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -40,6 +48,10 @@ api.interceptors.request.use((config) => {
   } else {
     console.log('API request without token:', config.url);
   }
+  
+  // Add version header for server-side validation
+  config.headers['X-App-Version'] = APP_VERSION;
+  
   return config;
 });
 
@@ -51,6 +63,20 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('API error:', error.config?.url, error.response?.status, error.response?.data);
+    
+    // Handle version incompatibility errors from server
+    if (error.response?.status === 426) { // 426 Upgrade Required
+      const message = error.response?.data?.message || 'Your app version is too old. Please update to continue using cloud features.';
+      const upgradeError = new Error(message);
+      upgradeError.isVersionError = true;
+      return Promise.reject(upgradeError);
+    }
+    
+    // Handle client-side version errors
+    if (error.isVersionError) {
+      return Promise.reject(error);
+    }
+    
     if (error.response?.status === 401) {
       console.log('Authentication failed, clearing tokens');
       localStorage.removeItem('auth_token');

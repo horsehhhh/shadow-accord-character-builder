@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { charactersAPI, migrationUtils } from '../services/api';
+import { APP_VERSION, MIN_CLOUD_VERSION, isVersionSupported } from '../version';
 
 // Custom hook to manage characters with API integration
 export const useCharacters = () => {
@@ -91,6 +92,27 @@ export const useCharacters = () => {
       setError(null);
       
       try {
+        // Check version compatibility before making API calls
+        if (!isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION)) {
+          console.warn(`⚠️ Version ${APP_VERSION} is too old for cloud connectivity. Minimum required: ${MIN_CLOUD_VERSION}`);
+          setError(`This version (${APP_VERSION}) is too old for cloud connectivity. Please update to version ${MIN_CLOUD_VERSION} or later.`);
+          // Fall back to localStorage only
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          if (savedData) {
+            const data = JSON.parse(savedData);
+            if (data.characters) {
+              const migratedCharacters = data.characters.map(char => ({
+                ...char,
+                xpHistory: char.xpHistory || []
+              }));
+              setCharacters(migratedCharacters);
+              console.log('📱 Characters loaded from localStorage (version incompatible)');
+            }
+          }
+          setLoading(false);
+          return;
+        }
+        
         if (isAuthenticated && navigator.onLine) {
           // Load from API if authenticated and online
           console.log('📡 Loading characters from API...');
@@ -170,6 +192,15 @@ export const useCharacters = () => {
       console.log('Creating character, isAuthenticated:', isAuthenticated);
       console.log('Character data being sent:', character);
       
+      // Check version compatibility for cloud operations
+      if (isAuthenticated && !isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION)) {
+        console.warn('⚠️ Version incompatible, saving to localStorage only');
+        // Save to localStorage only
+        const newCharacter = { ...character, id: Date.now() };
+        setCharacters(prev => [...prev, newCharacter]);
+        return newCharacter;
+      }
+      
       if (isAuthenticated && navigator.onLine) {
         try {
           // Attempt to create new API character
@@ -223,8 +254,11 @@ export const useCharacters = () => {
         lastModified: new Date().toISOString() 
       };
 
+      // Check version compatibility for cloud operations
+      const canUseCloud = isAuthenticated && isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION);
+      
       // If authenticated and this is an API character, sync to cloud immediately
-      if (isAuthenticated && character.id && String(character.id).startsWith('api_') && navigator.onLine) {
+      if (canUseCloud && character.id && String(character.id).startsWith('api_') && navigator.onLine) {
         try {
           console.log('🔄 Syncing API character update to cloud:', character.name);
           console.log('📤 Character data being sent:', {

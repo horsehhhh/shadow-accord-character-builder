@@ -64,7 +64,16 @@ const AuthComponent = ({ onAuthChange, onLoginSuccess }) => {
       
       setFormData({ username: '', email: '', password: '' });
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Authentication failed');
+      let errorMessage = err.response?.data?.message || err.message || 'Authentication failed';
+      
+      // Handle version incompatibility errors
+      if (err.isVersionError) {
+        errorMessage = err.message;
+        // Optionally show a more prominent version error
+        alert(`❌ Version Incompatible\n\n${err.message}\n\nPlease download the latest version to continue using cloud features.`);
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
