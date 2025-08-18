@@ -12321,7 +12321,7 @@ Your character is ready to play!`;
               try {
                 // Immediately refresh characters from cloud after login
                 console.log('🔄 Refreshing characters after login...');
-                await refreshFromCloud();
+                await refreshFromCloud(true); // Force refresh after login
                 console.log('✅ Characters refreshed successfully');
                 
                 // Check if we have local characters to sync
@@ -12339,7 +12339,7 @@ Your character is ready to play!`;
                       }
                       alert('Characters successfully synced to cloud storage!');
                       // Refresh again to get the newly synced characters
-                      await refreshFromCloud();
+                      await refreshFromCloud(true); // Force refresh after sync
                     } catch (error) {
                       console.error('Error syncing characters:', error);
                       alert('Some characters may not have synced. They remain saved locally.');
@@ -12355,7 +12355,7 @@ Your character is ready to play!`;
           onLoginSuccess={async () => {
             // This will be called immediately after successful login/register
             console.log('🔄 Login successful, refreshing characters...');
-            await refreshFromCloud();
+            await refreshFromCloud(true); // Force refresh after successful login
           }}
         />
       )}

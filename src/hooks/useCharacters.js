@@ -472,9 +472,15 @@ export const useCharacters = () => {
   };
 
   // Refresh characters from cloud (for auto-sync)
-  const refreshFromCloud = useCallback(async () => {
-    if (!isAuthenticated) {
+  const refreshFromCloud = useCallback(async (forceRefresh = false) => {
+    // Allow forced refresh (like after login) or check if authenticated
+    const hasValidToken = migrationUtils.isAuthenticated();
+    if (!forceRefresh && !isAuthenticated) {
       throw new Error('Must be authenticated to refresh from cloud');
+    }
+    
+    if (!hasValidToken) {
+      throw new Error('No valid authentication token found');
     }
 
     try {
