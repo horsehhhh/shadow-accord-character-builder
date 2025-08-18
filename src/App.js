@@ -298,8 +298,24 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.3.4';
+  const currentVersion = '0.3.5';
   const changelog = [
+    {
+      version: '0.3.5',
+      date: '2025-08-17',
+      changes: [
+        '🌐 OFFLINE MODE STABILITY FIX: Resolved critical UI breaking issues when transitioning between online and offline states',
+        '🛡️ Network Transition Handling - Authentication checks now properly handle offline scenarios without clearing valid tokens',
+        '🔄 Improved Error Recovery - Better fallback mechanisms to localStorage when API calls fail due to network issues',
+        '📱 Online Status Monitoring - Added real-time network status detection and appropriate behavior changes',
+        '💾 Enhanced Data Persistence - Character updates now properly save to localStorage as backup when cloud sync fails',
+        '⚡ Graceful Degradation - App maintains full functionality when going offline, with automatic sync when back online',
+        '🚨 Authentication Resilience - Only clear auth tokens on definitive auth failures (401/403), not network errors',
+        '🔧 Loading State Fixes - Improved loading state management to prevent UI breaks during network transitions',
+        '📊 Comprehensive Fallbacks - Multiple layers of error handling ensure app always loads character data from somewhere',
+        '🔍 Better Error Logging - Enhanced debugging information for network status and auth state changes'
+      ]
+    },
     {
       version: '0.3.4',
       date: '2025-08-17',
