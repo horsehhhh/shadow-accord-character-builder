@@ -53,23 +53,43 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug --no-daemon --stacktrace
         
+    - name: Rename APK with run number
+      run: |
+        cd android/app/build/outputs/apk/debug/
+        mv app-debug.apk "shadow-accord-v${{ github.run_number }}.apk"
+        echo "APK_NAME=shadow-accord-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+        echo "APK_PATH=android/app/build/outputs/apk/debug/shadow-accord-v${{ github.run_number }}.apk" >> $GITHUB_ENV
+        
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: shadow-accord-debug-apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        name: ${{ env.APK_NAME }}
+        path: ${{ env.APK_PATH }}
         retention-days: 30
+        compression-level: 0  # No compression for APK files
 
     - name: Get APK info
       run: |
-        APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
-        if [ -f "$APK_PATH" ]; then
-          APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+        if [ -f "${{ env.APK_PATH }}" ]; then
+          APK_SIZE=$(du -h "${{ env.APK_PATH }}" | cut -f1)
           echo "✅ APK built successfully!"
+          echo "📱 APK name: ${{ env.APK_NAME }}"
           echo "📱 APK size: $APK_SIZE"
-          echo "📁 APK path: $APK_PATH"
+          echo "📁 APK path: ${{ env.APK_PATH }}"
+          echo "🔢 Build number: ${{ github.run_number }}"
           echo "🔗 Download from the Actions artifacts above"
         else
           echo "❌ APK build failed!"
           exit 1
         fi
+
+    - name: Create build summary
+      run: |
+        echo "# 📱 Android APK Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Build:** \`${{ env.APK_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "**Size:** $(du -h "${{ env.APK_PATH }}" | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "**Run Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "⬇️ **Download the APK from the artifacts section above**" >> $GITHUB_STEP_SUMMARY
