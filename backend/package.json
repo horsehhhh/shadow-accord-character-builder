@@ -1,6 +1,6 @@
 {
   "name": "shadow-accord-backend",
-  "version": "0.3.0",
+  "version": "0.3.7",
   "description": "Backend API for Shadow Accord Character Builder",
   "main": "server.js",
   "scripts": {
