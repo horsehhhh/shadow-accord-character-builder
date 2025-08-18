@@ -5,18 +5,20 @@ import axios from 'axios';
 const isProduction = process.env.NODE_ENV === 'production';
 const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
 const isAndroid = typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android';
+const isElectron = typeof window !== 'undefined' && window.electronAPI;
 
 console.log('🔍 API Environment Detection:', {
   isProduction,
   isCapacitor,
   isAndroid,
+  isElectron,
   userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
   platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web'
 });
 
-// For Android, always use the production API URL to avoid localhost issues
+// For Android and Electron, always use the production API URL to avoid localhost issues
 const API_BASE = process.env.REACT_APP_API_URL || 
-  (isProduction || isCapacitor || isAndroid ? 'https://shadowaccordcharacterbuilder.up.railway.app/api' : 'http://localhost:5000/api');
+  (isProduction || isCapacitor || isAndroid || isElectron ? 'https://shadowaccordcharacterbuilder.up.railway.app/api' : 'http://localhost:5000/api');
 
 console.log('🌐 API Base URL:', API_BASE);
 
@@ -74,10 +76,22 @@ export const authAPI = {
   },
 
   login: async (email, password) => {
+    console.log('🔐 Attempting login with email:', email);
     const response = await api.post('/auth/login', { login: email, password });
+    console.log('✅ Login response:', response.data);
+    
     if (response.data.token) {
       localStorage.setItem('auth_token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      console.log('💾 Stored auth_token:', response.data.token.substring(0, 20) + '...');
+      
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        console.log('👤 Stored user:', response.data.user);
+      } else {
+        console.warn('⚠️ No user object in login response');
+      }
+    } else {
+      console.warn('⚠️ No token in login response');
     }
     return response.data;
   },
@@ -285,7 +299,10 @@ export const migrationUtils = {
   // Get current user
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    console.log('👤 Getting current user from localStorage:', userStr);
+    const user = userStr ? JSON.parse(userStr) : null;
+    console.log('👤 Parsed user object:', user);
+    return user;
   },
 };
 

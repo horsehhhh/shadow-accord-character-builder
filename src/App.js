@@ -275,7 +275,8 @@ const ShadowAccordComplete = () => {
     setCharacters,
     loading: cloudLoading, 
     createCharacter: cloudCreateCharacter,
-    updateCharacter: cloudUpdateCharacter
+    updateCharacter: cloudUpdateCharacter,
+    refreshFromCloud
   } = useCharacters();
 
   // Helper function to update character with cloud sync
@@ -12296,27 +12297,50 @@ Your character is ready to play!`;
     <ErrorBoundary>
       <div className="min-h-screen">
       {currentMode === 'menu' && (
-        <AuthComponent onAuthChange={async (isAuth) => {
-          console.log('Auth changed:', isAuth);
-          if (isAuth && characters.length > 0) {
-            // When user logs in, offer to sync existing characters to cloud
-            const shouldSync = window.confirm(
-              `Found ${characters.length} character(s) saved locally. Would you like to sync them to cloud storage so you can access them on any device?`
-            );
-            if (shouldSync) {
+        <AuthComponent 
+          onAuthChange={async (isAuth) => {
+            console.log('Auth changed:', isAuth);
+            if (isAuth) {
               try {
-                // Sync characters to cloud
-                for (const char of characters) {
-                  await cloudCreateCharacter(char);
+                // Immediately refresh characters from cloud after login
+                console.log('🔄 Refreshing characters after login...');
+                await refreshFromCloud();
+                console.log('✅ Characters refreshed successfully');
+                
+                // Check if we have local characters to sync
+                const localCharacters = characters.filter(c => c && c.id && !String(c.id).startsWith('api_'));
+                if (localCharacters.length > 0) {
+                  // When user logs in, offer to sync existing characters to cloud
+                  const shouldSync = window.confirm(
+                    `Found ${localCharacters.length} character(s) saved locally. Would you like to sync them to cloud storage so you can access them on any device?`
+                  );
+                  if (shouldSync) {
+                    try {
+                      // Sync characters to cloud
+                      for (const char of localCharacters) {
+                        await cloudCreateCharacter(char);
+                      }
+                      alert('Characters successfully synced to cloud storage!');
+                      // Refresh again to get the newly synced characters
+                      await refreshFromCloud();
+                    } catch (error) {
+                      console.error('Error syncing characters:', error);
+                      alert('Some characters may not have synced. They remain saved locally.');
+                    }
+                  }
                 }
-                alert('Characters successfully synced to cloud storage!');
-            } catch (error) {
-              console.error('Error syncing characters:', error);
-              alert('Some characters may not have synced. They remain saved locally.');
+              } catch (error) {
+                console.error('Error refreshing characters after login:', error);
+                // Continue anyway - the user is still logged in
+              }
             }
-          }
-        }
-      }} />
+          }}
+          onLoginSuccess={async () => {
+            // This will be called immediately after successful login/register
+            console.log('🔄 Login successful, refreshing characters...');
+            await refreshFromCloud();
+          }}
+        />
       )}
       
       {/* User Status (Optional Cloud Features) - Only on home screen */}

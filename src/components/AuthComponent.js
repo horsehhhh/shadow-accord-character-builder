@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authAPI, migrationUtils } from '../services/api';
 
-const AuthComponent = ({ onAuthChange }) => {
+const AuthComponent = ({ onAuthChange, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
@@ -12,6 +12,27 @@ const AuthComponent = ({ onAuthChange }) => {
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(migrationUtils.isAuthenticated());
   const [isMinimized, setIsMinimized] = useState(false);
+  const [user, setUser] = useState(migrationUtils.getCurrentUser());
+
+  // Try to fetch user profile if authenticated but no user object
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isAuthenticated && !user) {
+        console.log('🔄 No user object found, fetching profile...');
+        try {
+          const response = await authAPI.getProfile();
+          console.log('👤 Fetched user profile:', response.data);
+          const userData = response.data.user || response.data;
+          localStorage.setItem('user', JSON.stringify(userData));
+          setUser(userData);
+        } catch (err) {
+          console.error('❌ Failed to fetch user profile:', err);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [isAuthenticated, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,14 +40,28 @@ const AuthComponent = ({ onAuthChange }) => {
     setError('');
 
     try {
+      let userData;
       if (isLogin) {
-        await authAPI.login(formData.email, formData.password);
+        const loginResponse = await authAPI.login(formData.email, formData.password);
+        userData = loginResponse.user;
       } else {
-        await authAPI.register(formData.username, formData.email, formData.password);
+        const registerResponse = await authAPI.register(formData.username, formData.email, formData.password);
+        userData = registerResponse.user;
       }
       
       setIsAuthenticated(true);
+      setUser(userData || migrationUtils.getCurrentUser()); // Update local user state
       onAuthChange(true);
+      
+      // Call the login success callback if provided
+      if (onLoginSuccess) {
+        try {
+          await onLoginSuccess();
+        } catch (error) {
+          console.error('Error in login success callback:', error);
+        }
+      }
+      
       setFormData({ username: '', email: '', password: '' });
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Authentication failed');
@@ -49,8 +84,6 @@ const AuthComponent = ({ onAuthChange }) => {
   };
 
   if (isAuthenticated) {
-    const user = migrationUtils.getCurrentUser();
-    
     if (isMinimized) {
       return (
         <div style={{

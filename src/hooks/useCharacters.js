@@ -445,7 +445,12 @@ export const useCharacters = () => {
 
     try {
       console.log('🔄 Refreshing characters from cloud...');
+      setLoading(true);
+      setError(null);
+      
       const apiCharacters = await charactersAPI.getAll();
+      console.log('📡 Fresh API characters received:', apiCharacters?.length || 0);
+      
       const charactersWithId = apiCharacters.map(char => ({
         ...char,
         id: `api_${char._id}`,
@@ -457,11 +462,15 @@ export const useCharacters = () => {
       const allCharacters = [...charactersWithId, ...localOnlyCharacters];
       
       setCharacters(allCharacters);
-      console.log('✅ Successfully refreshed characters from cloud');
+      console.log('✅ Successfully refreshed characters from cloud:', allCharacters.length, 'total characters');
+      
       return allCharacters;
-    } catch (err) {
-      console.error('Error refreshing from cloud:', err);
-      throw err;
+    } catch (error) {
+      console.error('❌ Error refreshing characters from cloud:', error);
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   }, [isAuthenticated, characters]);
 
