@@ -363,8 +363,24 @@ const ShadowAccordComplete = () => {
   const [originalCharacterForFactionChange, setOriginalCharacterForFactionChange] = useState(null);
 
   // Version and Changelog Data
-  const currentVersion = '0.3.5';
+  const currentVersion = '0.3.6';
   const changelog = [
+    {
+      version: '0.3.6',
+      date: '2025-08-17',
+      changes: [
+        '📱 MOBILE PDF EXPORT OPTIMIZATION: Significantly improved PDF export experience on mobile devices',
+        '⏱️ Loading Progress Modal - Added visual loading indicator with progress bar for PDF generation operations',
+        '🚀 Enhanced User Feedback - Users now see real-time progress and clear status messages during export',
+        '⏰ Timeout Protection - Added 30-second timeout with clear error messages for slow mobile devices',
+        '📋 Mobile-Specific UI - Optimized loading modal designed specifically for touch devices',
+        '💫 Visual Progress Indicators - Animated progress bars and status updates keep users informed',
+        '🛡️ Better Error Handling - More descriptive error messages when PDF generation fails on mobile',
+        '⚡ Improved Responsiveness - Export buttons now provide immediate visual feedback on tap',
+        '🔄 Smart Progress Simulation - Progressive loading indicators help users understand export is working',
+        '📞 Cross-Platform Compatibility - Works seamlessly across web browsers and mobile WebView environments'
+      ]
+    },
     {
       version: '0.3.5',
       date: '2025-08-17',
