@@ -68,6 +68,26 @@ jobs:
         retention-days: 30
         compression-level: 0  # No compression for APK files
 
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: "build-${{ github.run_number }}"
+        name: "Shadow Accord Build ${{ github.run_number }}"
+        body: |
+          🚀 **Automated APK Build**
+          
+          **Build Number:** ${{ github.run_number }}
+          **Commit:** ${{ github.sha }}
+          **Built:** ${{ github.event.head_commit.timestamp }}
+          
+          📱 Download the APK directly from the assets below - no unzipping needed!
+        files: ${{ env.APK_PATH }}
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Get APK info
       run: |
         if [ -f "${{ env.APK_PATH }}" ]; then
@@ -92,4 +112,6 @@ jobs:
         echo "**Run Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
         echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "⬇️ **Download the APK from the artifacts section above**" >> $GITHUB_STEP_SUMMARY
+        echo "## 📥 Download Options:" >> $GITHUB_STEP_SUMMARY
+        echo "1. **Direct APK** (recommended): Download from [Releases](https://github.com/${{ github.repository }}/releases) - no unzipping needed!" >> $GITHUB_STEP_SUMMARY
+        echo "2. **Artifact**: Download from artifacts section above (will be in a zip file)" >> $GITHUB_STEP_SUMMARY
