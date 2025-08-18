@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, FileText, Database, FileSpreadsheet } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
+import { testConnectivity } from '../services/api';
 
 const Settings = ({ 
   darkMode, 
@@ -369,10 +370,29 @@ const Settings = ({
             <Database className="w-4 h-4" />
             Create Test Character
           </button>
+
+          {/* Connectivity Test */}
+          <button
+            onClick={createMobileHandler(async () => {
+              console.log('🧪 Starting connectivity test...');
+              const result = await testConnectivity();
+              if (result.success) {
+                alert(`✅ Connectivity Test Passed!\n\nAPI Response: ${JSON.stringify(result.data, null, 2)}`);
+              } else {
+                alert(`❌ Connectivity Test Failed!\n\nError: ${result.error}\nPlatform: ${result.details?.platform || 'Unknown'}\nNetwork Error: ${result.details?.networkError ? 'Yes' : 'No'}\nStatus: ${result.details?.status || 'N/A'}`);
+              }
+            })}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm flex items-center gap-2 justify-center min-h-[44px] touch-manipulation"
+            style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+          >
+            <Wifi className="w-4 h-4" />
+            Test API Connectivity
+          </button>
           
           <div className="text-xs text-gray-500 space-y-1">
             <div>• Creates a basic vampire character for testing PDF export and other features</div>
             <div>• Useful for debugging without going through full character creation</div>
+            <div>• Test API connectivity helps diagnose cloud sync issues on different platforms</div>
           </div>
         </div>
       </div>

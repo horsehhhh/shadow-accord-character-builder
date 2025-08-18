@@ -14,7 +14,10 @@ console.log('🔍 API Environment Detection:', {
   isAndroid,
   isElectron,
   userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
-  platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web'
+  platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web',
+  localStorageAvailable: typeof localStorage !== 'undefined',
+  windowCapacitor: typeof window !== 'undefined' && !!window.Capacitor,
+  capacitorInfo: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : null
 });
 
 // For Android and Electron, always use the production API URL to avoid localhost issues
@@ -22,6 +25,10 @@ const API_BASE = process.env.REACT_APP_API_URL ||
   (isProduction || isCapacitor || isAndroid || isElectron ? 'https://shadowaccordapi.up.railway.app/api' : 'http://localhost:5000/api');
 
 console.log('🌐 API Base URL:', API_BASE);
+console.log('🔧 Environment Variables:', {
+  NODE_ENV: process.env.NODE_ENV,
+  REACT_APP_API_URL: process.env.REACT_APP_API_URL
+});
 
 // Create axios instance with default config
 const api = axios.create({
@@ -58,11 +65,25 @@ api.interceptors.request.use((config) => {
 // Handle authentication errors
 api.interceptors.response.use(
   (response) => {
-    console.log('API response success:', response.config.url, response.status);
+    console.log('✅ API response success:', {
+      url: response.config.url,
+      status: response.status,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+      dataSize: response.data ? JSON.stringify(response.data).length : 0
+    });
     return response;
   },
   (error) => {
-    console.error('API error:', error.config?.url, error.response?.status, error.response?.data);
+    console.error('❌ API error details:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+      message: error.message,
+      networkError: !error.response,
+      timeout: error.code === 'ECONNABORTED'
+    });
     
     // Handle version incompatibility errors from server
     if (error.response?.status === 426) { // 426 Upgrade Required
@@ -89,6 +110,34 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Connectivity test function for debugging
+export const testConnectivity = async () => {
+  try {
+    console.log('🔍 Testing connectivity to:', API_BASE);
+    // Use a simple endpoint that should always work
+    const response = await api.get('/auth/status');
+    console.log('✅ Connectivity test passed:', response.data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('❌ Connectivity test failed:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+      networkError: !error.response
+    });
+    return { 
+      success: false, 
+      error: error.message,
+      details: {
+        status: error.response?.status,
+        platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+        networkError: !error.response
+      }
+    };
+  }
+};
 
 // Authentication API
 export const authAPI = {
