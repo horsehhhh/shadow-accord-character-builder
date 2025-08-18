@@ -33,20 +33,22 @@ export const useCharacters = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const hasToken = migrationUtils.isAuthenticated();
-      const platform = typeof window !== 'undefined' && window.Capacitor ? 'Android/Capacitor' : 'Web';
-      const isOnline = navigator.onLine;
+      const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
+      const platform = isCapacitor ? `${window.Capacitor.getPlatform()}/Capacitor` : 'Web';
+      const isOnlineStatus = navigator.onLine;
       
       console.log('🔐 Authentication Check:', {
         platform,
         hasToken: !!hasToken,
-        isOnline,
+        isOnline: isOnlineStatus,
+        isCapacitor,
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) + '...' : 'N/A'
       });
       
       if (hasToken) {
-        // If we're offline, assume authentication is valid and don't test the API
-        if (!isOnline) {
-          console.log('📱 Offline mode detected, assuming valid authentication');
+        // If we're offline or on Android, assume authentication is valid and don't test the API
+        if (!isOnlineStatus || isCapacitor) {
+          console.log('📱 Offline mode or mobile detected, assuming valid authentication');
           setIsAuthenticated(true);
           return;
         }

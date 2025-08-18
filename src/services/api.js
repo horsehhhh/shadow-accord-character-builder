@@ -4,22 +4,26 @@ import axios from 'axios';
 // Auto-detect environment and platform
 const isProduction = process.env.NODE_ENV === 'production';
 const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
+const isAndroid = typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android';
 
 console.log('🔍 API Environment Detection:', {
   isProduction,
   isCapacitor,
+  isAndroid,
   userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
-  platform: typeof window !== 'undefined' && window.Capacitor ? 'Capacitor/Mobile' : 'Web'
+  platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web'
 });
 
+// For Android, always use the production API URL to avoid localhost issues
 const API_BASE = process.env.REACT_APP_API_URL || 
-  (isProduction || isCapacitor ? 'https://shadowaccordcharacterbuilder.up.railway.app/api' : 'http://localhost:5000/api');
+  (isProduction || isCapacitor || isAndroid ? 'https://shadowaccordcharacterbuilder.up.railway.app/api' : 'http://localhost:5000/api');
 
 console.log('🌐 API Base URL:', API_BASE);
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE,
+  timeout: isCapacitor ? 30000 : 10000, // Longer timeout for mobile
   headers: {
     'Content-Type': 'application/json',
   },
