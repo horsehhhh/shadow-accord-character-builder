@@ -125,7 +125,7 @@ export const testConnectivity = async () => {
     
     // For Android, try a direct fetch first to test basic connectivity
     if (isAndroid) {
-      console.log('📱 Android detected - testing direct fetch first...');
+      console.log('📱 Android detected - testing direct fetch...');
       try {
         const directResponse = await fetch(`${API_BASE}/auth/status`, {
           method: 'GET',
