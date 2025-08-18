@@ -115,17 +115,61 @@ api.interceptors.response.use(
 export const testConnectivity = async () => {
   try {
     console.log('🔍 Testing connectivity to:', API_BASE);
-    // Use a simple endpoint that should always work
+    console.log('🔍 Platform info:', {
+      isAndroid,
+      isCapacitor,
+      isElectron,
+      platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'
+    });
+    
+    // For Android, try a direct fetch first to test basic connectivity
+    if (isAndroid) {
+      console.log('📱 Android detected - testing direct fetch first...');
+      try {
+        const directResponse = await fetch(`${API_BASE}/auth/status`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // Add CORS and cache settings for Android
+          mode: 'cors',
+          cache: 'no-cache',
+        });
+        console.log('📱 Direct fetch response:', {
+          ok: directResponse.ok,
+          status: directResponse.status,
+          statusText: directResponse.statusText,
+          headers: Object.fromEntries(directResponse.headers.entries())
+        });
+        
+        if (directResponse.ok) {
+          const data = await directResponse.json();
+          console.log('📱 Direct fetch data:', data);
+          return { success: true, data, method: 'direct-fetch' };
+        } else {
+          throw new Error(`HTTP ${directResponse.status}: ${directResponse.statusText}`);
+        }
+      } catch (fetchError) {
+        console.error('📱 Direct fetch failed:', fetchError);
+        // Fall through to axios
+      }
+    }
+    
+    // Use axios as fallback or primary method
+    console.log('🔍 Testing with axios...');
     const response = await api.get('/auth/status');
     console.log('✅ Connectivity test passed:', response.data);
-    return { success: true, data: response.data };
+    return { success: true, data: response.data, method: 'axios' };
   } catch (error) {
     console.error('❌ Connectivity test failed:', {
       message: error.message,
       status: error.response?.status,
       data: error.response?.data,
       platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
-      networkError: !error.response
+      networkError: !error.response,
+      errorType: error.constructor.name,
+      stack: error.stack
     });
     return { 
       success: false, 
@@ -133,7 +177,8 @@ export const testConnectivity = async () => {
       details: {
         status: error.response?.status,
         platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
-        networkError: !error.response
+        networkError: !error.response,
+        errorType: error.constructor.name
       }
     };
   }
