@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   server: {
     // Allow external URLs for API calls
     allowNavigation: [
-      'https://shadowaccordcharacterbuilder.up.railway.app'
+      'https://shadowaccordapi.up.railway.app'
     ]
   },
   android: {
