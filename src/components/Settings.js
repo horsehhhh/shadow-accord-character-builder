@@ -12,7 +12,8 @@ const Settings = ({
   lastSaved,
   characters,
   exportCharacter,
-  currentVersion
+  currentVersion,
+  createTestCharacter
 }) => {
   const { isAuthenticated, syncAllToCloud } = useCharacters();
   const [syncStatus, setSyncStatus] = useState('idle');
@@ -339,6 +340,41 @@ const Settings = ({
             Settings last saved: {new Date(lastSaved).toLocaleString()}
           </div>
         )}
+      </div>
+
+      {/* Debug Section */}
+      <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <SettingsIcon className="w-4 h-4" />
+          Debug Tools
+        </h3>
+        
+        <div className="space-y-3">
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            Development and testing utilities:
+          </div>
+          
+          {/* Test Character Creation */}
+          <button
+            onClick={createMobileHandler(() => {
+              if (createTestCharacter) {
+                createTestCharacter();
+              } else {
+                alert('Test character creation function not available');
+              }
+            })}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm flex items-center gap-2 justify-center min-h-[44px] touch-manipulation"
+            style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+          >
+            <Database className="w-4 h-4" />
+            Create Test Character
+          </button>
+          
+          <div className="text-xs text-gray-500 space-y-1">
+            <div>• Creates a basic vampire character for testing PDF export and other features</div>
+            <div>• Useful for debugging without going through full character creation</div>
+          </div>
+        </div>
       </div>
 
       {/* Data Management Section */}
