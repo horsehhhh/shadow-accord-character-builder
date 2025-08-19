@@ -39,7 +39,7 @@ jobs:
       
     - name: Rename and prepare EXE
       run: |
-        $exePath = "dist\Shadow Accord Character Builder 0.3.7.exe"
+        $exePath = "dist\Shadow Accord Character Builder 0.3.8.exe"
         $newName = "shadow-accord-v${{ github.run_number }}.exe"
         $newPath = "dist\$newName"
         if (Test-Path $exePath) {
