@@ -436,6 +436,46 @@ const Settings = ({
         </div>
       </div>
 
+      {/* Debug Information Section */}
+      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <Database className="w-4 h-4" />
+          Debug Information
+        </h3>
+        
+        <div className="space-y-2 text-sm">
+          <div><strong>Authentication:</strong> {isAuthenticated ? '✅ Logged In' : '❌ Not Logged In'}</div>
+          <div><strong>Online Status:</strong> {isOnline ? '✅ Online' : '❌ Offline'}</div>
+          <div><strong>Auth Token:</strong> {localStorage.getItem('auth_token') ? '✅ Present' : '❌ Missing'}</div>
+          <div><strong>Platform:</strong> {
+            typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android' ? 'Android' :
+            typeof window !== 'undefined' && window.electronAPI ? 'Electron' : 'Web'
+          }</div>
+          <div><strong>App Version:</strong> {currentVersion}</div>
+          <div><strong>Total Characters:</strong> {characters?.length || 0}</div>
+          <div><strong>Cloud Characters:</strong> {characters?.filter(c => c.id && String(c.id).startsWith('api_')).length || 0}</div>
+          <div><strong>Local Characters:</strong> {characters?.filter(c => c.id && !String(c.id).startsWith('api_')).length || 0}</div>
+          
+          {/* Test Character Creation */}
+          <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+            <button
+              onClick={async () => {
+                try {
+                  alert(`Debug: Starting character creation test...\nAuth: ${isAuthenticated}\nOnline: ${isOnline}\nToken: ${!!localStorage.getItem('auth_token')}`);
+                  await createTestCharacter();
+                  alert('✅ Test character created successfully!');
+                } catch (error) {
+                  alert(`❌ Test character creation failed: ${error.message}`);
+                }
+              }}
+              className={`${themeClasses.button} text-white px-4 py-2 rounded text-sm`}
+            >
+              🧪 Test Character Creation
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Data Management Section */}
       {characters && characters.length > 0 && (
         <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
