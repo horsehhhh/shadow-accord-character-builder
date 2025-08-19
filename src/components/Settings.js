@@ -460,12 +460,14 @@ const Settings = ({
           <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
             <button
               onClick={async () => {
-                console.log('🚨 TEST BUTTON CLICKED!');
-                alert('🚨 DEBUG: Test button clicked!');
-                
                 try {
-                  console.log('🚨 About to call createTestCharacter function...');
-                  alert(`Debug: Starting character creation test...\nAuth: ${isAuthenticated}\nOnline: ${isOnline}\nToken: ${!!localStorage.getItem('auth_token')}`);
+                  console.log('🧪 Test Character Creation initiated');
+                  console.log('� Current state:', {
+                    auth: isAuthenticated,
+                    online: isOnline,
+                    token: !!localStorage.getItem('auth_token'),
+                    version: currentVersion
+                  });
                   
                   if (!createTestCharacter) {
                     alert('❌ ERROR: createTestCharacter function is undefined!');
@@ -473,10 +475,10 @@ const Settings = ({
                   }
                   
                   await createTestCharacter();
-                  alert('✅ Test character created successfully!');
+                  console.log('✅ Test character creation completed');
                 } catch (error) {
-                  console.error('❌ Settings error:', error);
-                  alert(`❌ Test character creation failed: ${error.message}`);
+                  console.error('❌ Test character creation error:', error);
+                  alert(`❌ Test failed: ${error.message}`);
                 }
               }}
               className={`${themeClasses.button} text-white px-4 py-2 rounded text-sm`}

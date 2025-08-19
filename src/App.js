@@ -317,7 +317,7 @@ const ShadowAccordComplete = () => {
   const [creationStep, setCreationStep] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Cloud features - now the primary character management
+  // Cloud features - primary character management with enhanced debugging
   const { 
     characters,
     setCharacters,
@@ -326,9 +326,6 @@ const ShadowAccordComplete = () => {
     updateCharacter: cloudUpdateCharacter,
     refreshFromCloud
   } = useCharacters();
-  
-  // Debug: Test if createCharacter function has our debug code
-  console.log('🔧 cloudCreateCharacter function signature:', cloudCreateCharacter.toString().substring(0, 400));
 
   // Helper function to update character with cloud sync
   const updateCurrentCharacter = useCallback(async (updatedCharacter) => {
@@ -418,19 +415,35 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.3.8',
+      date: '2025-08-19',
+      changes: [
+        '🔧 ENHANCED CLOUD SYNC DIAGNOSTICS & DEBUGGING: Comprehensive diagnostic system for troubleshooting character sync issues',
+        '🔍 Comprehensive Diagnostics - Added detailed diagnostic logging for character creation and cloud sync processes',
+        '🧪 Test Character Creation - Enhanced test character creation feature with comprehensive error reporting and cloud sync verification',
+        '📱 Android Platform Support - Improved Android APK cloud connectivity with enhanced CORS handling and mobile-specific debugging',
+        '🔄 Debug Information Panel - Added comprehensive debug information section in Settings showing authentication status and character counts',
+        '⚡ Enhanced Error Reporting - Improved error messages and logging throughout the character creation and sync pipeline',
+        '✅ CORS Resolution - Fixed CORS issues preventing Android APK from connecting to cloud API',
+        '✅ API Endpoint Corrections - Corrected health check endpoint from /auth/status to /health',
+        '✅ Authentication State Management - Improved authentication state handling to prevent aggressive auth clearing on non-auth errors',
+        '✅ PDF Export for Electron - Fixed PDF template loading issues in Electron desktop application',
+        '🔧 Enhanced API Service - Updated API service with better mobile platform detection and error handling',
+        '🔧 Railway Backend Integration - Verified and optimized backend connectivity for all platforms'
+      ]
+    },
+    {
       version: '0.3.7',
       date: '2025-08-17',
       changes: [
-        '🔐 VERSION CONTROL SYSTEM: Prevent old app versions from accessing cloud features to ensure compatibility',
-        '🚫 Old Version Blocking - Apps older than v0.3.7 cannot connect to cloud API to prevent data corruption',
-        '⚡ Immediate Character Refresh - Characters now load instantly after login instead of requiring page refresh',
-        '🔄 Enhanced Authentication Flow - Dual callback system ensures characters sync immediately on successful login',
-        '📡 API Version Headers - All requests include version information for server-side compatibility checking',
-        '⚠️ Version Error Handling - Clear error messages when app version is incompatible with cloud services',
-        '🛡️ Graceful Degradation - Incompatible versions fall back to localStorage-only mode automatically',
-        '🔧 Centralized Version Management - Single version.js file controls app version and compatibility rules',
-        '✅ Enhanced Login Process - Login now triggers immediate character data refresh and cloud sync verification',
-        '🚨 User-Friendly Alerts - Version incompatibility shows clear upgrade prompts with download instructions'
+        '🧙‍♂️ EXPANDED SORCERER POWER TREE ACCESS: Sorcerers can now advance in all power trees',
+        '🌟 Sorcerer Tree Expansion - Sorcerers can now advance in all power trees, not just basic ones',
+        '💀 Corrupted Tree Access - Added access to corrupted power trees (Death, Demonology, Madness, Ruin) for sorcerers',
+        '🤝 Fellowship Tree Access - Sorcerers can now learn from all fellowship trees',
+        '� XP Cost Structure - Sorcerers pay learned costs (6/9/12 XP) for corrupted and fellowship trees',
+        '🔄 Power Tree Filtering - Modified power tree filtering logic to include corrupted and fellowship trees for sorcerers',
+        '� Cost Calculation - Maintained proper XP cost differentiation between innate and learned trees',
+        '🎮 User Experience - Enhanced advancement interface with clearer descriptions of available power trees'
       ]
     },
     {
@@ -447,6 +460,22 @@ const ShadowAccordComplete = () => {
         '⚡ Improved Responsiveness - Export buttons now provide immediate visual feedback on tap',
         '🔄 Smart Progress Simulation - Progressive loading indicators help users understand export is working',
         '📞 Cross-Platform Compatibility - Works seamlessly across web browsers and mobile WebView environments'
+      ]
+    },
+    {
+      version: '0.3.6',
+      date: '2025-08-17',
+      changes: [
+        '🔐 VERSION CONTROL SYSTEM: Prevent old app versions from accessing cloud features to ensure compatibility',
+        '🚫 Old Version Blocking - Apps older than minimum version cannot connect to cloud API to prevent data corruption',
+        '⚡ Immediate Character Refresh - Characters now load instantly after login instead of requiring page refresh',
+        '🔄 Enhanced Authentication Flow - Dual callback system ensures characters sync immediately on successful login',
+        '📡 API Version Headers - All requests include version information for server-side compatibility checking',
+        '⚠️ Version Error Handling - Clear error messages when app version is incompatible with cloud services',
+        '🛡️ Graceful Degradation - Incompatible versions fall back to localStorage-only mode automatically',
+        '🔧 Centralized Version Management - Single version.js file controls app version and compatibility rules',
+        '✅ Enhanced Login Process - Login now triggers immediate character data refresh and cloud sync verification',
+        '🚨 User-Friendly Alerts - Version incompatibility shows clear upgrade prompts with download instructions'
       ]
     },
     {
@@ -2918,17 +2947,13 @@ Generated by Shadow Accord Character Builder v${currentVersion}
 `;
   }, [gameData.merits, gameData.passions, currentVersion, formatDisplayText]);
 
-  // Test character creation for debugging
+  // Test character creation for debugging and troubleshooting
   const createTestCharacter = useCallback(async () => {
-    console.log('🚨 CREATETESTCHARACTER FUNCTION CALLED!');
-    alert('🚨 DEBUG: createTestCharacter function started!');
-    
     try {
       console.log('🧪 Creating test character for debugging...');
-      alert('🧪 DEBUG: About to create test character object...');
       
       const testCharacter = {
-        name: 'Test Character',
+        name: 'Test Character v0.3.8',
         player: 'Debug User',
         faction: 'vampire',
         subfaction: 'brujah',
@@ -3006,23 +3031,26 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                  typeof window !== 'undefined' && window.electronAPI ? 'Electron' : 'Web'
       });
       
-      console.log('🔍 ABOUT TO CALL cloudCreateCharacter with test data');
-      console.log('🔍 cloudCreateCharacter function:', typeof cloudCreateCharacter);
-      console.log('🔍 cloudCreateCharacter name:', cloudCreateCharacter.name);
-      console.log('🔍 cloudCreateCharacter.toString():', cloudCreateCharacter.toString().substring(0, 500));
-      alert('🔍 DEBUG: About to call cloudCreateCharacter...');
+      // Pre-creation diagnostic info
+      console.log('🔍 Pre-creation debug info:', {
+        hasToken: !!localStorage.getItem('auth_token'),
+        isOnline: navigator.onLine,
+        platform: typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android' ? 'Android' :
+                 typeof window !== 'undefined' && window.electronAPI ? 'Electron' : 'Web',
+        functionType: typeof cloudCreateCharacter,
+        hasDebugCode: cloudCreateCharacter.toString().includes('🚨🚨🚨 USECHARACTERS')
+      });
       
       try {
-        console.log('🚨 CALLING cloudCreateCharacter NOW!');
-        console.log('🚨 Calling with character data:', testCharacter.name);
-        console.log('🚨 Function string check:', cloudCreateCharacter.toString().includes('🚨🚨🚨 USECHARACTERS') ? 'HAS DEBUG CODE' : 'MISSING DEBUG CODE');
-        
-        // Test: Call the function and see if debug messages appear
+        console.log('🚀 Calling cloudCreateCharacter with test data...');
         const result = await cloudCreateCharacter(testCharacter);
-        console.log('✅ Character creation result:', result);
-        console.log('✅ Result type:', typeof result);
-        console.log('✅ Result id:', result?.id);
-        alert('✅ Test character created successfully! You can now test PDF export.');
+        console.log('✅ Test character creation result:', {
+          success: true,
+          resultType: typeof result,
+          resultId: result?.id,
+          resultName: result?.name
+        });
+        alert('✅ Test character created successfully! Check console for detailed logs.');
       } catch (cloudError) {
         console.error('❌ Cloud character creation failed:', cloudError);
         

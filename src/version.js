@@ -1,8 +1,8 @@
 // Application version - update this when releasing new versions
-export const APP_VERSION = '0.3.7';
+export const APP_VERSION = '0.3.8';
 
 // Minimum version required for cloud connectivity
-export const MIN_CLOUD_VERSION = '0.3.7';
+export const MIN_CLOUD_VERSION = '0.3.8';
 
 // Version comparison helper
 export const isVersionSupported = (currentVersion, minVersion) => {

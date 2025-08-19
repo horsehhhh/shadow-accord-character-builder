@@ -19,7 +19,80 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
-## [v0.3.3] - 2025-08-17
+## [v0.3.8] - 2025-08-19
+
+### 🔧 Enhanced Cloud Sync Diagnostics & Android Upload Fix
+
+#### Enhanced - Cloud Character Synchronization
+- **🔍 Comprehensive Diagnostics**: Added detailed diagnostic logging for character creation and cloud sync processes
+- **🧪 Test Character Creation**: Enhanced test character creation feature with comprehensive error reporting and cloud sync verification
+- **📱 Android Platform Support**: Improved Android APK cloud connectivity with enhanced CORS handling and mobile-specific debugging
+- **🔄 Debug Information Panel**: Added comprehensive debug information section in Settings showing authentication status, platform detection, and character counts
+- **⚡ Enhanced Error Reporting**: Improved error messages and logging throughout the character creation and sync pipeline
+
+#### Fixed - Android APK Character Upload Issue
+- **✅ Authentication Bypass Fix**: Removed automatic authentication bypass for Capacitor/Android apps that was preventing proper token validation
+- **✅ Dual Network Approach**: Implemented axios + fetch API fallback system specifically for Android networking compatibility
+- **✅ Mobile Token Validation**: Added fetch-based authentication validation for mobile platforms before API calls
+- **✅ Character Upload Resolution**: Fixed critical issue where Android APK could pull existing characters but couldn't upload new ones
+- **✅ Enhanced Android Headers**: Added Android-specific axios configuration with proper User-Agent and timeout settings
+
+#### Fixed - Cloud Connectivity Issues
+- **✅ CORS Resolution**: Fixed CORS issues preventing Android APK from connecting to cloud API
+- **✅ API Endpoint Corrections**: Corrected health check endpoint from `/auth/status` to `/health` 
+- **✅ Authentication State Management**: Improved authentication state handling to prevent aggressive auth clearing on non-auth errors
+- **✅ Version Compatibility**: Updated version requirements to ensure cloud sync compatibility
+- **✅ PDF Export for Electron**: Fixed PDF template loading issues in Electron desktop application
+
+#### Technical Improvements
+- **🔧 Enhanced API Service**: Updated API service with better mobile platform detection and error handling
+- **🔧 Improved useCharacters Hook**: Added comprehensive pre-creation diagnostics and better error reporting
+- **🔧 Railway Backend Integration**: Verified and optimized backend connectivity for all platforms
+- **🔧 Build Process Enhancement**: Improved automated APK and EXE build process with sequential naming
+- **🔧 Debug Tools**: Added function signature checking and comprehensive logging for troubleshooting
+
+#### Platform Support
+- **📱 Android APK**: Enhanced mobile support with improved network handling and debugging capabilities
+- **💻 Electron Desktop**: Fixed PDF export functionality and improved desktop-specific features  
+- **🌐 Web Browser**: Maintained full web functionality with cross-platform compatibility
+- **☁️ Railway Cloud**: Optimized cloud backend integration with comprehensive logging and error tracking
+
+---
+
+## [v0.3.7] - 2025-08-17
+
+### 🧙‍♂️ Expanded Sorcerer Power Tree Access
+
+#### Enhanced - Character Advancement
+- **🌟 Sorcerer Tree Expansion**: Sorcerers can now advance in all power trees, not just basic ones
+- **💀 Corrupted Tree Access**: Added access to corrupted power trees (Death, Demonology, Madness, Ruin) for sorcerers
+- **🤝 Fellowship Tree Access**: Sorcerers can now learn from all fellowship trees (ahl_i_batin, craftmason, messianic_voices, old_faith, order_of_hermes, spirit_talkers, valdaermen, veneficti)
+- **💰 XP Cost Structure**: Sorcerers pay learned costs (6/9/12 XP) for corrupted and fellowship trees while maintaining innate costs (3/6/9 XP) for basic trees
+- **📝 UI Updates**: Updated character advancement interface descriptions and help text to reflect expanded tree access
+
+#### Technical Improvements
+- **🔄 Power Tree Filtering**: Modified power tree filtering logic in character advancement to include corrupted and fellowship trees for sorcerers
+- **📊 Cost Calculation**: Maintained proper XP cost differentiation between innate and learned trees
+- **🎮 User Experience**: Enhanced advancement interface with clearer descriptions of available power trees
+
+---
+
+## [v0.3.6] - 2025-08-17
+
+### 🔐 Version Control System
+
+#### Enhanced - Cloud Compatibility
+- **🚫 Old Version Blocking**: Apps older than minimum version cannot connect to cloud API to prevent data corruption
+- **⚡ Immediate Character Refresh**: Characters now load instantly after login instead of requiring page refresh
+- **🔄 Enhanced Authentication Flow**: Dual callback system ensures characters sync immediately on successful login
+- **📡 API Version Headers**: All requests include version information for server-side compatibility checking
+- **⚠️ Version Error Handling**: Clear error messages when app version is incompatible with cloud services
+- **🛡️ Graceful Degradation**: Incompatible versions fall back to localStorage-only mode automatically
+- **🔧 Centralized Version Management**: Single version.js file controls app version and compatibility rules
+
+---
+
+## [v0.3.5] - 2025-08-17
 
 ### 🧙‍♂️ Expanded Sorcerer Power Tree Access
 

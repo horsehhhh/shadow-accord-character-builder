@@ -224,27 +224,27 @@ export const useCharacters = () => {
     loadCharacters();
   }, [isAuthenticated]);
 
-  // Create character function
+  // Enhanced character creation with comprehensive cloud sync diagnostics
   const createCharacter = async (character) => {
-    console.log('🚨🚨🚨 USECHARACTERS createCharacter FUNCTION CALLED!');
-    console.log('🚨🚨🚨 This is the enhanced createCharacter from useCharacters hook');
-    console.log('🚨🚨🚨 Character data received:', character);
+    console.log('� Character creation initiated:', {
+      name: character.name,
+      faction: character.faction,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web'
+    });
     
     try {
-      console.log('🆕 =================');
-      console.log('🆕 CREATE CHARACTER CALLED');
-      console.log('🆕 isAuthenticated:', isAuthenticated);
-      console.log('🆕 navigator.onLine:', navigator.onLine);
-      console.log('🆕 APP_VERSION:', APP_VERSION);
-      console.log('🆕 MIN_CLOUD_VERSION:', MIN_CLOUD_VERSION);
-      console.log('🆕 Version supported:', isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION));
-      console.log('🆕 Character data being sent:', character);
-      console.log('🆕 Auth token exists:', !!localStorage.getItem('auth_token'));
-      console.log('🆕 Auth token value:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
-      console.log('🆕 Platform:', isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web');
-      console.log('🆕 API_BASE from service:', 'https://shadowaccordapi.up.railway.app/api');
-      console.log('🆕 localStorage user:', localStorage.getItem('user'));
-      console.log('🆕 =================');
+      // Comprehensive pre-creation diagnostics
+      const diagnostics = {
+        isAuthenticated,
+        isOnline: navigator.onLine,
+        appVersion: APP_VERSION,
+        minCloudVersion: MIN_CLOUD_VERSION,
+        versionSupported: isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION),
+        hasAuthToken: !!localStorage.getItem('auth_token'),
+        platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web'
+      };
+      
+      console.log('🔍 Character creation diagnostics:', diagnostics);
       
       // Check version compatibility for cloud operations
       if (isAuthenticated && !isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION)) {
@@ -256,28 +256,10 @@ export const useCharacters = () => {
       }
       
       if (isAuthenticated && navigator.onLine) {
-        console.log('🌐 CONDITIONS MET - Attempting cloud save!');
-        
-        // Test connectivity first for Android
-        if (isAndroid) {
-          try {
-            console.log('📱 Testing Android connectivity before character creation...');
-            const testResponse = await fetch('https://shadowaccordapi.up.railway.app/api/health', {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              timeout: 5000
-            });
-            console.log('📱 Connectivity test result:', testResponse.status, testResponse.ok);
-          } catch (testError) {
-            console.error('📱 Connectivity test failed:', testError.message);
-          }
-        }
+        console.log('🌐 Attempting cloud character creation...');
         
         try {
-          // Attempt to create new API character
-          console.log('🔄 MAKING API CALL TO charactersAPI.create()');
+          console.log('� Calling charactersAPI.create()...');
           console.log('🔄 Character data:', {
             name: character.name,
             faction: character.faction,

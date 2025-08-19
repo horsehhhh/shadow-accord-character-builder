@@ -1,7 +1,7 @@
 {
   "name": "shadow-accord-character-builder",
-  "version": "0.3.7",
-  "description": "A comprehensive character creation tool for the Shadow Accord RPG system.",
+  "version": "0.3.8",
+  "description": "A comprehensive character creation tool for the Shadow Accord RPG system with enhanced cloud sync diagnostics and Android upload fixes.",
   "author": "horsehhhh and Claude",
   "license": "MIT",
   "main": "public/electron.js",
