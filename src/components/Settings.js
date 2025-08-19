@@ -383,7 +383,7 @@ const Settings = ({
                 // Test 1: Basic network availability
                 try {
                   console.log('📡 Testing basic network availability...');
-                  const basicTest = await fetch('https://www.google.com', { 
+                  await fetch('https://www.google.com', { 
                     method: 'HEAD', 
                     mode: 'no-cors',
                     cache: 'no-cache',
