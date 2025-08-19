@@ -21,8 +21,15 @@ console.log('🔍 API Environment Detection:', {
 });
 
 // For Android and Electron, always use the production API URL to avoid localhost issues
+// Add fallback URLs for Android connectivity issues
+const PRIMARY_API_BASE = 'https://shadowaccordapi.up.railway.app/api';
+const FALLBACK_API_BASES = [
+  'https://shadowaccordapi.up.railway.app/api', // Primary
+  'https://shadowaccordapi-production.up.railway.app/api', // Alternative Railway format
+];
+
 const API_BASE = process.env.REACT_APP_API_URL || 
-  (isProduction || isCapacitor || isAndroid || isElectron ? 'https://shadowaccordapi.up.railway.app/api' : 'http://localhost:5000/api');
+  (isProduction || isCapacitor || isAndroid || isElectron ? PRIMARY_API_BASE : 'http://localhost:5000/api');
 
 console.log('🌐 API Base URL:', API_BASE);
 console.log('🔧 Environment Variables:', {
@@ -111,6 +118,39 @@ api.interceptors.response.use(
   }
 );
 
+// Test multiple API endpoints to find working one (for Android issues)
+export const findWorkingApiBase = async () => {
+  if (!isAndroid) {
+    return API_BASE; // Only needed for Android
+  }
+  
+  console.log('🔍 Testing multiple API endpoints for Android...');
+  
+  for (const baseUrl of FALLBACK_API_BASES) {
+    try {
+      console.log(`📱 Testing: ${baseUrl}`);
+      const response = await fetch(`${baseUrl}/auth/status`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        signal: AbortSignal.timeout(8000)
+      });
+      
+      if (response.ok) {
+        console.log(`✅ Working API endpoint found: ${baseUrl}`);
+        return baseUrl;
+      } else {
+        console.log(`❌ Endpoint failed with status ${response.status}: ${baseUrl}`);
+      }
+    } catch (error) {
+      console.log(`❌ Endpoint failed with error: ${baseUrl} - ${error.message}`);
+    }
+  }
+  
+  console.log('❌ No working API endpoints found, using default');
+  return API_BASE;
+};
+
 // Connectivity test function for debugging
 export const testConnectivity = async () => {
   try {
@@ -125,73 +165,23 @@ export const testConnectivity = async () => {
       hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A'
     });
     
-    // For Android, try multiple connectivity tests
+    // For Android, try to find a working API endpoint first
+    let workingApiBase = API_BASE;
+    if (isAndroid) {
+      workingApiBase = await findWorkingApiBase();
+      if (workingApiBase !== API_BASE) {
+        console.log(`� Using alternative API endpoint: ${workingApiBase}`);
+      }
+    }
+    
+    // For Android, try multiple connectivity tests with working endpoint
     if (isAndroid) {
       console.log('📱 Android detected - running comprehensive connectivity tests...');
       
-      // Test 1: Basic ping to API server
-      console.log('📱 Test 1: Basic fetch to API root...');
+      // Test with the working endpoint
+      console.log('📱 Testing with discovered working endpoint...');
       try {
-        const rootResponse = await fetch(API_BASE.replace('/api', ''), {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          timeout: 10000
-        });
-        console.log('📱 Root fetch result:', {
-          ok: rootResponse.ok,
-          status: rootResponse.status,
-          statusText: rootResponse.statusText,
-          url: rootResponse.url
-        });
-      } catch (rootError) {
-        console.error('📱 Root fetch failed:', rootError.message);
-      }
-      
-      // Test 2: HTTPS connectivity test
-      console.log('📱 Test 2: HTTPS connectivity test...');
-      try {
-        const httpsResponse = await fetch('https://httpbin.org/get', {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          timeout: 10000
-        });
-        console.log('📱 HTTPS test result:', {
-          ok: httpsResponse.ok,
-          status: httpsResponse.status,
-          provider: 'httpbin.org'
-        });
-      } catch (httpsError) {
-        console.error('📱 HTTPS test failed:', httpsError.message);
-      }
-      
-      // Test 3: Railway domain resolution test
-      console.log('📱 Test 3: Railway domain resolution test...');
-      try {
-        const railwayResponse = await fetch('https://shadowaccordapi.up.railway.app/', {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          timeout: 15000
-        });
-        console.log('📱 Railway domain test result:', {
-          ok: railwayResponse.ok,
-          status: railwayResponse.status,
-          statusText: railwayResponse.statusText,
-          url: railwayResponse.url
-        });
-      } catch (railwayError) {
-        console.error('📱 Railway domain test failed:', {
-          name: railwayError.name,
-          message: railwayError.message
-        });
-      }
-      
-      // Test 4: Direct fetch to auth status
-      console.log('📱 Test 4: Direct fetch to auth status...');
-      try {
-        const directResponse = await fetch(`${API_BASE}/auth/status`, {
+        const workingResponse = await fetch(`${workingApiBase}/auth/status`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -201,29 +191,14 @@ export const testConnectivity = async () => {
           cache: 'no-cache',
           timeout: 15000
         });
-        console.log('📱 Direct fetch response:', {
-          ok: directResponse.ok,
-          status: directResponse.status,
-          statusText: directResponse.statusText,
-          headers: Object.fromEntries(directResponse.headers.entries()),
-          url: directResponse.url
-        });
         
-        if (directResponse.ok) {
-          const data = await directResponse.json();
-          console.log('📱 Direct fetch data:', data);
-          return { success: true, data, method: 'direct-fetch' };
-        } else {
-          const errorText = await directResponse.text();
-          throw new Error(`HTTP ${directResponse.status}: ${directResponse.statusText} - ${errorText}`);
+        if (workingResponse.ok) {
+          const data = await workingResponse.json();
+          console.log('✅ Working endpoint success:', data);
+          return { success: true, data, method: 'working-endpoint', endpoint: workingApiBase };
         }
-      } catch (fetchError) {
-        console.error('📱 Direct fetch failed:', {
-          name: fetchError.name,
-          message: fetchError.message,
-          stack: fetchError.stack
-        });
-        // Continue to axios test
+      } catch (workingError) {
+        console.error('📱 Working endpoint failed:', workingError);
       }
     }
     
