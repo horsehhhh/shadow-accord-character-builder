@@ -193,8 +193,16 @@ export const useCharacters = () => {
   // Create character function
   const createCharacter = async (character) => {
     try {
-      console.log('Creating character, isAuthenticated:', isAuthenticated);
-      console.log('Character data being sent:', character);
+      console.log('🆕 =================');
+      console.log('🆕 CREATE CHARACTER CALLED');
+      console.log('🆕 isAuthenticated:', isAuthenticated);
+      console.log('🆕 navigator.onLine:', navigator.onLine);
+      console.log('🆕 APP_VERSION:', APP_VERSION);
+      console.log('🆕 MIN_CLOUD_VERSION:', MIN_CLOUD_VERSION);
+      console.log('🆕 Version supported:', isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION));
+      console.log('🆕 Character data being sent:', character);
+      console.log('🆕 Auth token exists:', !!localStorage.getItem('auth_token'));
+      console.log('🆕 =================');
       
       // Check version compatibility for cloud operations
       if (isAuthenticated && !isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION)) {
@@ -206,9 +214,11 @@ export const useCharacters = () => {
       }
       
       if (isAuthenticated && navigator.onLine) {
+        console.log('🌐 CONDITIONS MET - Attempting cloud save!');
         try {
           // Attempt to create new API character
-          console.log('🔄 Attempting cloud save for character:', {
+          console.log('🔄 MAKING API CALL TO charactersAPI.create()');
+          console.log('🔄 Character data:', {
             name: character.name,
             faction: character.faction,
             hasStats: !!character.stats,
@@ -219,22 +229,26 @@ export const useCharacters = () => {
           });
           
           const created = await charactersAPI.create(character);
-          console.log('✅ Cloud save successful:', {
+          console.log('✅ API CALL SUCCESSFUL! Response:', {
             characterId: created._id,
             characterName: created.name,
-            hasApiId: !!created._id
+            hasApiId: !!created._id,
+            fullResponse: created
           });
           
           const newCharacter = { ...created, id: `api_${created._id}` };
           setCharacters(prev => [...prev, newCharacter]);
           return newCharacter;
         } catch (apiError) {
-          console.error('API character creation failed, falling back to localStorage:', apiError);
-          console.error('API Error details:', {
+          console.error('❌ API CALL FAILED:', apiError);
+          console.error('❌ API Error details:', {
             status: apiError.response?.status,
             statusText: apiError.response?.statusText,
             data: apiError.response?.data,
-            message: apiError.message
+            message: apiError.message,
+            url: apiError.config?.url,
+            method: apiError.config?.method,
+            headers: apiError.config?.headers
           });
           
           // Only clear authentication on actual auth errors (401, 403)
@@ -246,6 +260,11 @@ export const useCharacters = () => {
           }
           // Fall through to localStorage creation
         }
+      } else {
+        console.log('🏠 Conditions NOT met for cloud save:');
+        console.log('🏠 - isAuthenticated:', isAuthenticated);
+        console.log('🏠 - navigator.onLine:', navigator.onLine);
+        console.log('🏠 Falling back to localStorage...');
       }
       
       // Save to localStorage (either not authenticated or API failed)
