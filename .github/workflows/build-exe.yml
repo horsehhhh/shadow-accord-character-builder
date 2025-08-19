@@ -1,0 +1,121 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build React app
+      run: |
+        $env:GENERATE_SOURCEMAP="false"
+        npm run build
+        
+    - name: Build Electron EXE
+      run: npm run dist
+      
+    - name: Rename and prepare EXE
+      run: |
+        $exePath = "dist\Shadow Accord Character Builder 0.3.7.exe"
+        $newName = "shadow-accord-v${{ github.run_number }}.exe"
+        $newPath = "dist\$newName"
+        if (Test-Path $exePath) {
+          Move-Item -Path $exePath -Destination $newPath
+          echo "EXE_NAME=$newName" >> $env:GITHUB_ENV
+          echo "EXE_PATH=dist/$newName" >> $env:GITHUB_ENV
+          echo "✅ EXE renamed to: $newName"
+        } else {
+          echo "❌ EXE file not found at expected path"
+          Get-ChildItem -Path "dist" -Recurse -Name "*.exe"
+          exit 1
+        }
+        
+    - name: Upload EXE Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: shadow-accord-v${{ github.run_number }}-exe
+        path: dist/shadow-accord-v${{ github.run_number }}.exe
+        retention-days: 30
+        compression-level: 0
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && success()
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: "build-${{ github.run_number }}-windows"
+        name: "Shadow Accord Windows Build ${{ github.run_number }}"
+        body: |
+          🖥️ **Automated Windows EXE Build**
+          
+          **Build Number:** ${{ github.run_number }}
+          **Platform:** Windows x64
+          **Commit:** ${{ github.sha }}
+          **Built:** ${{ github.event.head_commit.timestamp }}
+          
+          💻 Download the EXE directly from the assets below - no installation needed!
+          
+          **Note:** Windows may show a security warning for unsigned executables.
+        files: dist/shadow-accord-v${{ github.run_number }}.exe
+        draft: false
+        prerelease: true
+        fail_on_unmatched_files: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get EXE info
+      run: |
+        $exePath = "dist\shadow-accord-v${{ github.run_number }}.exe"
+        if (Test-Path $exePath) {
+          $fileSize = [math]::Round((Get-Item $exePath).Length / 1MB, 2)
+          echo "✅ EXE built successfully!"
+          echo "💻 EXE name: shadow-accord-v${{ github.run_number }}.exe"
+          echo "💻 EXE size: ${fileSize} MB"
+          echo "📁 EXE path: $exePath"
+          echo "🔢 Build number: ${{ github.run_number }}"
+          echo "🔗 Download from the Actions artifacts above"
+        } else {
+          echo "❌ EXE build failed!"
+          exit 1
+        }
+
+    - name: Create build summary
+      run: |
+        $exePath = "dist\shadow-accord-v${{ github.run_number }}.exe"
+        echo "# 💻 Windows EXE Build Summary" >> $env:GITHUB_STEP_SUMMARY
+        echo "" >> $env:GITHUB_STEP_SUMMARY
+        echo "**Build:** ``shadow-accord-v${{ github.run_number }}.exe``" >> $env:GITHUB_STEP_SUMMARY
+        
+        if (Test-Path $exePath) {
+          $fileSize = [math]::Round((Get-Item $exePath).Length / 1MB, 2)
+          echo "**Size:** ${fileSize} MB" >> $env:GITHUB_STEP_SUMMARY
+        }
+        
+        echo "**Run Number:** ${{ github.run_number }}" >> $env:GITHUB_STEP_SUMMARY
+        echo "**Commit:** ``${{ github.sha }}``" >> $env:GITHUB_STEP_SUMMARY
+        echo "" >> $env:GITHUB_STEP_SUMMARY
+        echo "## 📥 Download Options:" >> $env:GITHUB_STEP_SUMMARY
+        echo "1. **Direct EXE** (recommended): Download from [Releases](https://github.com/${{ github.repository }}/releases) - no unzipping needed!" >> $env:GITHUB_STEP_SUMMARY
+        echo "2. **Artifact**: Download from artifacts section above (will be in a zip file)" >> $env:GITHUB_STEP_SUMMARY
