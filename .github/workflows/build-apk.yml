@@ -7,6 +7,11 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -69,8 +74,8 @@ jobs:
         compression-level: 0  # No compression for APK files
 
     - name: Create Release
-      if: github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/main' && success()
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: "build-${{ github.run_number }}"
         name: "Shadow Accord Build ${{ github.run_number }}"
@@ -85,6 +90,7 @@ jobs:
         files: ${{ env.APK_PATH }}
         draft: false
         prerelease: true
+        fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
