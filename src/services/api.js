@@ -166,8 +166,30 @@ export const testConnectivity = async () => {
         console.error('📱 HTTPS test failed:', httpsError.message);
       }
       
-      // Test 3: Direct fetch to auth status
-      console.log('📱 Test 3: Direct fetch to auth status...');
+      // Test 3: Railway domain resolution test
+      console.log('📱 Test 3: Railway domain resolution test...');
+      try {
+        const railwayResponse = await fetch('https://shadowaccordapi.up.railway.app/', {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-cache',
+          timeout: 15000
+        });
+        console.log('📱 Railway domain test result:', {
+          ok: railwayResponse.ok,
+          status: railwayResponse.status,
+          statusText: railwayResponse.statusText,
+          url: railwayResponse.url
+        });
+      } catch (railwayError) {
+        console.error('📱 Railway domain test failed:', {
+          name: railwayError.name,
+          message: railwayError.message
+        });
+      }
+      
+      // Test 4: Direct fetch to auth status
+      console.log('📱 Test 4: Direct fetch to auth status...');
       try {
         const directResponse = await fetch(`${API_BASE}/auth/status`, {
           method: 'GET',
