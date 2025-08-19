@@ -374,12 +374,51 @@ const Settings = ({
           {/* Connectivity Test */}
           <button
             onClick={createMobileHandler(async () => {
-              console.log('🧪 Starting connectivity test...');
+              console.log('🧪 Starting enhanced connectivity test...');
+              
+              // Enhanced connectivity test with basic network checks for Android
+              if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android') {
+                console.log('🔍 Starting Android network diagnostics...');
+                
+                // Test 1: Basic network availability
+                try {
+                  console.log('📡 Testing basic network availability...');
+                  const basicTest = await fetch('https://www.google.com', { 
+                    method: 'HEAD', 
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    signal: AbortSignal.timeout(5000)
+                  });
+                  console.log('✅ Basic network test passed');
+                } catch (basicError) {
+                  console.error('❌ Basic network test failed:', basicError);
+                  alert(`❌ Basic Network Test Failed!\n\nCannot reach internet.\nError: ${basicError.message}\n\nCheck WiFi/mobile data connection.`);
+                  return;
+                }
+                
+                // Test 2: HTTPS connectivity
+                try {
+                  console.log('🔒 Testing HTTPS connectivity...');
+                  const httpsTest = await fetch('https://httpbin.org/get', {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    signal: AbortSignal.timeout(10000)
+                  });
+                  console.log('✅ HTTPS test passed:', httpsTest.status);
+                } catch (httpsError) {
+                  console.error('❌ HTTPS test failed:', httpsError);
+                  alert(`❌ HTTPS Test Failed!\n\nCannot make secure connections.\nError: ${httpsError.message}\n\nThis might be a certificate or proxy issue.`);
+                  return;
+                }
+              }
+              
+              // Main API connectivity test
               const result = await testConnectivity();
               if (result.success) {
                 alert(`✅ Connectivity Test Passed!\n\nAPI Response: ${JSON.stringify(result.data, null, 2)}`);
               } else {
-                alert(`❌ Connectivity Test Failed!\n\nError: ${result.error}\nPlatform: ${result.details?.platform || 'Unknown'}\nNetwork Error: ${result.details?.networkError ? 'Yes' : 'No'}\nStatus: ${result.details?.status || 'N/A'}`);
+                alert(`❌ Connectivity Test Failed!\n\nError: ${result.error}\nPlatform: ${result.details?.platform || 'Unknown'}\nNetwork Error: ${result.details?.networkError ? 'Yes' : 'No'}\nStatus: ${result.details?.status || 'N/A'}\nTimeout: ${result.details?.isTimeout ? 'Yes' : 'No'}\nCORS: ${result.details?.isCORSError ? 'Yes' : 'No'}`);
               }
             })}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm flex items-center gap-2 justify-center min-h-[44px] touch-manipulation"

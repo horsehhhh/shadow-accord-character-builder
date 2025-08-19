@@ -11,7 +11,7 @@ const AuthComponent = ({ onAuthChange, onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(migrationUtils.isAuthenticated());
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true); // Start minimized by default
   const [user, setUser] = useState(migrationUtils.getCurrentUser());
 
   // Try to fetch user profile if authenticated but no user object
