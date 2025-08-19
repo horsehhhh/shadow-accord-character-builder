@@ -3,7 +3,6 @@ import { charactersAPI, migrationUtils } from '../services/api';
 import { APP_VERSION, MIN_CLOUD_VERSION, isVersionSupported } from '../version';
 
 // Platform detection
-const isCapacitor = typeof window !== 'undefined' && window.Capacitor;
 const isAndroid = typeof window !== 'undefined' && window.Capacitor && window.Capacitor.getPlatform() === 'android';
 const isElectron = typeof window !== 'undefined' && window.electronAPI;
 
