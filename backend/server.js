@@ -30,11 +30,29 @@ app.use(compression());
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://front-end-production-a8cc.up.railway.app',
-    'https://shadowaccordcharacterbuilder.up.railway.app'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, desktop apps, or direct API calls)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://front-end-production-a8cc.up.railway.app',
+      'https://shadowaccordcharacterbuilder.up.railway.app',
+      // For Capacitor apps, origins might be:
+      'capacitor://localhost',
+      'ionic://localhost',
+      'http://localhost',
+      'https://localhost'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // Log for debugging
+      console.log('🚫 CORS blocked origin:', origin);
+      callback(null, true); // Allow for now to debug - TODO: restrict in production
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

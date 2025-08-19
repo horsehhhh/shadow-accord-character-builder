@@ -21,11 +21,11 @@ console.log('🔍 API Environment Detection:', {
 });
 
 // For Android and Electron, always use the production API URL to avoid localhost issues
-// Add fallback URLs for Android connectivity issues
+// Confirmed via Railway CLI: backend is at shadowaccordapi.up.railway.app
 const PRIMARY_API_BASE = 'https://shadowaccordapi.up.railway.app/api';
 const FALLBACK_API_BASES = [
-  'https://shadowaccordapi.up.railway.app/api', // Primary
-  'https://shadowaccordapi-production.up.railway.app/api', // Alternative Railway format
+  'https://shadowaccordapi.up.railway.app/api', // Primary - confirmed backend URL
+  'https://shadowaccordapi.up.railway.app/api', // Same URL for consistency
 ];
 
 const API_BASE = process.env.REACT_APP_API_URL || 
