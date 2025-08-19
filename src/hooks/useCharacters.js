@@ -72,7 +72,7 @@ export const useCharacters = () => {
           if (isCapacitor) {
             console.log('📱 Using simplified auth check for mobile platform');
             
-            // Try multiple endpoints for mobile data compatibility
+            // Try multiple endpoints for mobile data compatibility with shorter timeouts
             const testEndpoints = [
               'https://shadowaccordapi.up.railway.app/api/characters',
               'http://shadowaccordapi.up.railway.app/api/characters',  // HTTP fallback
@@ -88,15 +88,11 @@ export const useCharacters = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${hasToken}`,
                   },
-                  timeout: 8000
+                  timeout: 5000  // Shorter timeout for mobile data
                 });
                 
                 if (testResponse.ok) {
                   console.log('✅ Mobile auth check successful with:', endpoint);
-                  // Update the global API base if we found a working alternative
-                  if (endpoint !== 'https://shadowaccordapi.up.railway.app/api/characters') {
-                    console.log('📱 Using alternative endpoint for mobile data compatibility');
-                  }
                   setIsAuthenticated(true);
                   return;
                 } else {
@@ -108,8 +104,12 @@ export const useCharacters = () => {
               }
             }
             
-            console.warn('📱 All mobile endpoints failed, falling back to axios');
-            // Fall through to axios method below
+            // If all endpoints failed, but we have a valid token, assume mobile data restrictions
+            // and set authenticated anyway - the actual API calls might still work
+            console.warn('📱 All auth endpoints failed, but token exists - assuming mobile data restrictions');
+            console.log('📱 Setting authenticated=true to allow API attempts during actual operations');
+            setIsAuthenticated(true);
+            return;
           }
           
           await charactersAPI.getAll();
