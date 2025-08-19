@@ -204,9 +204,23 @@ export const useCharacters = () => {
       if (isAuthenticated && navigator.onLine) {
         try {
           // Attempt to create new API character
-          console.log('Attempting cloud save...');
+          console.log('🔄 Attempting cloud save for character:', {
+            name: character.name,
+            faction: character.faction,
+            hasStats: !!character.stats,
+            hasSkills: !!character.skills,
+            authTokenExists: !!localStorage.getItem('auth_token'),
+            isOnline: navigator.onLine,
+            platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web'
+          });
+          
           const created = await charactersAPI.create(character);
-          console.log('Cloud save successful:', created);
+          console.log('✅ Cloud save successful:', {
+            characterId: created._id,
+            characterName: created.name,
+            hasApiId: !!created._id
+          });
+          
           const newCharacter = { ...created, id: `api_${created._id}` };
           setCharacters(prev => [...prev, newCharacter]);
           return newCharacter;
@@ -218,8 +232,14 @@ export const useCharacters = () => {
             data: apiError.response?.data,
             message: apiError.message
           });
-          // If API fails (token invalid, server down, etc.), fall back to localStorage
-          setIsAuthenticated(false); // Update auth status
+          
+          // Only clear authentication on actual auth errors (401, 403)
+          if (apiError.response?.status === 401 || apiError.response?.status === 403) {
+            console.warn('Authentication failed during character creation, clearing auth state');
+            setIsAuthenticated(false);
+          } else {
+            console.warn('Character creation failed due to server/network error, keeping auth state');
+          }
           // Fall through to localStorage creation
         }
       }
