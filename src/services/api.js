@@ -25,7 +25,8 @@ console.log('🔍 API Environment Detection:', {
 const PRIMARY_API_BASE = 'https://shadowaccordapi.up.railway.app/api';
 const FALLBACK_API_BASES = [
   'https://shadowaccordapi.up.railway.app/api', // Primary - confirmed backend URL
-  'https://shadowaccordapi.up.railway.app/api', // Same URL for consistency
+  'http://shadowaccordapi.up.railway.app/api',  // HTTP fallback for restrictive carriers
+  'https://shadowaccordcharacterbuilder.up.railway.app/api', // Alternative endpoint
 ];
 
 const API_BASE = process.env.REACT_APP_API_URL || 

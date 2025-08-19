@@ -41,7 +41,8 @@
       "Bash(git restore:*)",
       "Bash(PORT=3001 npm start)",
       "mcp__ide__getDiagnostics",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(railway logs:*)"
     ],
     "deny": []
   }

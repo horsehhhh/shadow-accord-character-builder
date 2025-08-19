@@ -1,0 +1,123 @@
+08-19 03:48:58.460   934   934 W Capacitor/Console: File: https://cdn.tailwindcss.com/ - Line 64 - Msg: cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+08-19 03:48:58.630   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì API Environment Detection: [object Object]
+08-19 03:48:58.630   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒîÉ API Base URL: https://shadowaccordapi.up.railway.app/api
+08-19 03:48:58.630   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöº Environment Variables: [object Object]
+08-19 03:48:58.646   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering input: [object Object]
+08-19 03:48:58.647   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering result: [object Object]
+08-19 03:48:58.648   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:58.649   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:48:58.695   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöÉ Authentication Check: [object Object]
+08-19 03:48:58.695   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Mobile app online - testing authentication token validity
+08-19 03:48:58.696   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôí Testing API connection on android/Capacitor ...
+08-19 03:48:58.696   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Using simplified auth check for mobile platform
+08-19 03:48:58.697   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöä Load characters triggered, isAuthenticated: false
+08-19 03:48:58.697   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Loading characters from localStorage (not authenticated)...
+08-19 03:48:58.697   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Setting characters from localStorage: [object Object],[object Object],[object Object],[object Object]
+08-19 03:48:58.699   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering input: [object Object]
+08-19 03:48:58.699   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering result: [object Object]
+08-19 03:48:58.717   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:58.718   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:48:58.898   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:58.899   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:48:59.028   934   934 W Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Mobile auth check failed: 401
+08-19 03:48:59.028   934   934 W Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Mobile auth check error, falling back to axios: Auth check failed: 401
+08-19 03:48:59.029   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: API request with token: /characters eyJhbGciOiJIUzI1NiIs...
+08-19 03:48:59.031   934   934 E Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Refused to set unsafe header "User-Agent"
+08-19 03:48:59.237   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à API response success: [object Object]
+08-19 03:48:59.238   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à Authentication successful on android/Capacitor
+08-19 03:48:59.239   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:59.240   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:48:59.240   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöä Load characters triggered, isAuthenticated: true
+08-19 03:48:59.241   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôí Loading characters from API...
+08-19 03:48:59.241   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: API request with token: /characters eyJhbGciOiJIUzI1NiIs...
+08-19 03:48:59.242   934   934 E Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Refused to set unsafe header "User-Agent"
+08-19 03:48:59.242   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:59.243   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:48:59.446   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à API response success: [object Object]
+08-19 03:48:59.446   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôí Raw API response: [object Object],[object Object]
+08-19 03:48:59.446   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôí API response count: 2
+08-19 03:48:59.446   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôí Processed characters for state: [object Object],[object Object]
+08-19 03:48:59.447   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à Characters loaded from API and set in state
+08-19 03:48:59.447   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering input: [object Object]
+08-19 03:48:59.447   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering result: [object Object]
+08-19 03:48:59.447   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:48:59.448   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
+08-19 03:54:00.971   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:00.971   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:00.971   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:04.262   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:04.262   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:04.262   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:05.846   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:05.846   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:05.847   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:08.528   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:08.529   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:08.529   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:09.882   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:09.883   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:09.883   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:11.699   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:11.699   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:11.699   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:16.259   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:16.259   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:16.259   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:18.483   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:18.483   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:18.483   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:20.810   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:20.810   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:20.811   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:22.354   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:22.354   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:22.355   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:22.850   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:22.851   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:22.851   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:23.232   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:23.232   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:23.232   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:23.405   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:23.405   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:23.406   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:25.028   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:25.029   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:25.030   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:25.973   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:25.973   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:25.974   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:27.588   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:27.589   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:27.589   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:29.354   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: renderCharacterCreation called
+08-19 03:54:29.354   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: newCharacter: [object Object]
+08-19 03:54:29.354   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: factionChangeCreationMode: false
+08-19 03:54:29.355   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: assignFreeLore called for character: [object Object]
+08-19 03:54:29.356   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Added shifter lore for kinfolk
+08-19 03:54:29.356   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Kinfolk tribal tree found: fenrir_gift
+08-19 03:54:29.356   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Added kinfolk tribal lore: tribe_fenrir
+08-19 03:54:29.357   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Final lore assignment: [object Object]
+08-19 03:54:30.867   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: assignFreeLore called for character: [object Object]
+08-19 03:54:30.868   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Added shifter lore for kinfolk
+08-19 03:54:30.868   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Kinfolk tribal tree found: fenrir_gift
+08-19 03:54:30.868   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Added kinfolk tribal lore: tribe_fenrir
+08-19 03:54:30.868   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Final lore assignment: [object Object]
+08-19 03:54:30.869   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒÜÇ Character creation data being sent: [object Object]
+08-19 03:54:30.869   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ∩┐╜ Character creation initiated: [object Object]
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character creation diagnostics: [object Object]
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒîÉ Attempting cloud character creation...
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ∩┐╜ Calling charactersAPI.create()...
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöä Character data: [object Object]
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôñ API create - sending character data: [object Object]
+08-19 03:54:30.870   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒô▒ Android detected - using enhanced error handling
+08-19 03:54:30.871   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: API request with token: /characters eyJhbGciOiJIUzI1NiIs...
+08-19 03:54:30.872   934   934 E Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Refused to set unsafe header "User-Agent"
+08-19 03:54:31.195   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à API response success: [object Object]
+08-19 03:54:31.196   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒôÑ API create - received response (first attempt): [object Object]
+08-19 03:54:31.196   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Γ£à API CALL SUCCESSFUL! Response: [object Object]
+08-19 03:54:31.196   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: Character successfully saved to cloud: 1
+08-19 03:54:31.198   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering input: [object Object]
+08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering result: [object Object]
+08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]

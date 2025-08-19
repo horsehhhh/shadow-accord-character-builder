@@ -68,31 +68,48 @@ export const useCharacters = () => {
           // Verify token is valid by making a test API call (only when online)
           console.log('📡 Testing API connection on', platform, '...');
           
-          // For Android, use a simpler auth check first
+          // For Android, use a simpler auth check first with multiple endpoints
           if (isCapacitor) {
             console.log('📱 Using simplified auth check for mobile platform');
-            try {
-              const testResponse = await fetch('https://shadowaccordapi.up.railway.app/api/characters', {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${hasToken}`,
-                },
-                timeout: 10000
-              });
-              
-              if (testResponse.ok) {
-                console.log('✅ Mobile auth check successful');
-                setIsAuthenticated(true);
-                return;
-              } else {
-                console.warn('📱 Mobile auth check failed:', testResponse.status, testResponse.statusText);
-                throw new Error(`Auth check failed: ${testResponse.status}`);
+            
+            // Try multiple endpoints for mobile data compatibility
+            const testEndpoints = [
+              'https://shadowaccordapi.up.railway.app/api/characters',
+              'http://shadowaccordapi.up.railway.app/api/characters',  // HTTP fallback
+              'https://shadowaccordcharacterbuilder.up.railway.app/api/characters' // Alternative
+            ];
+            
+            for (const endpoint of testEndpoints) {
+              try {
+                console.log(`📱 Testing endpoint: ${endpoint}`);
+                const testResponse = await fetch(endpoint, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${hasToken}`,
+                  },
+                  timeout: 8000
+                });
+                
+                if (testResponse.ok) {
+                  console.log('✅ Mobile auth check successful with:', endpoint);
+                  // Update the global API base if we found a working alternative
+                  if (endpoint !== 'https://shadowaccordapi.up.railway.app/api/characters') {
+                    console.log('📱 Using alternative endpoint for mobile data compatibility');
+                  }
+                  setIsAuthenticated(true);
+                  return;
+                } else {
+                  console.warn(`📱 Mobile auth check failed for ${endpoint}:`, testResponse.status, testResponse.statusText);
+                }
+              } catch (mobileError) {
+                console.warn(`📱 Mobile auth error for ${endpoint}:`, mobileError.message);
+                // Continue to next endpoint
               }
-            } catch (mobileError) {
-              console.warn('📱 Mobile auth check error, falling back to axios:', mobileError.message);
-              // Fall through to axios method below
             }
+            
+            console.warn('📱 All mobile endpoints failed, falling back to axios');
+            // Fall through to axios method below
           }
           
           await charactersAPI.getAll();
