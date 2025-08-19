@@ -120,27 +120,71 @@ export const testConnectivity = async () => {
       isCapacitor,
       isElectron,
       platform: typeof window !== 'undefined' && window.Capacitor ? window.Capacitor.getPlatform() : 'Web',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
+      origin: typeof window !== 'undefined' ? window.location.origin : 'N/A',
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A'
     });
     
-    // For Android, try a direct fetch first to test basic connectivity
+    // For Android, try multiple connectivity tests
     if (isAndroid) {
-      console.log('📱 Android detected - testing direct fetch...');
+      console.log('📱 Android detected - running comprehensive connectivity tests...');
+      
+      // Test 1: Basic ping to API server
+      console.log('📱 Test 1: Basic fetch to API root...');
+      try {
+        const rootResponse = await fetch(API_BASE.replace('/api', ''), {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-cache',
+          timeout: 10000
+        });
+        console.log('📱 Root fetch result:', {
+          ok: rootResponse.ok,
+          status: rootResponse.status,
+          statusText: rootResponse.statusText,
+          url: rootResponse.url
+        });
+      } catch (rootError) {
+        console.error('📱 Root fetch failed:', rootError.message);
+      }
+      
+      // Test 2: HTTPS connectivity test
+      console.log('📱 Test 2: HTTPS connectivity test...');
+      try {
+        const httpsResponse = await fetch('https://httpbin.org/get', {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-cache',
+          timeout: 10000
+        });
+        console.log('📱 HTTPS test result:', {
+          ok: httpsResponse.ok,
+          status: httpsResponse.status,
+          provider: 'httpbin.org'
+        });
+      } catch (httpsError) {
+        console.error('📱 HTTPS test failed:', httpsError.message);
+      }
+      
+      // Test 3: Direct fetch to auth status
+      console.log('📱 Test 3: Direct fetch to auth status...');
       try {
         const directResponse = await fetch(`${API_BASE}/auth/status`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'User-Agent': 'ShadowAccord-Android-App'
           },
-          // Add CORS and cache settings for Android
           mode: 'cors',
           cache: 'no-cache',
+          timeout: 15000
         });
         console.log('📱 Direct fetch response:', {
           ok: directResponse.ok,
           status: directResponse.status,
           statusText: directResponse.statusText,
-          headers: Object.fromEntries(directResponse.headers.entries())
+          headers: Object.fromEntries(directResponse.headers.entries()),
+          url: directResponse.url
         });
         
         if (directResponse.ok) {
@@ -148,11 +192,16 @@ export const testConnectivity = async () => {
           console.log('📱 Direct fetch data:', data);
           return { success: true, data, method: 'direct-fetch' };
         } else {
-          throw new Error(`HTTP ${directResponse.status}: ${directResponse.statusText}`);
+          const errorText = await directResponse.text();
+          throw new Error(`HTTP ${directResponse.status}: ${directResponse.statusText} - ${errorText}`);
         }
       } catch (fetchError) {
-        console.error('📱 Direct fetch failed:', fetchError);
-        // Fall through to axios
+        console.error('📱 Direct fetch failed:', {
+          name: fetchError.name,
+          message: fetchError.message,
+          stack: fetchError.stack
+        });
+        // Continue to axios test
       }
     }
     
@@ -169,7 +218,12 @@ export const testConnectivity = async () => {
       platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
       networkError: !error.response,
       errorType: error.constructor.name,
-      stack: error.stack
+      stack: error.stack,
+      config: error.config ? {
+        url: error.config.url,
+        method: error.config.method,
+        timeout: error.config.timeout
+      } : 'No config'
     });
     return { 
       success: false, 
@@ -178,7 +232,10 @@ export const testConnectivity = async () => {
         status: error.response?.status,
         platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
         networkError: !error.response,
-        errorType: error.constructor.name
+        errorType: error.constructor.name,
+        isTimeout: error.message.includes('timeout'),
+        isNetworkError: error.message.includes('Network Error'),
+        isCORSError: error.message.includes('CORS')
       }
     };
   }
