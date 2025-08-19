@@ -51,16 +51,50 @@ export const useCharacters = () => {
       });
       
       if (hasToken) {
-        // If we're offline or on Android, assume authentication is valid and don't test the API
-        if (!isOnlineStatus || isCapacitor) {
-          console.log('📱 Offline mode or mobile detected, assuming valid authentication');
+        // If we're offline, assume authentication is valid and don't test the API
+        // But for mobile (Capacitor), we should still test the API if we're online
+        if (!isOnlineStatus) {
+          console.log('📱 Offline mode detected, assuming valid authentication');
           setIsAuthenticated(true);
           return;
+        }
+        
+        // For Capacitor/mobile, test the API if we're online to ensure token is valid
+        if (isCapacitor && isOnlineStatus) {
+          console.log('📱 Mobile app online - testing authentication token validity');
         }
         
         try {
           // Verify token is valid by making a test API call (only when online)
           console.log('📡 Testing API connection on', platform, '...');
+          
+          // For Android, use a simpler auth check first
+          if (isCapacitor) {
+            console.log('📱 Using simplified auth check for mobile platform');
+            try {
+              const testResponse = await fetch('https://shadowaccordapi.up.railway.app/api/characters', {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${hasToken}`,
+                },
+                timeout: 10000
+              });
+              
+              if (testResponse.ok) {
+                console.log('✅ Mobile auth check successful');
+                setIsAuthenticated(true);
+                return;
+              } else {
+                console.warn('📱 Mobile auth check failed:', testResponse.status, testResponse.statusText);
+                throw new Error(`Auth check failed: ${testResponse.status}`);
+              }
+            } catch (mobileError) {
+              console.warn('📱 Mobile auth check error, falling back to axios:', mobileError.message);
+              // Fall through to axios method below
+            }
+          }
+          
           await charactersAPI.getAll();
           console.log('✅ Authentication successful on', platform);
           setIsAuthenticated(true);
@@ -206,6 +240,10 @@ export const useCharacters = () => {
       console.log('🆕 Version supported:', isVersionSupported(APP_VERSION, MIN_CLOUD_VERSION));
       console.log('🆕 Character data being sent:', character);
       console.log('🆕 Auth token exists:', !!localStorage.getItem('auth_token'));
+      console.log('🆕 Auth token value:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
+      console.log('🆕 Platform:', isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web');
+      console.log('🆕 API_BASE from service:', 'https://shadowaccordapi.up.railway.app/api');
+      console.log('🆕 localStorage user:', localStorage.getItem('user'));
       console.log('🆕 =================');
       
       // Check version compatibility for cloud operations
@@ -219,6 +257,24 @@ export const useCharacters = () => {
       
       if (isAuthenticated && navigator.onLine) {
         console.log('🌐 CONDITIONS MET - Attempting cloud save!');
+        
+        // Test connectivity first for Android
+        if (isAndroid) {
+          try {
+            console.log('📱 Testing Android connectivity before character creation...');
+            const testResponse = await fetch('https://shadowaccordapi.up.railway.app/api/health', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              timeout: 5000
+            });
+            console.log('📱 Connectivity test result:', testResponse.status, testResponse.ok);
+          } catch (testError) {
+            console.error('📱 Connectivity test failed:', testError.message);
+          }
+        }
+        
         try {
           // Attempt to create new API character
           console.log('🔄 MAKING API CALL TO charactersAPI.create()');
@@ -229,7 +285,8 @@ export const useCharacters = () => {
             hasSkills: !!character.skills,
             authTokenExists: !!localStorage.getItem('auth_token'),
             isOnline: navigator.onLine,
-            platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web'
+            platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+            userAgent: navigator.userAgent?.substring(0, 100)
           });
           
           const created = await charactersAPI.create(character);
