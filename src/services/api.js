@@ -129,7 +129,7 @@ export const findWorkingApiBase = async () => {
   for (const baseUrl of FALLBACK_API_BASES) {
     try {
       console.log(`📱 Testing: ${baseUrl}`);
-      const response = await fetch(`${baseUrl}/auth/status`, {
+      const response = await fetch(`${baseUrl}/health`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -181,7 +181,7 @@ export const testConnectivity = async () => {
       // Test with the working endpoint
       console.log('📱 Testing with discovered working endpoint...');
       try {
-        const workingResponse = await fetch(`${workingApiBase}/auth/status`, {
+        const workingResponse = await fetch(`${workingApiBase}/health`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export const testConnectivity = async () => {
     
     // Use axios as fallback or primary method
     console.log('🔍 Testing with axios...');
-    const response = await api.get('/auth/status');
+    const response = await api.get('/health');
     console.log('✅ Connectivity test passed:', response.data);
     return { success: true, data: response.data, method: 'axios' };
   } catch (error) {
