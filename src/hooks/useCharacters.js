@@ -192,6 +192,10 @@ export const useCharacters = () => {
 
   // Create character function
   const createCharacter = async (character) => {
+    console.log('🚨🚨🚨 USECHARACTERS createCharacter FUNCTION CALLED!');
+    console.log('🚨🚨🚨 This is the enhanced createCharacter from useCharacters hook');
+    console.log('🚨🚨🚨 Character data received:', character);
+    
     try {
       console.log('🆕 =================');
       console.log('🆕 CREATE CHARACTER CALLED');
