@@ -252,7 +252,12 @@ export const useCharacters = () => {
             message: apiError.message,
             url: apiError.config?.url,
             method: apiError.config?.method,
-            headers: apiError.config?.headers
+            headers: apiError.config?.headers,
+            platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+            networkError: !apiError.response,
+            isTimeout: apiError.code === 'ECONNABORTED' || apiError.message.includes('timeout'),
+            navigator_onLine: navigator.onLine,
+            auth_token_exists: !!localStorage.getItem('auth_token')
           });
           
           // Only clear authentication on actual auth errors (401, 403)

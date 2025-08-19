@@ -44,6 +44,16 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Android-specific configurations
+  ...(isAndroid && {
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'ShadowAccord-Android-App',
+      'Accept': 'application/json',
+    },
+    withCredentials: false,
+    maxRedirects: 5,
+  }),
 });
 
 // Add authentication token to requests
@@ -310,19 +320,62 @@ export const charactersAPI = {
       faction: dataToSend.faction,
       selfNerfsCount: dataToSend.selfNerfs?.length || 0,
       selfNerfsPreview: dataToSend.selfNerfs?.slice(0, 2) || [],
-      dataSize: JSON.stringify(dataToSend).length
+      dataSize: JSON.stringify(dataToSend).length,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+      apiBase: API_BASE
     });
     
     try {
-      const response = await api.post('/characters', dataToSend);
-      console.log('📥 API create - received response:', response.data);
-      return response.data.character;
+      // For Android, try multiple approaches if the first one fails
+      if (isAndroid) {
+        console.log('📱 Android detected - using enhanced error handling');
+        try {
+          const response = await api.post('/characters', dataToSend);
+          console.log('📥 API create - received response (first attempt):', response.data);
+          return response.data.character;
+        } catch (firstError) {
+          console.warn('📱 First Android API attempt failed, trying alternative approach:', firstError.message);
+          
+          // Try with fetch as fallback for Android
+          try {
+            const fetchResponse = await fetch(`${API_BASE}/characters`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'X-App-Version': APP_VERSION,
+                'User-Agent': 'ShadowAccord-Android-App',
+              },
+              body: JSON.stringify(dataToSend),
+            });
+            
+            if (!fetchResponse.ok) {
+              throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
+            }
+            
+            const fetchData = await fetchResponse.json();
+            console.log('📥 API create - received response (fetch fallback):', fetchData);
+            return fetchData.character;
+          } catch (fetchError) {
+            console.error('📱 Android fetch fallback also failed:', fetchError);
+            throw firstError; // Throw the original axios error
+          }
+        }
+      } else {
+        // Non-Android platforms use normal axios
+        const response = await api.post('/characters', dataToSend);
+        console.log('📥 API create - received response:', response.data);
+        return response.data.character;
+      }
     } catch (error) {
       console.error('❌ API create - failed:', {
         status: error.response?.status,
         statusText: error.response?.statusText,
         data: error.response?.data,
-        message: error.message
+        message: error.message,
+        platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+        networkError: !error.response,
+        isTimeout: error.code === 'ECONNABORTED'
       });
       throw error;
     }
@@ -330,8 +383,69 @@ export const charactersAPI = {
 
   // Update existing character
   update: async (id, characterData) => {
-    const response = await api.put(`/characters/${id}`, characterData);
-    return response.data.character;
+    console.log('📤 API update - sending character data:', {
+      characterId: id,
+      platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+      apiBase: API_BASE,
+      hasData: !!characterData,
+      dataSize: characterData ? JSON.stringify(characterData).length : 0
+    });
+    
+    try {
+      // For Android, use enhanced error handling similar to create
+      if (isAndroid) {
+        console.log('📱 Android detected - using enhanced update handling');
+        try {
+          const response = await api.put(`/characters/${id}`, characterData);
+          console.log('📥 API update - received response (first attempt):', response.data);
+          return response.data.character;
+        } catch (firstError) {
+          console.warn('📱 First Android update attempt failed, trying fetch fallback:', firstError.message);
+          
+          // Try with fetch as fallback for Android
+          try {
+            const fetchResponse = await fetch(`${API_BASE}/characters/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'X-App-Version': APP_VERSION,
+                'User-Agent': 'ShadowAccord-Android-App',
+              },
+              body: JSON.stringify(characterData),
+            });
+            
+            if (!fetchResponse.ok) {
+              throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
+            }
+            
+            const fetchData = await fetchResponse.json();
+            console.log('📥 API update - received response (fetch fallback):', fetchData);
+            return fetchData.character;
+          } catch (fetchError) {
+            console.error('📱 Android update fetch fallback also failed:', fetchError);
+            throw firstError; // Throw the original axios error
+          }
+        }
+      } else {
+        // Non-Android platforms use normal axios
+        const response = await api.put(`/characters/${id}`, characterData);
+        console.log('📥 API update - received response:', response.data);
+        return response.data.character;
+      }
+    } catch (error) {
+      console.error('❌ API update - failed:', {
+        characterId: id,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        platform: isAndroid ? 'Android' : isElectron ? 'Electron' : 'Web',
+        networkError: !error.response,
+        isTimeout: error.code === 'ECONNABORTED'
+      });
+      throw error;
+    }
   },
 
   // Delete character
