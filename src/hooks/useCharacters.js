@@ -272,8 +272,12 @@ export const useCharacters = () => {
         return newCharacter;
       }
       
-      if (isAuthenticated && navigator.onLine) {
+      // For mobile platforms, be more lenient about navigator.onLine since it can be unreliable
+      const shouldAttemptCloud = isAuthenticated && (navigator.onLine || (isAndroid && isAuthenticated));
+      
+      if (shouldAttemptCloud) {
         console.log('🌐 Attempting cloud character creation...');
+        console.log('📱 Mobile override:', isAndroid, 'navigator.onLine:', navigator.onLine, 'final decision:', shouldAttemptCloud);
         
         try {
           console.log('� Calling charactersAPI.create()...');
