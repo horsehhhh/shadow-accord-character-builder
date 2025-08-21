@@ -11,9 +11,9 @@ vampire,Vampire,Vitae,10,1,15,6,Road,Amaranth|Bestial Frenzy|Blood Buff|Draining
 shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 1|Step Sideways|War Form
 wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Temporary Angst|Umbra Sight`,
 
-  subfactions: `subfaction_id,subfaction_name,faction_id,type,restrictions,dormancy_rules,innate_trees
-ananasi,Ananasi,shifter,fera,,,ananasi_gift
-assamite,Assamite,vampire,clan,,,celerity|obfuscate|quietus
+  subfactions: `subfaction_id,subfaction_name,faction_id,type,energy_type,restrictions,dormancy_rules,innate_trees
+ananasi,Ananasi,shifter,fera,Gnosis,,,ananasi_gift
+assamite,Assamite,vampire,clan,Vitae,,,celerity|obfuscate|quietus
 baali,Baali,vampire,clan,,,daimoinon|obfuscate|presence
 bagheera,Bagheera,shifter,fera,,,bagheera_gift
 black_fury,Black Fury,shifter,tribe,,,black_fury_gift
@@ -25,20 +25,20 @@ caitiff,Caitiff,vampire,clan,,,choice|choice|choice
 cappadocian,Cappadocian,vampire,clan,,,auspex|fortitude|necromancy
 ceilican,Ceilican,shifter,fera,,,ceilican_gift
 child_of_gaia,Child of Gaia,shifter,tribe,,,child_of_gaia_gift
-claimed_drone,Claimed (Drone),human,special,All other subfactions go dormant,,custom_selection
-claimed_fomori,Claimed (Fomori),human,special,Can be active with another subfaction,,custom_selection
-claimed_gorgon,Claimed (Gorgon),human,special,Can be active with another subfaction,,custom_selection
-commoner,Commoner,human,base,,,custom_selection
+claimed_drone,Claimed (Drone),human,special,Vitality,All other subfactions go dormant,,custom_selection
+claimed_fomori,Claimed (Fomori),human,special,Vitality,Can be active with another subfaction,,custom_selection
+claimed_gorgon,Claimed (Gorgon),human,special,Vitality,Can be active with another subfaction,,custom_selection
+commoner,Commoner,human,base,Vitality,,,custom_selection
 corax,Corax,shifter,fera,,,corax_gift
-faithful,Faithful,human,special,10 Humanity required,Less than 10 Humanity,custom_selection
+faithful,Faithful,human,special,Vitality,10 Humanity required,Less than 10 Humanity,custom_selection
 fallen_fera,Fallen Fera,shifter,fera,Wyrm aligned,,corruption|cunning|defiling|fear|madness_wyrm|strength
 fenrir,Fenrir,shifter,tribe,,,fenrir_gift
 fianna,Fianna,shifter,tribe,,,fianna_gift
 gangrel,Gangrel,vampire,clan,,,animalism|fortitude|protean
 gargoyle,Gargoyle,vampire,clan,,,fortitude|potence|visceratika
-ghoul,Ghoul,human,special,,Drone active,celerity|fortitude|potence
+ghoul,Ghoul,human,special,Vitae,,Drone active,celerity|fortitude|potence
 giovanni,Giovanni,vampire,clan,Cappadocian bloodline,,fortitude|necromancy|potence
-kinfolk,Gifted Kinfolk,human,special,Kinfolk merit,Ghoul or Drone active,homid
+kinfolk,Gifted Kinfolk,human,special,Gnosis,Kinfolk merit,Ghoul or Drone active,homid
 lamia,Lamia,vampire,clan,Cappadocian bloodline - Female only,,fortitude|necromancy|potence
 lasombra,Lasombra,vampire,clan,,,dominate|obtenebration|potence
 malkavian,Malkavian,vampire,clan,,,auspex|dementation|obfuscate
@@ -51,7 +51,8 @@ salubri_warrior,Salubri (Warrior),vampire,clan,,,auspex|fortitude|valeren_warrio
 shadow_lord,Shadow Lord,shifter,tribe,,,shadow_lord_gift
 silent_strider,Silent Strider,shifter,tribe,,,silent_strider_gift
 silver_fang,Silver Fang,shifter,tribe,,,silver_fang_gift
-sorcerer,Sorcerer,human,special,,Ghoul or Drone active,custom_selection
+sorcerer,Sorcerer,human,special,Essence,,Ghoul or Drone active,custom_selection
+// NOTE: For human subfactions, if a character qualifies for multiple subfactions with different energy types, the non-Vitality energy type takes precedence. For example, Sorcerer + Claimed Gorgon/Fomori/Drone = Essence energy type.
 swara,Swara,shifter,fera,,,swara_gift
 toreador,Toreador,vampire,clan,,,auspex|celerity|presence
 tremere,Tremere,vampire,clan,,,auspex|dominate|thaumaturgy_rego_vitae
