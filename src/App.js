@@ -888,88 +888,90 @@ const ShadowAccordComplete = () => {
   // CSV DATA FROM SHADOW ACCORD RULEBOOK
   // ========================================
   const gameDataCSV = {
+    // NOTE: For human subfactions, if a character qualifies for multiple subfactions with different energy types, 
+    // the non-Vitality energy type takes precedence. For example, Sorcerer + Claimed Gorgon/Fomori/Drone = Essence energy type.
     factions: `faction_id,faction_name,energy_type,base_health,base_willpower,base_energy,base_virtue,virtue_type,fundamental_powers
 human,Human,Vitality,10,1,10,7,Humanity,
 vampire,Vampire,Vitae,10,1,15,6,Road,Amaranth|Bestial Frenzy|Blood Buff|Draining|Paralyzing Bite|Regeneration 1|Test Faction|Test Vitae
 shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 1|Step Sideways|War Form
 wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Temporary Angst|Umbra Sight`,
 
-    subfactions: `subfaction_id,subfaction_name,faction_id,type,restrictions,dormancy_rules,innate_trees
-ananasi,Ananasi,shifter,fera,,,ananasi_gift
-assamite,Assamite,vampire,clan,,,celerity|obfuscate|quietus
-baali,Baali,vampire,clan,,,daimoinon|obfuscate|presence
-bagheera,Bagheera,shifter,fera,,,bagheera_gift
-black_fury,Black Fury,shifter,tribe,,,black_fury_gift
-black_spiral_dancer,Black Spiral Dancer,shifter,tribe,Wyrm aligned,,corruption|cunning|defiling|fear|madness_wyrm|strength
-bone_gnawer,Bone Gnawer,shifter,tribe,,,bone_gnawer_gift
-brujah,Brujah,vampire,clan,,,celerity|potence|presence
-bubasti,Bubasti,shifter,fera,,,bubasti_gift
-caitiff,Caitiff,vampire,clan,,,choice|choice|choice
-cappadocian,Cappadocian,vampire,clan,,,auspex|fortitude|necromancy
-ceilican,Ceilican,shifter,fera,,,ceilican_gift
-child_of_gaia,Child of Gaia,shifter,tribe,,,child_of_gaia_gift
-claimed_drone,Claimed (Drone),human,special,All other subfactions go dormant,,custom_selection
-claimed_fomori,Claimed (Fomori),human,special,Can be active with another subfaction,,custom_selection
-claimed_gorgon,Claimed (Gorgon),human,special,Can be active with another subfaction,,custom_selection
-commoner,Commoner,human,base,,,custom_selection
-corax,Corax,shifter,fera,,,corax_gift
-faithful,Faithful,human,special,10 Humanity required,Less than 10 Humanity,custom_selection
-fallen_fera,Fallen Fera,shifter,fera,Wyrm aligned,,corruption|cunning|defiling|fear|madness_wyrm|strength
-fenrir,Fenrir,shifter,tribe,,,fenrir_gift
-fianna,Fianna,shifter,tribe,,,fianna_gift
-gangrel,Gangrel,vampire,clan,,,animalism|fortitude|protean
-gargoyle,Gargoyle,vampire,clan,,,fortitude|potence|visceratika
-ghoul,Ghoul,human,special,,Drone active,celerity|fortitude|potence
-giovanni,Giovanni,vampire,clan,Cappadocian bloodline,,fortitude|necromancy|potence
-kinfolk,Gifted Kinfolk,human,special,Kinfolk merit,Ghoul or Drone active,homid
-lamia,Lamia,vampire,clan,Cappadocian bloodline - Female only,,fortitude|necromancy|potence
-lasombra,Lasombra,vampire,clan,,,dominate|obtenebration|potence
-malkavian,Malkavian,vampire,clan,,,auspex|dementation|obfuscate
-nosferatu,Nosferatu,vampire,clan,,,animalism|obfuscate|potence
-ratkin,Ratkin,shifter,fera,,,ratkin_gift
-ravnos,Ravnos,vampire,clan,,,animalism|fortitude|chimerstry
-red_talon,Red Talon,shifter,tribe,Lupus only,,red_talon_gift
-salubri_healer,Salubri (Healer),vampire,clan,,,auspex|fortitude|valeren_healer
-salubri_warrior,Salubri (Warrior),vampire,clan,,,auspex|fortitude|valeren_warrior
-shadow_lord,Shadow Lord,shifter,tribe,,,shadow_lord_gift
-silent_strider,Silent Strider,shifter,tribe,,,silent_strider_gift
-silver_fang,Silver Fang,shifter,tribe,,,silver_fang_gift
-sorcerer,Sorcerer,human,special,,Ghoul or Drone active,custom_selection
-swara,Swara,shifter,fera,,,swara_gift
-toreador,Toreador,vampire,clan,,,auspex|celerity|presence
-tremere,Tremere,vampire,clan,,,auspex|dominate|thaumaturgy_rego_vitae
-tzimisce,Tzimisce,vampire,clan,,,animalism|auspex|vicissitude
-ventrue,Ventrue,vampire,clan,,,dominate|fortitude|presence
-warder_of_man,Warder of Man,shifter,tribe,,,warder_of_man_gift
-iron_legion,Iron Legion,wraith,legion,,,custom_selection
-skeletal_legion,Skeletal Legion,wraith,legion,,,custom_selection
-grim_legion,Grim Legion,wraith,legion,,,custom_selection
-penitent_legion,Penitent Legion,wraith,legion,,,custom_selection
-emerald_legion,Emerald Legion,wraith,legion,,,custom_selection
-silent_legion,Silent Legion,wraith,legion,,,custom_selection
-legion_of_paupers,Legion of Paupers,wraith,legion,,,custom_selection
-legion_of_fate,Legion of Fate,wraith,legion,,,custom_selection
-no_legion,None,wraith,legion,,,custom_selection
-renegades,Renegades,wraith,faction,,,custom_selection
-heretics,Heretics,wraith,faction,,,custom_selection
-no_guild,None,wraith,guild,,,custom_selection
-artificers,Artificers,wraith,guild,,,custom_selection
-masquers,Masquers,wraith,guild,,,custom_selection
-pardoners,Pardoners,wraith,guild,,,custom_selection
-usurers,Usurers,wraith,guild,,,custom_selection
-chanteurs,Chanteurs,wraith,guild,,,custom_selection
-harbingers,Harbingers,wraith,guild,,,custom_selection
-oracles,Oracles,wraith,guild,,,custom_selection
-sandmen,Sandmen,wraith,guild,,,custom_selection
-haunters,Haunters,wraith,guild,,,custom_selection
-monitors,Monitors,wraith,guild,,,custom_selection
-spooks,Spooks,wraith,guild,,,custom_selection
-proctors,Proctors,wraith,guild,,,custom_selection
-puppeteers,Puppeteers,wraith,guild,,,custom_selection
-alchemists,Alchemists,wraith,guild,,,custom_selection
-mnemoi,Mnemoi,wraith,guild,,,custom_selection
-solicitors,Solicitors,wraith,guild,,,custom_selection
-enfant,Enfant,wraith,guild,,,custom_selection`,
+    subfactions: `subfaction_id,subfaction_name,faction_id,type,energy_type,restrictions,dormancy_rules,innate_trees
+ananasi,Ananasi,shifter,fera,Gnosis,,,ananasi_gift
+assamite,Assamite,vampire,clan,Vitae,,,celerity|obfuscate|quietus
+baali,Baali,vampire,clan,Vitae,,,daimoinon|obfuscate|presence
+bagheera,Bagheera,shifter,fera,Gnosis,,,bagheera_gift
+black_fury,Black Fury,shifter,tribe,Gnosis,,,black_fury_gift
+black_spiral_dancer,Black Spiral Dancer,shifter,tribe,Gnosis,Wyrm aligned,,corruption|cunning|defiling|fear|madness_wyrm|strength
+bone_gnawer,Bone Gnawer,shifter,tribe,Gnosis,,,bone_gnawer_gift
+brujah,Brujah,vampire,clan,Vitae,,,celerity|potence|presence
+bubasti,Bubasti,shifter,fera,Gnosis,,,bubasti_gift
+caitiff,Caitiff,vampire,clan,Vitae,,,choice|choice|choice
+cappadocian,Cappadocian,vampire,clan,Vitae,,,auspex|fortitude|necromancy
+ceilican,Ceilican,shifter,fera,Gnosis,,,ceilican_gift
+child_of_gaia,Child of Gaia,shifter,tribe,Gnosis,,,child_of_gaia_gift
+claimed_drone,Claimed (Drone),human,special,Vitality,All other subfactions go dormant,,custom_selection
+claimed_fomori,Claimed (Fomori),human,special,Vitality,Can be active with another subfaction,,custom_selection
+claimed_gorgon,Claimed (Gorgon),human,special,Vitality,Can be active with another subfaction,,custom_selection
+commoner,Commoner,human,base,Vitality,,,custom_selection
+corax,Corax,shifter,fera,Gnosis,,,corax_gift
+faithful,Faithful,human,special,Vitality,10 Humanity required,Less than 10 Humanity,custom_selection
+fallen_fera,Fallen Fera,shifter,fera,Gnosis,Wyrm aligned,,corruption|cunning|defiling|fear|madness_wyrm|strength
+fenrir,Fenrir,shifter,tribe,Gnosis,,,fenrir_gift
+fianna,Fianna,shifter,tribe,Gnosis,,,fianna_gift
+gangrel,Gangrel,vampire,clan,Vitae,,,animalism|fortitude|protean
+gargoyle,Gargoyle,vampire,clan,Vitae,,,fortitude|potence|visceratika
+ghoul,Ghoul,human,special,Vitae,,Drone active,celerity|fortitude|potence
+giovanni,Giovanni,vampire,clan,Vitae,Cappadocian bloodline,,fortitude|necromancy|potence
+kinfolk,Gifted Kinfolk,human,special,Gnosis,Kinfolk merit,Ghoul or Drone active,homid
+lamia,Lamia,vampire,clan,Vitae,Cappadocian bloodline - Female only,,fortitude|necromancy|potence
+lasombra,Lasombra,vampire,clan,Vitae,,,dominate|obtenebration|potence
+malkavian,Malkavian,vampire,clan,Vitae,,,auspex|dementation|obfuscate
+nosferatu,Nosferatu,vampire,clan,Vitae,,,animalism|obfuscate|potence
+ratkin,Ratkin,shifter,fera,Gnosis,,,ratkin_gift
+ravnos,Ravnos,vampire,clan,Vitae,,,animalism|fortitude|chimerstry
+red_talon,Red Talon,shifter,tribe,Gnosis,Lupus only,,red_talon_gift
+salubri_healer,Salubri (Healer),vampire,clan,Vitae,,,auspex|fortitude|valeren_healer
+salubri_warrior,Salubri (Warrior),vampire,clan,Vitae,,,auspex|fortitude|valeren_warrior
+shadow_lord,Shadow Lord,shifter,tribe,Gnosis,,,shadow_lord_gift
+silent_strider,Silent Strider,shifter,tribe,Gnosis,,,silent_strider_gift
+silver_fang,Silver Fang,shifter,tribe,Gnosis,,,silver_fang_gift
+sorcerer,Sorcerer,human,special,Essence,,Ghoul or Drone active,custom_selection
+swara,Swara,shifter,fera,Gnosis,,,swara_gift
+toreador,Toreador,vampire,clan,Vitae,,,auspex|celerity|presence
+tremere,Tremere,vampire,clan,Vitae,,,auspex|dominate|thaumaturgy_rego_vitae
+tzimisce,Tzimisce,vampire,clan,Vitae,,,animalism|auspex|vicissitude
+ventrue,Ventrue,vampire,clan,Vitae,,,dominate|fortitude|presence
+warder_of_man,Warder of Man,shifter,tribe,Gnosis,,,warder_of_man_gift
+iron_legion,Iron Legion,wraith,legion,Pathos,,,custom_selection
+skeletal_legion,Skeletal Legion,wraith,legion,Pathos,,,custom_selection
+grim_legion,Grim Legion,wraith,legion,Pathos,,,custom_selection
+penitent_legion,Penitent Legion,wraith,legion,Pathos,,,custom_selection
+emerald_legion,Emerald Legion,wraith,legion,Pathos,,,custom_selection
+silent_legion,Silent Legion,wraith,legion,Pathos,,,custom_selection
+legion_of_paupers,Legion of Paupers,wraith,legion,Pathos,,,custom_selection
+legion_of_fate,Legion of Fate,wraith,legion,Pathos,,,custom_selection
+no_legion,None,wraith,legion,Pathos,,,custom_selection
+renegades,Renegades,wraith,faction,Pathos,,,custom_selection
+heretics,Heretics,wraith,faction,Pathos,,,custom_selection
+no_guild,None,wraith,guild,Pathos,,,custom_selection
+artificers,Artificers,wraith,guild,Pathos,,,custom_selection
+masquers,Masquers,wraith,guild,Pathos,,,custom_selection
+pardoners,Pardoners,wraith,guild,Pathos,,,custom_selection
+usurers,Usurers,wraith,guild,Pathos,,,custom_selection
+chanteurs,Chanteurs,wraith,guild,Pathos,,,custom_selection
+harbingers,Harbingers,wraith,guild,Pathos,,,custom_selection
+oracles,Oracles,wraith,guild,Pathos,,,custom_selection
+sandmen,Sandmen,wraith,guild,Pathos,,,custom_selection
+haunters,Haunters,wraith,guild,Pathos,,,custom_selection
+monitors,Monitors,wraith,guild,Pathos,,,custom_selection
+spooks,Spooks,wraith,guild,Pathos,,,custom_selection
+proctors,Proctors,wraith,guild,Pathos,,,custom_selection
+puppeteers,Puppeteers,wraith,guild,Pathos,,,custom_selection
+alchemists,Alchemists,wraith,guild,Pathos,,,custom_selection
+mnemoi,Mnemoi,wraith,guild,Pathos,,,custom_selection
+solicitors,Solicitors,wraith,guild,Pathos,,,custom_selection
+enfant,Enfant,wraith,guild,Pathos,,,custom_selection`,
 
     skills: `skill_id,skill_name,category,description,faction_restrictions
 academics,Academics,OTHER,Literacy - read/write languages; Tutor - teach extra skill; Mentor - teach extra power,
