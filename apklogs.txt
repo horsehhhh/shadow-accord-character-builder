@@ -120,4 +120,5 @@
 08-19 03:54:31.198   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering input: [object Object]
 08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒöì Character filtering result: [object Object]
 08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Getting current user from localStorage: {"id":"6889a102acb70dc0dcb3b834","username":"horse","role":"player","settings":{"accessibility":{"highContrast":false,"largeText":false,"keyboardNavigation":true},"darkMode":true,"exportFormat":"pdf","autoSave":true},"lastLogin":"2025-08-19T10:18:21.378Z"}
+help me install this in a folder on my desktop : 
 08-19 03:54:31.199   934   934 I Capacitor/Console: File: https://localhost/static/js/main.6faeb152.js - Line 2 - Msg: ≡ƒæñ Parsed user object: [object Object]
