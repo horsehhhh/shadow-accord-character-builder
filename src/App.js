@@ -9948,6 +9948,7 @@ Your character is ready to play!`;
                 <div className="space-y-3">
                   {gameData.skills?.map(skill => {
                     if (!skill || !skill.skill_id) return null;
+                    if (!character.skills || typeof character.skills !== 'object') return null;
                     const currentLevel = character.skills[skill.skill_id] || 0;
                     const canAdvance = currentLevel < 3;
                     const nextLevel = currentLevel + 1;
