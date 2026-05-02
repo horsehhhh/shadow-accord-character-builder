@@ -1073,7 +1073,7 @@ thaumaturgy_rego_phobos,Rego Phobos (Path of Fear),vampire,Monsters,Dreamshape|T
 theurge,Theurge,shifter,Release Spirit|Sense Spirit,Umbra Sight,Umbra Strike
 usury,Usury,wraith,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
 valeren_healer,Valeren Healer,vampire,Healing Touch,Serenity,Revive
-valeren_warrior,Valeren Warrior,vampire,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Aggravated 1
+valeren_warrior,Valeren Warrior,vampire,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Light Weapon|Vengeance of Samiel
 vicissitude,Vicissitude,vampire,Malleable Visage,Body Wrack,Horrid Form
 visceratika,Visceratika,vampire,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
 warder_of_man_gift,Warder of Man Gift,shifter,Pence from Heaven,Fabricate Armor,Cloak Sight
