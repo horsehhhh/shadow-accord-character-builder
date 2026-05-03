@@ -158,6 +158,25 @@ npm run build                        # React build process
 - Version mismatch triggers fallback to localStorage-only mode
 - Check `version.js` for `APP_VERSION` and `MIN_CLOUD_VERSION`
 
+### PDF Export Text Formatting
+- **Issue**: Power names, skills, and other fields exported to PDF appear in undercase with underscores (e.g., "light_weapon" instead of "Light Weapon")
+- **Root cause**: `formatDisplayText()` utility (line ~352) was only replacing underscores with spaces but not applying title case capitalization
+- **Solution**: Updated function to both replace underscores AND apply `.replace(/\b\w/g, l => l.toUpperCase())` for proper capitalization
+- **Application**: All PDF form fields now use this utility: innate trees, learned powers, skills, merits, lores
+- **Note**: This ensures consistent visual presentation across all exported character sheets regardless of how field names are stored in game data
+
+### Ghoul Character Power System
+- **Innate Trees**: Ghouls automatically assigned three innate vampire trees (Celerity, Fortitude, Potence) at character creation
+- **Free Dot**: Potence 1 automatically granted free (stored as `powers.potence['1']: true`) in `handleSubfactionChange()` line ~1649
+- **Character Manager UI**: In character manager, ghouls can learn ANY vampire power sequentially after creation—ensure `canLearnPower()` check allows non-creation phases (line ~2282)
+- **Faction Powers Filter**: Ghoul faction powers display must NOT exclude innate trees (line ~10955) so they can see duplication option to show learned pricing
+- **Old Code**: Removed broken innate tree selection UI from creation wizard (was preventing all power assignment)—now auto-assigns and shows explanatory blurb instead
+
+### Valeren Warrior Power Data
+- **Issue**: Valeren Warrior level 3 was showing "Aggravated 1" instead of correct rulebook power
+- **Fix Applied**: Corrected CSV data in App.js (line ~1076) to "Light Weapon|Vengeance of Samiel"
+- **Pattern**: Game data embedded as CSV strings in App.js must be verified against rulebook—exact matching required
+
 ### Mongo User Filtering Broken
 - Root cause: `req.user.id` vs `req.user._id` type mismatch (string vs ObjectId)
 - Solution: Use `$or` query with both types + `$expr` string conversion (see `characters.js` line ~20)
