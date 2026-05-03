@@ -24,13 +24,18 @@ All game mechanics, character data, and rulebook references implemented in this 
 ### 📄 PDF Export Formatting Improvements
 
 #### Fixed - PDF Text Display Issues
-- **🔤 Title Case Formatting**: Power names, skill names, advantages, and lore now display in proper title case (e.g., "Light Weapon" instead of "light_weapon")
+- **🔤 Title Case Formatting**: Power names, skill names, advantages, lore, subfactions, and gen/rank now display in proper title case (e.g., "Light Weapon" instead of "light_weapon")
 - **✨ Underscore Replacement**: All underscore characters in PDF export fields are now converted to spaces for cleaner display
-- **🎯 Consistent Field Formatting**: Applied uniform text formatting across all PDF form fields (innate trees, learned powers, skills, merits, lores)
+- **🎯 Consistent Field Formatting**: Applied uniform text formatting across all PDF form fields (innate trees, learned powers, skills, merits, lores, subfactions, gen/rank)
+
+#### Fixed - Ghoul Innate Tree Duplication
+- **🧛 Removed Duplicate Display**: Ghouls' innate vampire trees (Celerity, Fortitude, Potence) no longer appear twice in the character manager's "Learn New Powers" section
+- **✨ Clean Separation**: Innate trees now display only in the "Innate Power Trees" section; faction powers section excludes already-innate trees for all characters
 
 #### Technical Implementation
 - Updated `formatDisplayText()` utility function to apply both underscore-to-space replacement and title case capitalization
 - Consolidated text formatting logic to use a single, consistent utility across all PDF field assignments
+- Removed ghoul-specific exception in faction powers filter that was causing innate tree duplication
 - Maintains original character data integrity while improving visual presentation in exported PDFs
 
 ### ✨ Ghoul Character System Improvements
