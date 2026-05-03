@@ -19,6 +19,30 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [Unreleased]
+
+### ✨ Ghoul Character System Improvements
+
+#### Enhanced - Ghoul Power Management
+- **🧛 Automatic Potence 1 Assignment**: Ghouls now automatically receive Potence 1 for free at character creation—no selection UI required
+- **🎨 Clear Creation UI**: Added prominent blurb in character creation showing the auto-assigned Potence 1 power with visual confirmation
+- **📚 Innate Power Trees**: Ghouls display three innate vampire power trees (Celerity, Fortitude, Potence) at innate costs (3/6/9 XP)
+- **🔓 Unrestricted Power Learning**: Ghouls can now learn any vampire power at learned prices (6/9/12 XP) in addition to their innate trees
+
+#### Fixed - Ghoul Character Manager Issues
+- **✅ Power Selection UI Fix**: Removed broken innate trees selection UI from character creation that was preventing power assignment
+- **✅ Sequential Power Learning**: Fixed "Limit Reached" issue—ghouls can now learn powers sequentially in the character manager
+- **✅ All Vampire Powers Visible**: Corrected filter logic so ghouls see all available vampire power trees (both innate and faction powers)
+- **✅ Faction Powers Display**: Faction Powers section now properly displays all learnable vampire trees for ghouls
+
+#### Refined - Ghoul Rules Alignment
+- **📖 Rulebook Compliance**: Implemented correct ghoul ruleset:
+  - Innate trees: Celerity, Fortitude, Potence (cost 3/6/9 XP)
+  - Can learn any vampire power tree at learned price (6/9/12 XP)
+  - Potence 1 granted free at creation to align with supernatural servant concept
+
+---
+
 ## [v0.3.8] - 2025-08-19
 
 ### 🔧 Enhanced Cloud Sync Diagnostics & Android Upload Fix
