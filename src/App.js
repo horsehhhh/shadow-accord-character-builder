@@ -954,8 +954,8 @@ silent_legion,Silent Legion,wraith,legion,Pathos,,,custom_selection
 legion_of_paupers,Legion of Paupers,wraith,legion,Pathos,,,custom_selection
 legion_of_fate,Legion of Fate,wraith,legion,Pathos,,,custom_selection
 no_legion,None,wraith,legion,Pathos,,,custom_selection
-renegades,Renegades,wraith,faction,Pathos,,,custom_selection
-heretics,Heretics,wraith,faction,Pathos,,,custom_selection
+renegades,Renegades,wraith,legion,Pathos,,,custom_selection
+heretics,Heretics,wraith,legion,Pathos,,,custom_selection
 no_guild,None,wraith,guild,Pathos,,,custom_selection
 artificers,Artificers,wraith,guild,Pathos,,,custom_selection
 masquers,Masquers,wraith,guild,Pathos,,,custom_selection
@@ -1214,6 +1214,33 @@ clan_baali,Baali Lore,uncommon,lore_uncommon,,"","Knowledge of the demon-worship
 the_senate,The Senate Lore,uncommon,lore_uncommon,,"","Knowledge of the vampire political body and their governance structures"
 lamia_lore,Lamia Lore,uncommon,lore_uncommon,,"","Knowledge of the serpentine bloodline and their ancient mysteries"
 clan_tzimisce,Tzimisce Lore,uncommon,lore_uncommon,,"","Knowledge of Clan Tzimisce, their fleshcrafting, and territorial nature"
+grim_legion_lore,Grim Legion Lore,common,lore_common,,"","Knowledge of the Grim Legion, wraith protectors and enforcers"
+skeletal_legion_lore,Skeletal Legion Lore,common,lore_common,,"","Knowledge of the Skeletal Legion and their ancient traditions"
+iron_legion_lore,Iron Legion Lore,common,lore_common,,"","Knowledge of the Iron Legion and their military discipline"
+emerald_legion_lore,Emerald Legion Lore,common,lore_common,,"","Knowledge of the Emerald Legion and their mystical practices"
+legion_of_paupers_lore,Legion of Paupers Lore,common,lore_common,,"","Knowledge of the Legion of Paupers and the downtrodden wraiths"
+harbingers_guild_lore,Harbingers Lore,common,lore_common,,"","Knowledge of the Harbingers guild and their role as messengers"
+chanteurs_guild_lore,Chanteurs Lore,common,lore_common,,"","Knowledge of the Chanteurs guild and their artistic traditions"
+proctors_guild_lore,Proctors Lore,common,lore_common,,"","Knowledge of the Proctors guild and their enforcement role"
+lifeliners_guild_lore,Lifeliners Lore,common,lore_common,,"","Knowledge of the Lifeliners guild and their connection to life"
+sandmen_guild_lore,Sandmen Lore,common,lore_common,,"","Knowledge of the Sandmen guild and dream manipulation"
+puppeteers_guild_lore,Puppeteers Lore,common,lore_common,,"","Knowledge of the Puppeteers guild and their control techniques"
+usurers_guild_lore,Usurers Lore,common,lore_common,,"","Knowledge of the Usurers guild and their economic networks"
+penitent_legion_lore,Penitent Legion Lore,uncommon,lore_uncommon,,"","Knowledge of the Penitent Legion and their redemptive focus"
+silent_legion_lore,Silent Legion Lore,uncommon,lore_uncommon,,"","Knowledge of the Silent Legion and their secretive nature"
+pardoners_guild_lore,Pardoners Lore,uncommon,lore_uncommon,,"","Knowledge of the Pardoners guild and their absolution rituals"
+artificers_guild_lore,Artificers Lore,uncommon,lore_uncommon,,"","Knowledge of the Artificers guild and their craftsmanship"
+alchemists_guild_lore,Alchemists Lore,uncommon,lore_uncommon,,"","Knowledge of the Alchemists guild and their transmutation"
+mnemoi_guild_lore,Mnemoi Lore,uncommon,lore_uncommon,,"","Knowledge of the Mnemoi guild and their memory preservation"
+oracles_guild_lore,Oracles Lore,uncommon,lore_uncommon,,"","Knowledge of the Oracles guild and their prophetic visions"
+haunters_guild_lore,Haunters Lore,uncommon,lore_uncommon,,"","Knowledge of the Haunters guild and their territorial bonds"
+heretics_lore,Heretics Lore,uncommon,lore_uncommon,,"","Knowledge of the Heretics and their spiritual resistance"
+renegades_lore,Renegades Lore,uncommon,lore_uncommon,,"","Knowledge of the Renegades and their political rebellion"
+legion_of_fate_lore,Legion of Fate Lore,rare,lore_rare,,"","Knowledge of the Legion of Fate and their supernatural purpose"
+masquers_guild_lore,Masquers Lore,rare,lore_rare,,"","Knowledge of the Masquers guild and identity manipulation"
+monitors_guild_lore,Monitors Lore,rare,lore_rare,,"","Knowledge of the Monitors guild and surveillance networks"
+solicitors_guild_lore,Solicitors Lore,rare,lore_rare,,"","Knowledge of the Solicitors guild and legal intrigue"
+specters_lore,Specters Lore,rare,lore_rare,,"","Knowledge of Specters and the twisted servants of oblivion"
 ahl_i_batin,Ahl-i-Batin Lore,rare,lore_rare,,"","Knowledge of the Middle Eastern mage tradition and their mystical practices"
 ananasi_lore,Ananasi Lore,rare,lore_rare,,"","Knowledge of the werespider shapeshifters and their web of secrets"
 bagheera_lore,Bagheera Lore,rare,lore_rare,,"","Knowledge of the Bagheera werepanther tribe and their nobility"
@@ -1335,7 +1362,8 @@ pleasure,Pleasure,Joy|excitement|comfort`
     breed: '',
     auspice: '',
     tribe: '',
-    guild: '',
+    guild: '', // For wraith guild selection
+    legion: '', // For wraith legion selection (Legion/Heretic/Renegade)
     fellowship: null, // For sorcerer fellowship selection
     selectedClan: null, // For ghoul clan selection
     created: new Date().toISOString(),
@@ -2909,7 +2937,8 @@ pleasure,Pleasure,Joy|excitement|comfort`
 Name: ${character.name}
 Player: ${character.player}
 Faction: ${formatDisplayText(character.faction)}
-Subfaction: ${formatDisplayText(character.subfaction)}${character.faction === 'wraith' && character.guild ? `
+Subfaction: ${formatDisplayText(character.subfaction)}${character.faction === 'wraith' && character.legion ? `
+Legion: ${formatDisplayText(character.legion)}` : ''}${character.faction === 'wraith' && character.guild ? `
 Guild: ${formatDisplayText(character.guild)}` : ''}${character.faction === 'wraith' && character.selectedPassions && character.selectedPassions.length > 0 ? `
 Passions: ${character.selectedPassions.map(passionId => {
   const passion = gameData.passions.find(p => p.passion_id === passionId);
@@ -3429,6 +3458,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               if (character.tribe) subfactions.push(character.tribe);
               if (character.breed) subfactions.push(character.breed);
               if (character.auspice) subfactions.push(character.auspice);
+              if (character.legion) subfactions.push(character.legion);
               if (character.guild) subfactions.push(character.guild);
               if (character.fellowship) subfactions.push(character.fellowship);
               if (character.selectedClan) subfactions.push(character.selectedClan);
@@ -4352,7 +4382,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
           
           // For wraiths, separate legions and guilds
           const availableLegions = newCharacter.faction === 'wraith' 
-            ? availableSubfactions.filter(sf => sf.type === 'legion' || sf.type === 'faction')
+            ? availableSubfactions.filter(sf => sf.type === 'legion')
             : [];
           const availableGuilds = newCharacter.faction === 'wraith'
             ? availableSubfactions.filter(sf => sf.type === 'guild')
@@ -4371,25 +4401,27 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               {/* Legion Selection for Wraiths */}
               {newCharacter.faction === 'wraith' && availableLegions.length > 0 && (
                 <div className="grid md:grid-cols-2 gap-2">
-                  {availableLegions.map(subfaction => (
+                  {availableLegions.map(legion => (
                   <button
-                    key={subfaction.subfaction_id}
+                    key={legion.subfaction_id}
                     onClick={() => {
-                      const updated = handleSubfactionChange(newCharacter, subfaction.subfaction_id);
-                      setNewCharacter(updated);
+                      setNewCharacter({
+                        ...newCharacter,
+                        legion: legion.subfaction_id
+                      });
                     }}
                     className={`p-3 rounded-lg border-2 transition-all text-left ${
-                      newCharacter.subfaction === subfaction.subfaction_id
+                      newCharacter.legion === legion.subfaction_id
                         ? 'border-blue-500 bg-blue-500 bg-opacity-20'
                         : 'border-gray-600 hover:border-gray-400'
                     }`}
                   >
-                    <h4 className="font-bold text-xl capitalize mb-2">{subfaction.subfaction_name}</h4>
-                    {subfaction.restrictions && (
-                      <p className="text-sm text-yellow-400 mb-2">{subfaction.restrictions}</p>
+                    <h4 className="font-bold text-xl capitalize mb-2">{legion.subfaction_name}</h4>
+                    {legion.restrictions && (
+                      <p className="text-sm text-yellow-400 mb-2">{legion.restrictions}</p>
                     )}
-                    {subfaction.dormancy_rules && (
-                      <p className="text-sm text-red-400 mb-2">Dormancy: {subfaction.dormancy_rules}</p>
+                    {legion.dormancy_rules && (
+                      <p className="text-sm text-red-400 mb-2">Dormancy: {legion.dormancy_rules}</p>
                     )}
                   </button>
                 ))}
@@ -8482,6 +8514,12 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       <div className="flex justify-between">
                         <span className="text-gray-400">Generation:</span>
                         <span>{newCharacter.generation}</span>
+                      </div>
+                    )}
+                    {newCharacter.faction === 'wraith' && newCharacter.legion && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Legion:</span>
+                        <span className="capitalize">{formatDisplayText(newCharacter.legion)}</span>
                       </div>
                     )}
                     {newCharacter.faction === 'wraith' && newCharacter.guild && (
