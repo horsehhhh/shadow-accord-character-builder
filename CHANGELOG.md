@@ -21,7 +21,24 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [Unreleased]
 
-### 📄 PDF Export Formatting Improvements
+### � 2026 Rulebook Updates
+
+#### Fixed - Human Faction Stats
+- **✅ Energy Correction**: Human faction base energy corrected from 10 → 15 (per page 69 of rulebook)
+
+#### Enhanced - Wraith Subfaction System
+- **🧟 Three-Slot Subfaction Structure**: Wraiths now properly support three subfaction slots:
+  - **Legion (Required)**: Legion/Heretic/Renegade selection (mandatory)
+  - **Guild (Optional)**: All 24 guilds available for selection
+  - **Specter Status**: Tracked separately (occurs when Angst = 10)
+- **📚 Wraith Subfaction Lores**: Added 28 new purchasable lores representing all wraith subfactions:
+  - **Common (12)**: Grim Legion, Skeletal Legion, Iron Legion, Emerald Legion, Legion of Paupers, Harbingers, Chanteurs, Proctors, Lifeliners, Sandmen, Puppeteers, Usurers
+  - **Uncommon (10)**: Penitent Legion, Silent Legion, Pardoners, Artificers, Alchemists, Mnemoi, Oracles, Haunters, Heretics, Renegades
+  - **Rare (5)**: Legion of Fate, Masquers, Monitors, Solicitors, Specters
+- **✨ UI Improvements**: Legion and Guild now display separately in character sheet and PDF exports
+- **📄 PDF Support**: All wraith subfaction lores export correctly with proper formatting
+
+### �📄 PDF Export Formatting Improvements
 
 #### Fixed - PDF Text Display Issues
 - **🔤 Title Case Formatting**: Power names, skill names, advantages, lore, subfactions, and gen/rank now display in proper title case (e.g., "Light Weapon" instead of "light_weapon")
