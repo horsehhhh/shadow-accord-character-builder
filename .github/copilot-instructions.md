@@ -136,6 +136,23 @@ npm test                             # Jest tests with setupTests.js
 npm run build                        # React build process
 ```
 
+## Git Commit Workflow
+
+### Single Commit per Feature
+- **Always combine code changes + CHANGELOG.md updates into ONE git commit**
+- Never make separate commits for changelog alone
+- This keeps git history clean and groups related changes together
+
+### Commit Pattern
+```powershell
+# Good: One commit with all changes
+git add -A; git commit -m "Add feature X and update changelog"; git push origin main
+
+# Bad: Multiple commits (avoid this)
+git add src/App.js; git commit -m "Add feature X"; git push
+git add CHANGELOG.md; git commit -m "Update changelog"; git push
+```
+
 ## Important Gotchas & Debugging Tips
 
 ### API Connection Issues
