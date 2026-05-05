@@ -9210,7 +9210,7 @@ Your character is ready to play!`;
                   (creationStep === 0 && !newCharacter.faction) ||
                   (creationStep === 1 && newCharacter.faction !== 'wraith' && newCharacter.faction !== 'human' && !newCharacter.subfaction) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction !== 'sorcerer' && newCharacter.subfaction !== 'faithful' && newCharacter.subfaction !== 'claimed_drone' && newCharacter.subfaction !== 'claimed_fomori' && newCharacter.subfaction !== 'claimed_gorgon' && newCharacter.subfaction !== 'commoner' && newCharacter.subfaction !== 'ghoul' && newCharacter.subfaction !== 'kinfolk' && !newCharacter.subfaction) ||
-                  (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.subfaction || !newCharacter.guild || newCharacter.selectedPassions.length !== 2)) ||
+                  (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.legion || newCharacter.selectedPassions.length !== 2)) ||
                   (creationStep === 1 && newCharacter.faction === 'vampire' && newCharacter.subfaction === 'caitiff' && newCharacter.innateTreeIds.length !== 3) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && newCharacter.innateTreeIds.length !== 2) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' && newCharacter.innateTreeIds.length !== 1) ||

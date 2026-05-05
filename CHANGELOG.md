@@ -20,7 +20,14 @@ All game mechanics, character data, and rulebook references implemented in this 
 ---
 
 ## [Unreleased]
+### 🔧 Fixed - Wraith Creation UI
 
+#### Fixed - Next Button Disabled Bug
+- **🧟 Wraith Creation Progression**: Fixed Next button remaining disabled even when all wraith subfaction fields were completed
+- **Root Cause**: Validation logic was checking for non-existent `subfaction` field instead of `legion` field for wraiths
+- **Solution**: Updated validation to check `!newCharacter.legion` (required) instead of `!newCharacter.subfaction`
+- **Impact**: Wraith players can now progress past the Subfaction step after selecting Legion, Shadow Archetype, Thorn, and Passions
+- **Verification**: All wraith requirements properly validated—3 innate Arcanoi, shadow archetype selection, thorn option, legion selection, and 2 passions
 ### � 2026 Rulebook Updates
 
 #### Fixed - Human Faction Stats
