@@ -28,6 +28,11 @@ All game mechanics, character data, and rulebook references implemented in this 
 - **Solution**: Updated validation to check `!newCharacter.legion` (required) instead of `!newCharacter.subfaction`
 - **Impact**: Wraith players can now progress past the Subfaction step after selecting Legion, Shadow Archetype, Thorn, and Passions
 - **Verification**: All wraith requirements properly validated—3 innate Arcanoi, shadow archetype selection, thorn option, legion selection, and 2 passions
+
+#### Fixed - Human Base Energy
+- **📊 Energy Correction**: Human faction base energy corrected from 15 → 10
+- **Max Cap**: Human max energy cap remains 15 (for advancement via merits/XP)
+- **Distinction**: Base energy (10) is starting value; max energy (15) is advancement cap
 ### � 2026 Rulebook Updates
 
 #### Fixed - Human Faction Stats

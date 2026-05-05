@@ -893,7 +893,7 @@ const ShadowAccordComplete = () => {
     // NOTE: For human subfactions, if a character qualifies for multiple subfactions with different energy types, 
     // the non-Vitality energy type takes precedence. For example, Sorcerer + Claimed Gorgon/Fomori/Drone = Essence energy type.
     factions: `faction_id,faction_name,energy_type,base_health,base_willpower,base_energy,base_virtue,virtue_type,fundamental_powers
-human,Human,Vitality,10,1,15,7,Humanity,
+human,Human,Vitality,10,1,10,7,Humanity,
 vampire,Vampire,Vitae,10,1,15,6,Road,Amaranth|Bestial Frenzy|Blood Buff|Draining|Paralyzing Bite|Regeneration 1|Test Faction|Test Vitae
 shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 1|Step Sideways|War Form
 wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Temporary Angst|Umbra Sight`,
