@@ -19,6 +19,19 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.2] - 2026-05-05
+
+### 🔄 Faction Change Dormancy + Bug Fix
+
+#### Added
+- **Faction change dormant tags**: Powers from a character's original faction (e.g., vampire-turned-wraith with `originalFaction: 'vampire'`) are now marked with the amber DORMANT badge in the advancement panel — same visual treatment as human subfaction dormancy
+- **PDF dormant label**: Dormant trees print as `"Tree Name (Dormant)"` in both the Learned Powers and Row fields of the exported character sheet
+
+#### Fixed
+- **Runtime crash on load**: Removed `gameData` from the `useEffect` dependency array for the one-time energy type migration — `gameData` was evaluated synchronously in the dep array before its `const` declaration, causing a Temporal Dead Zone `ReferenceError` on every load
+
+---
+
 ## [v0.4.1] - 2026-05-05
 
 ### 😴 Dormant Power Tree Tags (Issue #12)
