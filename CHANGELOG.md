@@ -21,11 +21,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [v0.4.4] - 2026-05-06
 
-### 👨‍👩‍👧 Kinfolk Merit Fix (Issue #7)
+### 👨‍👩‍👧 Kinfolk Merit Fix + Merit Math Overhaul (Issue #7)
 
 #### Changed
 - **Kinfolk merit cost**: Changed from 1 XP to 3 XP to match rulebook
 - **Free lores on creation**: A new character who takes the Kinfolk merit may now select their related tribe during character creation — choosing a tribe grants Shifter Faction Lore and that tribe's lore at no additional cost
+- **Human merit cost formula fixed**: Human merit costs were off by 3 XP — they now correctly follow 0/3/6/9/12 (1st free, 2nd=3, 3rd=6...) instead of the previous wrong 0/6/9/12
+- **Merit removal refund fixed**: Removing any merit now refunds the correct progressive slot cost (`3*N` for non-human, `3*(N-1)` for human) rather than always refunding a flat 3 XP — this fixes the XP gain/loss on add→remove round trips
+- **Kinfolk/Delirium excluded from progressive cost**: Flat-cost merits (marked "Does not increase cost of future merits") are excluded from the merit count used to compute progressive costs for other merits; they also always cost/refund a flat 3 XP regardless of order
+- **Creation freebie display fixed**: `calculateFreebieSpent` now uses a closed-form sum formula instead of calling `calculateXPCost` on already-owned merits (which double-counted and inflated displayed costs)
 
 #### Added
 - **Tribe selection UI**: Step 3 of character creation shows a tribe picker when the Kinfolk merit is selected, so players choose which shifter tribe they are related to (Garou tribes and Fera available, corrupted lineages excluded)
