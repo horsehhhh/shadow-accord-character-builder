@@ -1193,7 +1193,7 @@ strength,Strength (Wyrm),shifter,wyrm_gift,Hide of the Wyrm,Totemic Form|Resilie
 adept,Adept,1,,false,Additional production item per check-in (except Alchemy),
 antiquarian,Antiquarian,1,,false,Attunement pool increased by 4 points,
 averted_weakness,Averted Weakness,2,vampire,false,Do not suffer clan weakness,Gargoyles/Cappadocians/Nosferatu cannot take
-delirium,Delirium,1,human,false,Enter delirium when witnessing supernatural,Always FREE for Commoners - does not cost XP or increase cost of future merits
+delirium,Delirium,1,human,false,When witnessing undeniably supernatural events: lose reality grip (Confusion) or Frenzy (no Virtue loss) - memory of event erased. Spend Willpower to resist for 10 min. Cannot take if Unveiled. May remove at Check-In.,Does not increase cost of future merits nor do other merits increase the cost of this one. Commoners may take this for free.
 doomslayer,Doomslayer,2,wraith,true,Use Dark Arcanoi without Catharsis,Can purchase multiple times
 eidolon,Eidolon,1,wraith,false,Leave Catharsis after 5 minutes instead of 10,
 enhanced_blood_buff,Enhanced Blood Buff,1,vampire,false,Spend 3 Energy for Augment 1 for 10 minutes,
@@ -2094,8 +2094,9 @@ pleasure,Pleasure,Joy|excitement|comfort`
       const merit = gameData.merits.find(m => m.merit_id === itemId);
       if (!merit) return 0;
 
-      // Kinfolk merit is always a flat 3 XP and does not count toward the progressive cost for other merits
-      if (itemId === 'kinfolk') return 3;
+      // Flat-cost merits (Kinfolk, Delirium): always 3 XP, never progressive, never free for humans
+      // Exception: Delirium is free for Commoners (handled above)
+      if (merit.special_notes?.includes('Does not increase cost of future merits')) return 3;
 
       // Count total merit instances, excluding merits that don't affect progressive cost (e.g. Kinfolk)
       const currentMeritCount = Object.entries(character.merits || {}).reduce((total, [meritId, quantity]) => {
@@ -2374,8 +2375,9 @@ pleasure,Pleasure,Joy|excitement|comfort`
         return calculateXPCost(character, 'power', itemId, level);
       case 'merit': {
         const merit = gameData.merits.find(m => m.merit_id === itemId);
-        // Flat-cost merits (Kinfolk, Delirium, etc.) always refund their base 3 XP
+        // Flat-cost merits (Kinfolk, Delirium, etc.): refund 3 XP, or 0 if it was free
         if (merit?.special_notes?.includes('Does not increase cost of future merits')) {
+          if (itemId === 'delirium' && character.subfaction === 'commoner') return 0;
           return 3;
         }
         // Progressive merits: refund = cost of the last slot occupied
