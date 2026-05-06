@@ -436,6 +436,17 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.4.1',
+      date: '2026-05-05',
+      changes: [
+        '😴 Dormant Power Tree Tags (Issue #12) - Human characters with multiple subfactions now show amber DORMANT badges on trees belonging to inactive subfactions',
+        '🔍 Energy Type Dormancy Logic - Trees are marked dormant when their subfaction energy type (Vitae/Gnosis/Essence/Vitality) differs from the character\'s active energy type',
+        '🕷️ Claimed Drone Dormancy - Drone characters see all non-drone trees marked dormant (Drone overrides all other subfactions)',
+        '🟨 Amber Dormant Styling - Dormant tree cards display with amber border/background instead of green, replacing the checkmark with a DORMANT pill badge',
+        '✅ Fomori/Gorgon Exempt - Claimed Fomori and Gorgon characters never show dormant trees (they remain simultaneously active with original subfaction per rulebook)'
+      ]
+    },
+    {
       version: '0.4.0',
       date: '2026-05-05',
       changes: [
@@ -2222,6 +2233,28 @@ pleasure,Pleasure,Joy|excitement|comfort`
         });
       });
     });
+  };
+
+  // Returns true if a human character's tree is currently dormant (different energy type than active subfaction)
+  const isTreeDormant = (character, tree) => {
+    if (character.faction !== 'human') return false;
+    const activeSubfaction = character.subfaction;
+    // Claimed Drone makes ALL non-drone trees dormant
+    if (activeSubfaction === 'claimed_drone') return tree.group !== 'claimed_drone';
+    // Claimed Fomori/Gorgon can be simultaneously active with original subfaction
+    if (activeSubfaction === 'claimed_fomori' || activeSubfaction === 'claimed_gorgon') return false;
+    const characterEnergyType = character.stats?.energyType;
+    if (!characterEnergyType) return false;
+    const groupEnergyType = {
+      clan_innate: 'Vitae', common: 'Vitae', thaumaturgy: 'Vitae', dark_thaumaturgy: 'Vitae',
+      auspice: 'Gnosis', breed: 'Gnosis', tribe_gift: 'Gnosis', fera_gift: 'Gnosis', wyrm_gift: 'Gnosis',
+      sorcerer: 'Essence', fellowship: 'Essence', fallen_path: 'Essence',
+      talent: 'Vitality', bounty: 'Vitality',
+      claimed_drone: 'Vitality', claimed_fomori: 'Vitality', claimed_gorgon: 'Vitality',
+    };
+    const treeEnergyType = groupEnergyType[tree.group];
+    if (!treeEnergyType) return false;
+    return treeEnergyType !== characterEnergyType;
   };
 
   // ==============================
@@ -10641,19 +10674,30 @@ Your character is ready to play!`;
                   {Object.entries(character.powers || {}).map(([treeId, levels]) => {
                     const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
                     if (!tree) return null;
-                    
+                    const isDormant = isTreeDormant(character, tree);
+
                     return (
-                      <div 
-                        key={treeId} 
-                        className="p-3 rounded-lg border-2 border-green-500 bg-green-500 bg-opacity-20 shadow-lg transition-all duration-200"
+                      <div
+                        key={treeId}
+                        className={`p-3 rounded-lg border-2 shadow-lg transition-all duration-200 ${
+                          isDormant
+                            ? 'border-amber-500 bg-amber-500 bg-opacity-10'
+                            : 'border-green-500 bg-green-500 bg-opacity-20'
+                        }`}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center mb-2">
                               <h4 className="font-bold text-lg capitalize">{formatDisplayText(tree.tree_name)}</h4>
-                              <div className="ml-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm">✓</span>
-                              </div>
+                              {isDormant ? (
+                                <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 bg-opacity-20 text-amber-300 border border-amber-500 rounded-full uppercase tracking-wider">
+                                  Dormant
+                                </span>
+                              ) : (
+                                <div className="ml-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">✓</span>
+                                </div>
+                              )}
                             </div>
                             
                             <div className="space-y-3">
@@ -10730,24 +10774,31 @@ Your character is ready to play!`;
                           {innateTreeIds.map(treeId => {
                             const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
                             if (!tree) return null;
-                            
+
                             const currentLevels = character.powers[treeId] || {};
                             const hasAnyLevel = Object.keys(currentLevels).length > 0;
-                            
+                            const isDormant = isTreeDormant(character, tree);
+
                             return (
-                              <div 
-                                key={treeId} 
+                              <div
+                                key={treeId}
                                 className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                                  hasAnyLevel
-                                    ? 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
-                                    : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
+                                  isDormant
+                                    ? 'border-amber-500 bg-amber-500 bg-opacity-10'
+                                    : hasAnyLevel
+                                      ? 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
+                                      : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
                                 }`}
                               >
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
                                     <div className="flex items-center mb-2">
                                       <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
-                                      {hasAnyLevel && (
+                                      {isDormant ? (
+                                        <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 bg-opacity-20 text-amber-300 border border-amber-500 rounded-full uppercase tracking-wider">
+                                          Dormant
+                                        </span>
+                                      ) : hasAnyLevel && (
                                         <div className="ml-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                           <span className="text-white text-sm">✓</span>
                                         </div>
@@ -11020,24 +11071,31 @@ Your character is ready to play!`;
                                 {trees.map(tree => {
                                   const currentLevels = character.powers[tree.tree_id] || {};
                                   const hasAnyLevel = Object.keys(currentLevels).length > 0;
+                                  const isDormant = isTreeDormant(character, tree);
                                   return (
                                     <div
                                       key={tree.tree_id}
                                       className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                                        hasAnyLevel
-                                          ? isCorruptGroup
-                                            ? 'border-red-500 bg-red-500 bg-opacity-20 shadow-lg'
-                                            : 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
-                                          : isCorruptGroup
-                                            ? 'border-red-800 bg-red-900 bg-opacity-20 hover:border-red-600 hover:bg-red-800 hover:bg-opacity-20 hover:shadow-md'
-                                            : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
+                                        isDormant
+                                          ? 'border-amber-500 bg-amber-500 bg-opacity-10'
+                                          : hasAnyLevel
+                                            ? isCorruptGroup
+                                              ? 'border-red-500 bg-red-500 bg-opacity-20 shadow-lg'
+                                              : 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
+                                            : isCorruptGroup
+                                              ? 'border-red-800 bg-red-900 bg-opacity-20 hover:border-red-600 hover:bg-red-800 hover:bg-opacity-20 hover:shadow-md'
+                                              : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
                                       }`}
                                     >
                                       <div className="flex justify-between items-start">
                                         <div className="flex-1">
                                           <div className="flex items-center mb-2">
                                             <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
-                                            {hasAnyLevel && (
+                                            {isDormant ? (
+                                              <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 bg-opacity-20 text-amber-300 border border-amber-500 rounded-full uppercase tracking-wider">
+                                                Dormant
+                                              </span>
+                                            ) : hasAnyLevel && (
                                               <div className={`ml-2 w-6 h-6 rounded-full flex items-center justify-center ${isCorruptGroup ? 'bg-red-500' : 'bg-green-500'}`}>
                                                 <span className="text-white text-sm">✓</span>
                                               </div>

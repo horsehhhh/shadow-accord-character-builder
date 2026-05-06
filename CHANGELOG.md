@@ -19,6 +19,21 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.1] - 2026-05-05
+
+### 😴 Dormant Power Tree Tags (Issue #12)
+
+#### Added
+- **Dormant DORMANT badges**: Human characters with multiple subfactions now see amber "DORMANT" pill badges on trees belonging to their inactive subfaction
+- **Energy-type dormancy logic**: A tree is marked dormant when its subfaction's energy type (Vitae/Gnosis/Essence/Vitality) differs from the character's currently active energy type — matches rulebook rule "Characters can only use powers associated with their current Energy type"
+- **Claimed Drone override**: Drone characters see all non-drone trees (Ghoul/Sorcerer/Kinfolk/etc.) marked dormant, reflecting the rulebook's "All other subfactions go dormant" rule
+- **Amber dormant styling**: Dormant cards render with an amber border and background; the green checkmark is replaced with an amber DORMANT pill; applies in both Current Powers and Learn New Powers panels
+
+#### Unchanged by design
+- Claimed Fomori and Gorgon characters are never shown as dormant — they remain simultaneously active with their original subfaction per rulebook
+
+---
+
 ## [v0.4.0] - 2026-05-05
 
 ### 🏷️ Power Tree Group System
