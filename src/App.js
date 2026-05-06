@@ -2574,15 +2574,17 @@ pleasure,Pleasure,Joy|excitement|comfort`
       ]
     };
 
-    // Record XP spending/gaining in XP history
-    if (cost !== 0) {
+    // Record XP spending/gaining in XP history — always for virtue (even 0 XP), otherwise only when cost !== 0
+    if (cost !== 0 || type === 'virtue') {
       const xpEntry = {
         timestamp: newLastModified,
-        type: cost > 0 ? 'loss' : 'gain',
+        type: cost > 0 ? 'loss' : cost < 0 ? 'gain' : 'neutral',
         amount: Math.abs(cost),
-        reason: cost > 0 
+        reason: cost > 0
           ? `Purchased ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`
-          : `Increased ${type === 'virtue' ? 'Angst' : itemId}`,
+          : cost < 0
+            ? `Increased ${type === 'virtue' ? 'Angst' : itemId}`
+            : `Increased ${character.stats?.virtueType || 'Virtue'} level`,
         previousTotal: character.totalXP,
         newTotal: character.totalXP - cost
       };
@@ -2902,17 +2904,19 @@ pleasure,Pleasure,Joy|excitement|comfort`
       lastModified: newLastModified
     };
 
-    // Record XP refund in XP history (if refund > 0)
-    if (refund > 0) {
+    // Record in XP history — always for virtue (even 0 XP), otherwise only when refund > 0
+    if (refund > 0 || type === 'virtue') {
       const xpEntry = {
         timestamp: newLastModified,
-        type: 'gain',
+        type: refund > 0 ? 'gain' : 'neutral',
         amount: refund,
-        reason: `Removed ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`,
+        reason: type === 'virtue'
+          ? `Removed ${character.stats?.virtueType || 'Virtue'} level`
+          : `Removed ${type === 'merit' ? gameData.merits.find(m => m.merit_id === itemId)?.merit_name || itemId : itemId}`,
         previousTotal: character.totalXP,
         newTotal: newTotalXP
       };
-      
+
       characterUpdate = {
         ...characterUpdate,
         xpHistory: [...(characterUpdate.xpHistory || []), xpEntry]
@@ -12015,10 +12019,10 @@ Your character is ready to play!`;
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center">
                             <span className={`inline-block w-3 h-3 rounded-full mr-3 ${
-                              entry.type === 'gain' ? 'bg-green-500' : 'bg-red-500'
+                              entry.type === 'gain' ? 'bg-green-500' : entry.type === 'neutral' ? 'bg-gray-500' : 'bg-red-500'
                             }`} />
                             <span className="font-medium">
-                              {entry.type === 'gain' ? '+' : '-'}{entry.amount} XP
+                              {entry.type === 'gain' ? '+' : entry.type === 'neutral' ? '' : '-'}{entry.amount} XP
                             </span>
                           </div>
                           <div className="text-right">
