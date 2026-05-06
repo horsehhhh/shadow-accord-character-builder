@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, BookOpen, Zap, Users, DollarSign, Volume2, ArrowLeft } from 'lucide-react';
+import { Search, Filter, BookOpen, Zap, Users, DollarSign, Volume2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 
 function PowerIndex({ onBack, embedded = false }) {
   const [powers, setPowers] = useState([]);
+  const [showLegend, setShowLegend] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
@@ -1820,6 +1821,56 @@ function PowerIndex({ onBack, embedded = false }) {
           <div className="text-sm text-gray-400">
             Showing {filteredPowers.length} of {powers.length} powers
           </div>
+        </div>
+
+        {/* Source Code Legend */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 mb-4">
+          <button
+            onClick={() => setShowLegend(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:text-white transition-colors"
+          >
+            <span>Source Code Legend (e.g. H1, Vc2, Sr3…)</span>
+            {showLegend ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {showLegend && (
+            <div className="px-4 pb-4 border-t border-gray-700 pt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-4">
+                <div>
+                  <h5 className="text-xs font-semibold uppercase tracking-widest text-blue-300 border-b border-blue-900 pb-1 mb-2">Factions</h5>
+                  <ul className="space-y-1 text-gray-300">
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">H</span> — Human (Faithful, Sorcerer)</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">S</span> — Shifter Gift</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">V</span> — Vampire Discipline</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">W</span> — Wraith Arcanoi</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-xs font-semibold uppercase tracking-widest text-blue-300 border-b border-blue-900 pb-1 mb-2">Modifiers</h5>
+                  <ul className="space-y-1 text-gray-300">
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">r</span> — Rare tree</li>
+                    <li><span className="font-mono text-red-300 bg-gray-700 px-1 rounded">c</span> — Corrupt / Dark Arcanoi</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">f</span> — Fundamental Power</li>
+                    <li><span className="font-mono text-yellow-300 bg-gray-700 px-1 rounded">1/2/3</span> — Level in the tree</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-xs font-semibold uppercase tracking-widest text-blue-300 border-b border-blue-900 pb-1 mb-2">Other Sources</h5>
+                  <ul className="space-y-1 text-gray-300">
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">Wt</span> — Wraith (Specter) Thorn</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">K</span> — Skill Power</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">M</span> — Merit Power</li>
+                    <li><span className="font-mono text-white bg-gray-700 px-1 rounded">C</span> — Charm Power (ST rulebook)</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-xs font-semibold uppercase tracking-widest text-blue-300 border-b border-blue-900 pb-1 mb-2">Example</h5>
+                  <p className="text-gray-300 text-xs leading-relaxed">
+                    <span className="font-mono text-white">Hr1 Hc1 S1 V1 Vr1 Vc1</span> means the power appears at level 1 in a Human rare tree, a Human corrupt tree, a Shifter tree, a standard Vampire discipline, a Vampire rare tree, and a Vampire corrupt tree.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Power List */}

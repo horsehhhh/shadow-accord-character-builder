@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
   Download, Upload, Plus, ChevronRight, ChevronLeft, 
   Trash2, X, Search, Users, Book,
@@ -394,6 +394,25 @@ const ShadowAccordComplete = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showXpDropdown, showCheckInDropdown]);
   
+  // One-time migration: fix energyType on existing saved characters
+  const energyTypeMigrated = useRef(false);
+  useEffect(() => {
+    if (energyTypeMigrated.current || !characters.length || !gameData.subfactions.length) return;
+    const fixed = characters.map(char => {
+      if (!char.subfaction || !char.stats) return char;
+      const subfaction = gameData.subfactions.find(sf => sf.subfaction_id === char.subfaction);
+      if (!subfaction?.energy_type) return char;
+      const faction = gameData.factions.find(f => f.faction_id === char.faction);
+      const expected = (subfaction.energy_type && subfaction.energy_type !== faction?.energy_type)
+        ? subfaction.energy_type
+        : faction?.energy_type;
+      if (!expected || char.stats.energyType === expected) return char;
+      return { ...char, stats: { ...char.stats, energyType: expected } };
+    });
+    energyTypeMigrated.current = true;
+    if (fixed.some((c, i) => c !== characters[i])) setCharacters(fixed);
+  }, [characters, gameData, setCharacters]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Phase 8: Advanced State Management
   const [searchQuery, setSearchQuery] = useState('');
   const [filterFaction, setFilterFaction] = useState('');
@@ -1718,12 +1737,23 @@ pleasure,Pleasure,Joy|excitement|comfort`
       innateTreeIds = [];
     }
     
+    // Apply subfaction energy type if it differs from the faction default
+    const subfactionEnergyType = subfaction.energy_type;
+    const factionEnergyType = gameData.factions.find(f => f.faction_id === character.faction)?.energy_type;
+    const resolvedEnergyType = (subfactionEnergyType && subfactionEnergyType !== factionEnergyType)
+      ? subfactionEnergyType
+      : factionEnergyType;
+
     return {
       ...character,
       subfaction: subfactionId,
       innateTreeIds,
       freeFirstDotPowers,
-      fundamentalPowers
+      fundamentalPowers,
+      stats: {
+        ...character.stats,
+        energyType: resolvedEnergyType || character.stats?.energyType
+      }
     };
   };
 
