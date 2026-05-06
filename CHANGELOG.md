@@ -19,73 +19,65 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
-## [Unreleased]
+## [v0.4.0] - 2026-05-05
+
+### 🏷️ Power Tree Group System
+
+#### Added - Rulebook-Accurate Category Taxonomy
+- **📚 Official Group Names**: All 100+ power trees assigned to named categories matching rulebook terminology
+  - **Vampire**: Clan Disciplines, Common Disciplines, Thaumaturgy, Dark Thaumaturgy
+  - **Shifter**: Auspice, Breed, Tribe Gifts, Fera Gifts, Wyrm Gifts
+  - **Wraith**: Arcanoi Trees, Dark Arcanoi Trees
+  - **Human**: Sorcerer Trees, Fellowship Trees, Bounty Trees, Talent Trees, Fallen Paths, Claimed (Drone/Fomori/Gorgon)
+- **👹 Claimed Tree Isolation**: Each claimed type (Drone/Fomori/Gorgon) has its own group — claimed characters cannot learn other claimed trees
+- **🔧 Group-Based Code Logic**: XP cost calculation, PDF corrupt marking, advancement filters, and creation wizard validation all use group checks instead of hardcoded tree ID lists
+
+#### Enhanced - Advancement Panel UI
+- **📂 Grouped Section Headers**: Learnable trees now display under labeled category headers in the advancement panel
+- **🔤 Alphabetical Within Groups**: Trees sorted alphabetically within each category
+- **💀 Corrupt Groups Always Last**: Fallen Paths, Wyrm Gifts, Dark Arcanoi Trees, Dark Thaumaturgy, and Claimed trees always appear at the bottom
+- **🔴 Red Corrupt Tree Cards**: Corrupt/dark tree cards render with red border and background; section headers also styled red for corrupt groups
+
+### 🔧 Rulebook Data Fixes
+
+#### Fixed - Power Tree Data
+- **✅ Ravnos Clan Disciplines**: Corrected innate disciplines from Animalism/Fortitude/Chimerstry → Celerity/Obfuscate/Presence
+- **✅ Valeren Warrior Level 3**: Corrected powers to Light Weapon and Vengeance of Samiel per rulebook
+- **✅ Intimation, Pandemonium, Puppetry**: Corrected group from Dark Arcanoi to standard Arcanoi Trees
+
+### 🧛 Ghoul Power System
+
+#### Fixed - Character Creation & Manager
+- **✅ Innate Trees**: Ghouls now correctly have Celerity, Fortitude, and Potence as innate trees (cost 3/6/9 XP)
+- **✅ Free Potence 1**: Potence Level 1 automatically granted at creation per rulebook
+- **✅ Character Manager**: Fixed "Limit Reached" on all powers — ghouls can now learn any vampire power tree at proper XP costs
+- **✅ Removed Broken UI**: Removed duplicate innate tree selection panel from character creation that was blocking power assignment
+
+---
+
+## [v0.3.9] - 2026-05-05
+
 ### 🔧 Fixed - Wraith Creation UI
 
 #### Fixed - Next Button Disabled Bug
 - **🧟 Wraith Creation Progression**: Fixed Next button remaining disabled even when all wraith subfaction fields were completed
 - **Root Cause**: Validation logic was checking for non-existent `subfaction` field instead of `legion` field for wraiths
 - **Solution**: Updated validation to check `!newCharacter.legion` (required) instead of `!newCharacter.subfaction`
-- **Impact**: Wraith players can now progress past the Subfaction step after selecting Legion, Shadow Archetype, Thorn, and Passions
-- **Verification**: All wraith requirements properly validated—3 innate Arcanoi, shadow archetype selection, thorn option, legion selection, and 2 passions
 
 #### Fixed - Human Base Energy
-- **📊 Energy Correction**: Human faction base energy corrected from 15 → 10
-- **Max Cap**: Human max energy cap remains 15 (for advancement via merits/XP)
-- **Distinction**: Base energy (10) is starting value; max energy (15) is advancement cap
-### � 2026 Rulebook Updates
+- **📊 Energy Correction**: Human faction base energy corrected to 10 (base starting value); max cap remains 15 for advancement
 
-#### Fixed - Human Faction Stats
-- **✅ Energy Correction**: Human faction base energy corrected from 10 → 15 (per page 69 of rulebook)
+### ✨ Enhanced - Wraith Subfaction System
+- **🧟 Three-Slot Subfaction Structure**: Legion (required), Guild (optional), Specter Status (tracked)
+- **📚 28 New Purchasable Lores**: All guilds and legions — Common (12), Uncommon (10), Rare (5) including all named guilds and legions
+- **✨ UI Improvements**: Legion and Guild display separately in character sheet and PDF exports
 
-#### Enhanced - Wraith Subfaction System
-- **🧟 Three-Slot Subfaction Structure**: Wraiths now properly support three subfaction slots:
-  - **Legion (Required)**: Legion/Heretic/Renegade selection (mandatory)
-  - **Guild (Optional)**: All 24 guilds available for selection
-  - **Specter Status**: Tracked separately (occurs when Angst = 10)
-- **📚 Wraith Subfaction Lores**: Added 28 new purchasable lores representing all wraith subfactions:
-  - **Common (12)**: Grim Legion, Skeletal Legion, Iron Legion, Emerald Legion, Legion of Paupers, Harbingers, Chanteurs, Proctors, Lifeliners, Sandmen, Puppeteers, Usurers
-  - **Uncommon (10)**: Penitent Legion, Silent Legion, Pardoners, Artificers, Alchemists, Mnemoi, Oracles, Haunters, Heretics, Renegades
-  - **Rare (5)**: Legion of Fate, Masquers, Monitors, Solicitors, Specters
-- **✨ UI Improvements**: Legion and Guild now display separately in character sheet and PDF exports
-- **📄 PDF Support**: All wraith subfaction lores export correctly with proper formatting
+### 📄 PDF Export Formatting
+- **🔤 Title Case Formatting**: Power names, skills, merits, lores, and subfactions now display in proper title case
+- **✨ Underscore Replacement**: All underscore characters converted to spaces across all PDF fields
 
-### �📄 PDF Export Formatting Improvements
-
-#### Fixed - PDF Text Display Issues
-- **🔤 Title Case Formatting**: Power names, skill names, advantages, lore, subfactions, and gen/rank now display in proper title case (e.g., "Light Weapon" instead of "light_weapon")
-- **✨ Underscore Replacement**: All underscore characters in PDF export fields are now converted to spaces for cleaner display
-- **🎯 Consistent Field Formatting**: Applied uniform text formatting across all PDF form fields (innate trees, learned powers, skills, merits, lores, subfactions, gen/rank)
-
-#### Fixed - Ghoul Innate Tree Duplication
-- **🧛 Removed Duplicate Display**: Ghouls' innate vampire trees (Celerity, Fortitude, Potence) no longer appear twice in the character manager's "Learn New Powers" section
-- **✨ Clean Separation**: Innate trees now display only in the "Innate Power Trees" section; faction powers section excludes already-innate trees for all characters
-
-#### Technical Implementation
-- Updated `formatDisplayText()` utility function to apply both underscore-to-space replacement and title case capitalization
-- Consolidated text formatting logic to use a single, consistent utility across all PDF field assignments
-- Removed ghoul-specific exception in faction powers filter that was causing innate tree duplication
-- Maintains original character data integrity while improving visual presentation in exported PDFs
-
-### ✨ Ghoul Character System Improvements
-
-#### Enhanced - Ghoul Power Management
-- **🧛 Automatic Potence 1 Assignment**: Ghouls now automatically receive Potence 1 for free at character creation—no selection UI required
-- **🎨 Clear Creation UI**: Added prominent blurb in character creation showing the auto-assigned Potence 1 power with visual confirmation
-- **📚 Innate Power Trees**: Ghouls display three innate vampire power trees (Celerity, Fortitude, Potence) at innate costs (3/6/9 XP)
-- **🔓 Unrestricted Power Learning**: Ghouls can now learn any vampire power at learned prices (6/9/12 XP) in addition to their innate trees
-
-#### Fixed - Ghoul Character Manager Issues
-- **✅ Power Selection UI Fix**: Removed broken innate trees selection UI from character creation that was preventing power assignment
-- **✅ Sequential Power Learning**: Fixed "Limit Reached" issue—ghouls can now learn powers sequentially in the character manager
-- **✅ All Vampire Powers Visible**: Corrected filter logic so ghouls see all available vampire power trees (both innate and faction powers)
-- **✅ Faction Powers Display**: Faction Powers section now properly displays all learnable vampire trees for ghouls
-
-#### Refined - Ghoul Rules Alignment
-- **📖 Rulebook Compliance**: Implemented correct ghoul ruleset:
-  - Innate trees: Celerity, Fortitude, Potence (cost 3/6/9 XP)
-  - Can learn any vampire power tree at learned price (6/9/12 XP)
-  - Potence 1 granted free at creation to align with supernatural servant concept
+### 🧛 Ghoul Innate Tree Deduplication
+- **✅ Clean Separation**: Celerity, Fortitude, Potence no longer appear twice in the Learn New Powers section
 
 ---
 

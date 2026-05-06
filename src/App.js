@@ -417,6 +417,35 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.4.0',
+      date: '2026-05-05',
+      changes: [
+        '🏷️ POWER TREE GROUP SYSTEM: All power trees now assigned to rulebook-accurate named categories',
+        '📚 Official Category Names - Clan Disciplines, Common Disciplines, Thaumaturgy, Auspice, Breed, Tribe Gifts, Fera Gifts, Arcanoi Trees, Dark Arcanoi Trees, Sorcerer Trees, Fellowship Trees, Bounty Trees, Talent Trees, Fallen Paths, Wyrm Gifts, Dark Thaumaturgy, Claimed (Drone/Fomori/Gorgon)',
+        '📂 Grouped Advancement Panel - Learnable trees now display under labeled section headers, sorted alphabetically within each group',
+        '💀 Corrupt Groups Always Last - Fallen Paths, Wyrm Gifts, Dark Arcanoi Trees, Dark Thaumaturgy, and Claimed trees always appear at bottom of the advancement list',
+        '🔴 Red Corrupt Tree Cards - Corrupt/dark tree cards render with red border and background in the advancement panel',
+        '👹 Claimed Tree Isolation - Each claimed type has its own group; claimed characters cannot learn other claimed trees',
+        '🔧 Group-Based Logic - XP cost calculation, PDF export, advancement filters, and creation wizard validation all use group checks instead of hardcoded tree ID lists',
+        '✅ Fixed Ravnos Clan Disciplines - Corrected from Animalism/Fortitude/Chimerstry to Celerity/Obfuscate/Presence per rulebook',
+        '✅ Fixed Valeren Warrior Level 3 - Corrected powers to Light Weapon and Vengeance of Samiel per rulebook',
+        '✅ Fixed Intimation, Pandemonium, Puppetry - Corrected group from Dark Arcanoi to standard Arcanoi Trees',
+        '🧛 Fixed Ghoul Power System - Celerity, Fortitude, and Potence are all innate trees; Potence 1 granted free at creation',
+        '✅ Fixed Ghoul Character Manager - Ghouls can now learn all vampire power trees at proper XP costs in the character manager'
+      ]
+    },
+    {
+      version: '0.3.9',
+      date: '2026-05-05',
+      changes: [
+        '🧟 Fixed Wraith Creation - Next button no longer stays disabled after completing all wraith subfaction fields',
+        '📊 Human Base Energy Correction - Base energy corrected to 10 (max cap remains 15)',
+        '🧟 Wraith Subfaction System - Three-slot structure (Legion/Guild/Specter) with 28 new purchasable lores across all guilds and legions',
+        '🔤 PDF Text Formatting - All power names and fields now display in proper title case with underscores converted to spaces',
+        '🧛 Ghoul Innate Tree Deduplication - Celerity, Fortitude, Potence no longer appear twice in the Learn New Powers section'
+      ]
+    },
+    {
       version: '0.3.8',
       date: '2025-08-19',
       changes: [
@@ -931,7 +960,7 @@ lasombra,Lasombra,vampire,clan,Vitae,,,dominate|obtenebration|potence
 malkavian,Malkavian,vampire,clan,Vitae,,,auspex|dementation|obfuscate
 nosferatu,Nosferatu,vampire,clan,Vitae,,,animalism|obfuscate|potence
 ratkin,Ratkin,shifter,fera,Gnosis,,,ratkin_gift
-ravnos,Ravnos,vampire,clan,Vitae,,,animalism|fortitude|chimerstry
+ravnos,Ravnos,vampire,clan,Vitae,,,celerity|obfuscate|presence
 red_talon,Red Talon,shifter,tribe,Gnosis,Lupus only,,red_talon_gift
 salubri_healer,Salubri (Healer),vampire,clan,Vitae,,,auspex|fortitude|valeren_healer
 salubri_warrior,Salubri (Warrior),vampire,clan,Vitae,,,auspex|fortitude|valeren_warrior
@@ -990,128 +1019,127 @@ melee,Melee,COMBAT,Martial weapon proficiency; Great Weapons - 2 damage; Flouris
 rituals,Rituals,OTHER,Ritual Casting and Identification; Scribe common rituals; Duplicate rituals,
 shields,Shields,COMBAT,Shield proficiency; Glancing Blow - Withstand power; Deflection - Avoidance power,`,
 
-    powerTrees: `tree_id,tree_name,faction,level1_powers,level2_powers,level3_powers
-ahroun,Ahroun,shifter,Silver Claws,Might,Brutal Strike
-ananasi_gift,Ananasi Gift,shifter,Cloak,Venom,Meld
-animalism,Animalism,vampire,Beast Mind,Disquiet|Induce Frenzy,Frenzy Control
-animal,Animal,human,Beast Mind,Disquiet|Induce Frenzy,Frenzy Control
-argos,Argos,wraith,Cloak,Resilience,Hasty Escape
-auspex,Auspex,vampire,Sense Amaranth|Sense Emotion|Sense Item|Sense Vitae,Telepathy,Cloak Sight
-bagheera_gift,Bagheera Gift,shifter,Detect Taint,Fire Weapon,Daze
-bubasti_gift,Bubasti Gift,shifter,Forgetful Mind,Entrancement,Form of Vapor
-ceilican_gift,Ceilican Gift,shifter,Hallucination|Withstand,Fire Weapon,Hasty Escape
-swara_gift,Swara Gift,shifter,Razor Claws,Mask of a Thousand Faces,Gauntlet Walk
-black_fury_gift,Black Fury Gift,shifter,Detect Taint,Body Wrack,Aggravated 1
-body,Body,human,Withstand|Endure,Resilience,Resist Taint
-bone_gnawer_gift,Bone Gnawer Gift,shifter,Forgetful Mind,Ranged 2 <Stone>,Resist Taint
-bounty,Bounty,human,Blessing|Ward,Consecrate|Sanctuary,Miracle|Divine Wrath
-castigate,Castigate,wraith,Detect Taint|Sense Angst|Sense Shadow,Disquiet|Shadow Coax,Sanctuary
-celerity,Celerity,vampire,Disarm,Avoidance,Hasty Escape
-child_of_gaia_gift,Child of Gaia Gift,shifter,Healing Touch,Serenity,Silver Armor
-contaminate,Contaminate,wraith,Sense Fetter|Taint,Rend the Lifeweb,Induce Catharsis
-corax_gift,Corax Gift,shifter,Insight,Fire 2,Hasty Escape
-curse,Curse,human,Forgetful Mind,Body Wrack,Paralyze
-daimoinon,Daimoinon,vampire,Sense Desire,Hellborn Investiture,Balefire
-death,Death,human,<Tainted> Silence,Insight,<Tainted> Decay
-deimos,Deimos,vampire,Black Ichor,Dreamshape,Ranged 4 (Bile)
-dementation,Dementation,vampire,Confusion,Visions,Derange|Passion
-demonology,Demonology,human,Sense Demon|Scion of Evil,Umbra Sight,Subjugate
-dominate,Dominate,vampire,Forgetful Mind,Obedience,Conditioning
-embody,Embody,wraith,Disembodied,Appear,Materialize
-fatalism,Fatalism,wraith,Insight|Sense Pathos,Visions,Cloak Sight
-fenrir_gift,Fenrir Gift,shifter,Razor Claws,Venom,Hero's Stand
-fianna_gift,Fianna Gift,shifter,Fast Healing,Woadling,Form of Vapor
-flux,Flux,wraith,Move Object|Sense Item,Shatter|Wither,Ranged 4 (Earth)
-fortitude,Fortitude,vampire,Endure|Withstand,Resilience,Toughness
-galliard,Galliard,shifter,Taunt,Dreamshape,Song of Rage
-healer,Healer,human,Healing Touch,Serenity,Revive
-hive_mind,Hive Mind,wraith,Detect Taint|Sense Angst|Sense Shadow,Telepathy,Subjugate
-homid,Homid,shifter,Avert,Avoidance,Paralyze
-inhabit,Inhabit,wraith,Sense Item|Withstand,Might,Dark Sword|Fabricate Armor
-intimation,Intimation,wraith,Sense Desire,Induce Sin,Craving
-keening,Keening,wraith,Passion,Ranged 2 (Sonic),Conditioning
-larceny,Larceny,wraith,Fast Healing,Devour|Expel Corpus|Health Exchange|Paralyzing Touch,Toughness
-lifeweb,Lifeweb,wraith,Fetter Creation|Sense Fetter,Detect Fetter|Fetter Consumption,Disable
-lupus,Lupus,shifter,Snarl,Resilience,Frenzy Control
-madness,Madness,human,<Tainted> Monsters,Derange,Horrid Reality
-maleficence,Maleficence,wraith,Detect Taint|Scion of Evil,<Tainted> Silence,<Tainted> Horrid Reality
-mind,Mind,human,Confusion,Telepathy,Obedience
-mnemosynis,Mnemosynis,wraith,Forgetful Mind,Telepathy,Obedience
-moliate,Moliate,wraith,Weaponry,Imitate,Resilience|Powerful Form
-mortis,Mortis,vampire,Wither,Meld,Decay
-natus,Natus,shifter,Wither,Telepathy,Passion|Terror
-necromancy,Necromancy,vampire,Insight,Umbra Sight,Umbra Drain
-obfuscate,Obfuscate,vampire,Cloak,Mask of a Thousand Faces,Cloak Gathering
-obtenebration,Obtenebration,vampire,Root|Tentacles,Terror,Form of Vapor
-outrage,Outrage,wraith,Stonehand Punch,Move Object|Realm Grasp,Aggravated 1
-pandemonium,Pandemonium,wraith,Confusion,Monsters,Avoidance|Root
-patterns,Patterns,human,Shatter,Fabricate Armor,Disable
-perception,Perception,human,Sense Item|Sense Essence,Read Magic|Sense Spirit,Detect Taint|Sense Confidence|Sense Desire
-phantasm,Phantasm,wraith,Cognizance,Dreamshape,Daze
-philodox,Philodox,shifter,Sense Gnosis|Sense Item,Meditate,Toughness
-potence,Potence,vampire,Shatter,Might,Brutal Strike
-presence,Presence,vampire,Snarl,Entrancement,Majesty
-protection,Protection,human,Avert,Cloak,Sanctuary
-protean,Protean,vampire,Clawed Form: Wolf Mask|Razor Claws,Meld,Aggravated Claws
-puppetry,Puppetry,wraith,Control Voice,Control Body,Possession
-quietus,Quietus,vampire,Silence,Venom,Daze
-ragabash,Ragabash,shifter,Confusion,Disembodied|Realm Grasp,Mimic
-ratkin_gift,Ratkin Gift,shifter,Cloak,Monsters,Aggravated 1
-red_talon_gift,Red Talon Gift,shifter,Shatter,Beast Mind|Root,Fire 4
-ruin,Ruin,human,<Tainted> Wither,Ranged 2 <Dark>,Brittle Bones
-shadow_lord_gift,Shadow Lord Gift,shifter,Disarm,Wounding Lies,Disable
-tempest_weaving,Tempest Weaving,wraith,Cloak,Meld,Form of Vapor
-silent_strider_gift,Silent Strider Gift,shifter,Silence,Horrid Reality,Gauntlet Walk
-silver_fang_gift,Silver Fang Gift,shifter,Detect Taint,True Form,Obedience
-spirit,Spirit,human,Resist Gauntlet,Cleanse,Exorcism
-thaumaturgy_creo_ignem,Thaumaturgy: Creo Ignem,vampire,Fire 2,<Fire> Weapon,Fire 4
-thaumaturgy_rego_aquam,Thaumaturgy: Rego Aquam,vampire,Silence,Fabricate Armor,Paralyze
-thaumaturgy_rego_vitae,Thaumaturgy: Rego Vitae,vampire,Sense Vitae|Test Generation|Test Oath,Ranged 2 <Blood>,Aggravated 1
-thaumaturgy_path_of_the_defiler,Path of the Defiler,vampire,Taint,Derange,Balefire
-thaumaturgy_rego_dolor,Rego Dolor (Path of Pain),vampire,Silence,Body Wrack,Horrid Reality
-thaumaturgy_rego_manes,Rego Manes (Path of Spirit),vampire,Scion of Evil|Sense Demon|Sense Spirit,Umbra Sight,Subjugate
-thaumaturgy_rego_pestis,Rego Pestis (Path of Pestilence),vampire,Wither,Venom,Brittle Bones
-thaumaturgy_rego_phobos,Rego Phobos (Path of Fear),vampire,Monsters,Dreamshape|Terror,Leech of Fear
-theurge,Theurge,shifter,Release Spirit|Sense Spirit,Umbra Sight,Umbra Strike
-usury,Usury,wraith,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
-valeren_healer,Valeren Healer,vampire,Healing Touch,Serenity,Revive
-valeren_warrior,Valeren Warrior,vampire,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Light Weapon|Vengeance of Samiel
-vicissitude,Vicissitude,vampire,Malleable Visage,Body Wrack,Horrid Form
-visceratika,Visceratika,vampire,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
-warder_of_man_gift,Warder of Man Gift,shifter,Pence from Heaven,Fabricate Armor,Cloak Sight
-warrior,Warrior,human,Taunt,Might,Avoidance|Disarm
-ahl_i_batin,Ahl-i-batin,human,Visions,Mask of a Thousand Faces,Hasty Escape
-craftmason,Craftmason,human,Pence from Heaven,Meditate,Daze
-messianic_voices,Messianic Voices,human,Sense Demon|Silence,Ranged 2 (Holy),Majesty
-old_faith,Old Faith,human,Root,Wither,Entrancement|Passion
-order_of_hermes,Order of Hermes,human,Fire 2,True Form|Daze,Disembodied
-spirit_talkers,Spirit Talkers,human,Hallucination,Dreamshape,Umbra Sight
-valdaermen,Valdaermen,human,Snarl,Clawed Form|Powerful Form,Toughness
-veneficti,Veneficti,human,Sense Demon|Venom,Induce Sin,Silver Tongue
-affinity,Affinity,human,Pence from Heaven,Taunt,Hypnotism
-champion,Champion,human,Heal Self,Resilience,Avoidance|Disarm
-discernment,Discernment,human,Detect Taint,Sense Amaranth|Sense Demon|Sense Rank,Cloak Sight
-purity,Purity,human,Avert,Serenity,Cleanse
-solace,Solace,human,Sense Angst|Sense Fetter|Sense Shadow,Detect Fetter|Fetter Consumption,Exorcism
-spiritual,Spiritual,human,Sense Spirit|Resist Gauntlet,Umbra Sight,Umbra Strike
-stasis,Stasis,human,Cloak Gathering,Fabricate Armor,Toughness
-weaver,Weaver,human,Taint|True Form,Paralyze,Disable
-onesong,Onesong,human,Forgetful Mind|Visions,Telepathy,Conditioning|Entrancement
-enticer,Enticer,human,Tentacles,<Tainted> Entrancement,Paralyze
-ferectori,Ferectori,human,<Tainted> Snarl,Terror,Gauntlet Walk
-gorehound,Gorehound,human,Fast Healing,<Tainted> Body Wrack,Might
-toad,Toad,human,Ranged 2 <Acid>,Taint|Venom,Form of Vapor
-gorgon,Gorgon,human,Hallucination,Dreamshape,Gauntlet Walk|Sense Spirit|Umbra Sight
-brash,Brash,human,Taunt,Disarm,Avoidance
-brawny,Brawny,human,Shatter,Might,Brutal Strike
-inquisitive,Inquisitive,human,Sense Emotion,Sense Mental,Sense Vitality
-sturdy,Sturdy,human,Endure & Withstand,Resilience,Toughness
-corruption,Corruption (Wyrm),shifter,Taint,Corrupted Powers,Subjugate
-cunning,Cunning (Wyrm),shifter,Smell Fear,Cloak Gathering,Hidden Taint
-defiling,Defiling (Wyrm),shifter,Detect Taint|Scion of Evil,Induce Sin,Tainted Induce Frenzy|Terror
-fear,Fear (Wyrm),shifter,Sense Confidence,Horrid Reality,Disable
-madness_wyrm,Madness (Wyrm),shifter,Tainted Confusion,Tainted Derange,Tainted Decay
-strength,Strength (Wyrm),shifter,Hide of the Wyrm,Totemic Form|Resilience,Balefire`,
+    powerTrees: `tree_id,tree_name,faction,group,level1_powers,level2_powers,level3_powers
+ahroun,Ahroun,shifter,auspice,Silver Claws,Might,Brutal Strike
+ananasi_gift,Ananasi Gift,shifter,fera_gift,Cloak,Venom,Meld
+animalism,Animalism,vampire,common,Beast Mind,Disquiet|Induce Frenzy,Frenzy Control
+animal,Animal,human,sorcerer,Beast Mind,Disquiet|Induce Frenzy,Frenzy Control
+argos,Argos,wraith,arcanos,Cloak,Resilience,Hasty Escape
+auspex,Auspex,vampire,common,Sense Amaranth|Sense Emotion|Sense Item|Sense Vitae,Telepathy,Cloak Sight
+bagheera_gift,Bagheera Gift,shifter,fera_gift,Detect Taint,Fire Weapon,Daze
+bubasti_gift,Bubasti Gift,shifter,fera_gift,Forgetful Mind,Entrancement,Form of Vapor
+ceilican_gift,Ceilican Gift,shifter,fera_gift,Hallucination|Withstand,Fire Weapon,Hasty Escape
+swara_gift,Swara Gift,shifter,fera_gift,Razor Claws,Mask of a Thousand Faces,Gauntlet Walk
+black_fury_gift,Black Fury Gift,shifter,tribe_gift,Detect Taint,Body Wrack,Aggravated 1
+body,Body,human,sorcerer,Withstand|Endure,Resilience,Resist Taint
+bone_gnawer_gift,Bone Gnawer Gift,shifter,tribe_gift,Forgetful Mind,Ranged 2 <Stone>,Resist Taint
+castigate,Castigate,wraith,arcanos,Detect Taint|Sense Angst|Sense Shadow,Disquiet|Shadow Coax,Sanctuary
+celerity,Celerity,vampire,common,Disarm,Avoidance,Hasty Escape
+child_of_gaia_gift,Child of Gaia Gift,shifter,tribe_gift,Healing Touch,Serenity,Silver Armor
+contaminate,Contaminate,wraith,dark_arcanos,Sense Fetter|Taint,Rend the Lifeweb,Induce Catharsis
+corax_gift,Corax Gift,shifter,fera_gift,Insight,Fire 2,Hasty Escape
+curse,Curse,human,sorcerer,Forgetful Mind,Body Wrack,Paralyze
+daimoinon,Daimoinon,vampire,clan_innate,Sense Desire,Hellborn Investiture,Balefire
+death,Death,human,fallen_path,<Tainted> Silence,Insight,<Tainted> Decay
+deimos,Deimos,vampire,clan_innate,Black Ichor,Dreamshape,Ranged 4 (Bile)
+dementation,Dementation,vampire,clan_innate,Confusion,Visions,Derange|Passion
+demonology,Demonology,human,fallen_path,Sense Demon|Scion of Evil,Umbra Sight,Subjugate
+dominate,Dominate,vampire,common,Forgetful Mind,Obedience,Conditioning
+embody,Embody,wraith,arcanos,Disembodied,Appear,Materialize
+fatalism,Fatalism,wraith,arcanos,Insight|Sense Pathos,Visions,Cloak Sight
+fenrir_gift,Fenrir Gift,shifter,tribe_gift,Razor Claws,Venom,Hero's Stand
+fianna_gift,Fianna Gift,shifter,tribe_gift,Fast Healing,Woadling,Form of Vapor
+flux,Flux,wraith,arcanos,Move Object|Sense Item,Shatter|Wither,Ranged 4 (Earth)
+fortitude,Fortitude,vampire,common,Endure|Withstand,Resilience,Toughness
+galliard,Galliard,shifter,auspice,Taunt,Dreamshape,Song of Rage
+healer,Healer,human,sorcerer,Healing Touch,Serenity,Revive
+hive_mind,Hive Mind,wraith,dark_arcanos,Detect Taint|Sense Angst|Sense Shadow,Telepathy,Subjugate
+homid,Homid,shifter,breed,Avert,Avoidance,Paralyze
+inhabit,Inhabit,wraith,arcanos,Sense Item|Withstand,Might,Dark Sword|Fabricate Armor
+intimation,Intimation,wraith,arcanos,Sense Desire,Induce Sin,Craving
+keening,Keening,wraith,arcanos,Passion,Ranged 2 (Sonic),Conditioning
+larceny,Larceny,wraith,dark_arcanos,Fast Healing,Devour|Expel Corpus|Health Exchange|Paralyzing Touch,Toughness
+lifeweb,Lifeweb,wraith,arcanos,Fetter Creation|Sense Fetter,Detect Fetter|Fetter Consumption,Disable
+lupus,Lupus,shifter,breed,Snarl,Resilience,Frenzy Control
+madness,Madness,human,fallen_path,<Tainted> Monsters,Derange,Horrid Reality
+maleficence,Maleficence,wraith,dark_arcanos,Detect Taint|Scion of Evil,<Tainted> Silence,<Tainted> Horrid Reality
+mind,Mind,human,sorcerer,Confusion,Telepathy,Obedience
+mnemosynis,Mnemosynis,wraith,arcanos,Forgetful Mind,Telepathy,Obedience
+moliate,Moliate,wraith,arcanos,Weaponry,Imitate,Resilience|Powerful Form
+mortis,Mortis,vampire,clan_innate,Wither,Meld,Decay
+natus,Natus,shifter,breed,Wither,Telepathy,Passion|Terror
+necromancy,Necromancy,vampire,clan_innate,Insight,Umbra Sight,Umbra Drain
+obfuscate,Obfuscate,vampire,common,Cloak,Mask of a Thousand Faces,Cloak Gathering
+obtenebration,Obtenebration,vampire,clan_innate,Root|Tentacles,Terror,Form of Vapor
+outrage,Outrage,wraith,arcanos,Stonehand Punch,Move Object|Realm Grasp,Aggravated 1
+pandemonium,Pandemonium,wraith,arcanos,Confusion,Monsters,Avoidance|Root
+patterns,Patterns,human,sorcerer,Shatter,Fabricate Armor,Disable
+perception,Perception,human,sorcerer,Sense Item|Sense Essence,Read Magic|Sense Spirit,Detect Taint|Sense Confidence|Sense Desire
+phantasm,Phantasm,wraith,arcanos,Cognizance,Dreamshape,Daze
+philodox,Philodox,shifter,auspice,Sense Gnosis|Sense Item,Meditate,Toughness
+potence,Potence,vampire,common,Shatter,Might,Brutal Strike
+presence,Presence,vampire,common,Snarl,Entrancement,Majesty
+protection,Protection,human,sorcerer,Avert,Cloak,Sanctuary
+protean,Protean,vampire,clan_innate,Clawed Form: Wolf Mask|Razor Claws,Meld,Aggravated Claws
+puppetry,Puppetry,wraith,arcanos,Control Voice,Control Body,Possession
+quietus,Quietus,vampire,clan_innate,Silence,Venom,Daze
+ragabash,Ragabash,shifter,auspice,Confusion,Disembodied|Realm Grasp,Mimic
+ratkin_gift,Ratkin Gift,shifter,fera_gift,Cloak,Monsters,Aggravated 1
+red_talon_gift,Red Talon Gift,shifter,tribe_gift,Shatter,Beast Mind|Root,Fire 4
+ruin,Ruin,human,fallen_path,<Tainted> Wither,Ranged 2 <Dark>,Brittle Bones
+shadow_lord_gift,Shadow Lord Gift,shifter,tribe_gift,Disarm,Wounding Lies,Disable
+tempest_weaving,Tempest Weaving,wraith,dark_arcanos,Cloak,Meld,Form of Vapor
+silent_strider_gift,Silent Strider Gift,shifter,tribe_gift,Silence,Horrid Reality,Gauntlet Walk
+silver_fang_gift,Silver Fang Gift,shifter,tribe_gift,Detect Taint,True Form,Obedience
+spirit,Spirit,human,sorcerer,Resist Gauntlet,Cleanse,Exorcism
+thaumaturgy_creo_ignem,Thaumaturgy: Creo Ignem,vampire,thaumaturgy,Fire 2,<Fire> Weapon,Fire 4
+thaumaturgy_rego_aquam,Thaumaturgy: Rego Aquam,vampire,thaumaturgy,Silence,Fabricate Armor,Paralyze
+thaumaturgy_rego_vitae,Thaumaturgy: Rego Vitae,vampire,thaumaturgy,Sense Vitae|Test Generation|Test Oath,Ranged 2 <Blood>,Aggravated 1
+thaumaturgy_path_of_the_defiler,Path of the Defiler,vampire,dark_thaumaturgy,Taint,Derange,Balefire
+thaumaturgy_rego_dolor,Rego Dolor (Path of Pain),vampire,dark_thaumaturgy,Silence,Body Wrack,Horrid Reality
+thaumaturgy_rego_manes,Rego Manes (Path of Spirit),vampire,dark_thaumaturgy,Scion of Evil|Sense Demon|Sense Spirit,Umbra Sight,Subjugate
+thaumaturgy_rego_pestis,Rego Pestis (Path of Pestilence),vampire,dark_thaumaturgy,Wither,Venom,Brittle Bones
+thaumaturgy_rego_phobos,Rego Phobos (Path of Fear),vampire,dark_thaumaturgy,Monsters,Dreamshape|Terror,Leech of Fear
+theurge,Theurge,shifter,auspice,Release Spirit|Sense Spirit,Umbra Sight,Umbra Strike
+usury,Usury,wraith,arcanos,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
+valeren_healer,Valeren Healer,vampire,clan_innate,Healing Touch,Serenity,Revive
+valeren_warrior,Valeren Warrior,vampire,clan_innate,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Light Weapon|Vengeance of Samiel
+vicissitude,Vicissitude,vampire,clan_innate,Malleable Visage,Body Wrack,Horrid Form
+visceratika,Visceratika,vampire,clan_innate,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
+warder_of_man_gift,Warder of Man Gift,shifter,tribe_gift,Pence from Heaven,Fabricate Armor,Cloak Sight
+warrior,Warrior,human,sorcerer,Taunt,Might,Avoidance|Disarm
+ahl_i_batin,Ahl-i-batin,human,fellowship,Visions,Mask of a Thousand Faces,Hasty Escape
+craftmason,Craftmason,human,fellowship,Pence from Heaven,Meditate,Daze
+messianic_voices,Messianic Voices,human,fellowship,Sense Demon|Silence,Ranged 2 (Holy),Majesty
+old_faith,Old Faith,human,fellowship,Root,Wither,Entrancement|Passion
+order_of_hermes,Order of Hermes,human,fellowship,Fire 2,True Form|Daze,Disembodied
+spirit_talkers,Spirit Talkers,human,fellowship,Hallucination,Dreamshape,Umbra Sight
+valdaermen,Valdaermen,human,fellowship,Snarl,Clawed Form|Powerful Form,Toughness
+veneficti,Veneficti,human,fellowship,Sense Demon|Venom,Induce Sin,Silver Tongue
+affinity,Affinity,human,bounty,Pence from Heaven,Taunt,Hypnotism
+champion,Champion,human,bounty,Heal Self,Resilience,Avoidance|Disarm
+discernment,Discernment,human,bounty,Detect Taint,Sense Amaranth|Sense Demon|Sense Rank,Cloak Sight
+purity,Purity,human,bounty,Avert,Serenity,Cleanse
+solace,Solace,human,bounty,Sense Angst|Sense Fetter|Sense Shadow,Detect Fetter|Fetter Consumption,Exorcism
+spiritual,Spiritual,human,bounty,Sense Spirit|Resist Gauntlet,Umbra Sight,Umbra Strike
+stasis,Stasis,human,claimed_drone,Cloak Gathering,Fabricate Armor,Toughness
+weaver,Weaver,human,claimed_drone,Taint|True Form,Paralyze,Disable
+onesong,Onesong,human,claimed_drone,Forgetful Mind|Visions,Telepathy,Conditioning|Entrancement
+enticer,Enticer,human,claimed_fomori,Tentacles,<Tainted> Entrancement,Paralyze
+ferectori,Ferectori,human,claimed_fomori,<Tainted> Snarl,Terror,Gauntlet Walk
+gorehound,Gorehound,human,claimed_fomori,Fast Healing,<Tainted> Body Wrack,Might
+toad,Toad,human,claimed_fomori,Ranged 2 <Acid>,Taint|Venom,Form of Vapor
+gorgon,Gorgon,human,claimed_gorgon,Hallucination,Dreamshape,Gauntlet Walk|Umbra Sight
+brash,Brash,human,talent,Taunt,Disarm,Avoidance
+brawny,Brawny,human,talent,Shatter,Might,Brutal Strike
+inquisitive,Inquisitive,human,talent,Sense Emotion,Sense Mental,Sense Vitality
+sturdy,Sturdy,human,talent,Endure & Withstand,Resilience,Toughness
+corruption,Corruption (Wyrm),shifter,wyrm_gift,Taint,Corrupted Powers,Subjugate
+cunning,Cunning (Wyrm),shifter,wyrm_gift,Smell Fear,Cloak Gathering,Hidden Taint
+defiling,Defiling (Wyrm),shifter,wyrm_gift,Detect Taint|Scion of Evil,Induce Sin,Tainted Induce Frenzy|Terror
+fear,Fear (Wyrm),shifter,wyrm_gift,Sense Confidence,Horrid Reality,Disable
+madness_wyrm,Madness (Wyrm),shifter,wyrm_gift,Tainted Confusion,Tainted Derange,Tainted Decay
+strength,Strength (Wyrm),shifter,wyrm_gift,Hide of the Wyrm,Totemic Form|Resilience,Balefire`,
 
     merits: `merit_id,merit_name,merit_level,faction_restriction,can_purchase_multiple,description,special_notes
 adept,Adept,1,,false,Additional production item per check-in (except Alchemy),
@@ -2025,37 +2053,29 @@ pleasure,Pleasure,Joy|excitement|comfort`
       // Determine if power should be treated as innate
       let isInnate = character.innateTreeIds.includes(itemId);
       
-      // For Claimed Fomori: all Fomori trees use innate pricing (corrupt trees)
-      if (character.faction === 'human' && character.subfaction === 'claimed_fomori' && 
-          ['enticer', 'ferectori', 'gorehound', 'toad'].includes(itemId)) {
-        isInnate = true; // All Fomori trees use innate pricing for Claimed Fomori
+      const treeObj = gameData.powerTrees.find(t => t.tree_id === itemId);
+      const treeGroup = treeObj?.group;
+
+      // For Claimed: their claimed trees always use innate pricing
+      if (character.faction === 'human' && character.subfaction === 'claimed_fomori' && treeGroup === 'claimed_fomori') {
+        isInnate = true;
       }
-      
-      // For Claimed Drone: all Weaver trees use innate pricing
-      if (character.faction === 'human' && character.subfaction === 'claimed_drone' && 
-          ['stasis', 'weaver', 'onesong'].includes(itemId)) {
-        isInnate = true; // All Weaver trees use innate pricing for Claimed Drone
+      if (character.faction === 'human' && character.subfaction === 'claimed_drone' && treeGroup === 'claimed_drone') {
+        isInnate = true;
       }
-      
-      // For Claimed Gorgon: Gorgon tree uses innate pricing
-      if (character.faction === 'human' && character.subfaction === 'claimed_gorgon' && 
-          itemId === 'gorgon') {
-        isInnate = true; // Gorgon tree uses innate pricing for Claimed Gorgon
+      if (character.faction === 'human' && character.subfaction === 'claimed_gorgon' && treeGroup === 'claimed_gorgon') {
+        isInnate = true;
       }
-      
+
       // For Claimed characters: check if this is from their original subfaction
-      if (character.originalSubfaction && 
+      if (character.originalSubfaction &&
           (character.subfaction === 'claimed_drone' || character.subfaction === 'claimed_fomori' || character.subfaction === 'claimed_gorgon')) {
-        
+
         if (character.originalSubfaction === 'sorcerer') {
-          const isBasicSorcererPower = ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(itemId);
-          const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(itemId);
-          const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(itemId);
-          
-          if (isBasicSorcererPower) {
+          if (treeGroup === 'sorcerer') {
             isInnate = true; // Original sorcerer basic powers remain innate
-          } else if (isCorruptedTree || isFellowshipTree) {
-            isInnate = false; // Original sorcerer corrupted/fellowship powers remain learned
+          } else if (treeGroup === 'fallen_path' || treeGroup === 'fellowship') {
+            isInnate = false; // Original sorcerer fallen path/fellowship powers remain learned
           }
         } else if (character.originalSubfaction === 'ghoul') {
           const vampireTrees = gameData.powerTrees.filter(tree => tree.faction === 'vampire').map(tree => tree.tree_id);
@@ -3697,27 +3717,15 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 !character.innateTreeIds?.includes(treeId)
               );
               
-              // Define corrupt/Wyrm-aligned power trees
-              const corruptTrees = [
-                'corruption', 'cunning', 'defiling', 'fear', 'madness_wyrm', 'strength',
-                'death', 'demonology', 'daimoinon', 'dark_thaumaturgy', 'thaumaturgy_dark_path_1',
-                'thaumaturgy_dark_path_2', 'thaumaturgy_dark_path_3', 'thaumaturgy_dark_path_4',
-                'thaumaturgy_dark_path_5',
-                // Dark Arcanoi (wraith corrupt trees)
-                'contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'
-              ];
-              
+              const CORRUPT_GROUPS = new Set(['wyrm_gift', 'dark_arcanos', 'dark_thaumaturgy', 'fallen_path', 'claimed_drone', 'claimed_fomori', 'claimed_gorgon']);
+
               // Map checkboxes 1-45 to learned powers (fields 4-48)
               learnedTrees.forEach((treeId, index) => {
                 const checkboxIndex = index + 1; // Checkboxes 1-45
                 if (checkboxIndex <= 45) { // Only use checkboxes 1-45
                   const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
                   if (tree) {
-                    // Check if this is a corrupt/Wyrm tree
-                    const isCorrupt = corruptTrees.includes(treeId) || 
-                                     tree.tree_name.toLowerCase().includes('wyrm') ||
-                                     tree.tree_name.toLowerCase().includes('dark') ||
-                                     tree.tree_name.toLowerCase().includes('corruption');
+                    const isCorrupt = CORRUPT_GROUPS.has(tree.group);
                     
                     if (isCorrupt) {
                       const checkboxFieldName = `Check Box${checkboxIndex}`;
@@ -4529,8 +4537,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         const canSelect = !isSelected && newCharacter.innateTreeIds.length < 3;
                         const canDeselect = isSelected;
                         
-                        // Check if this is a Dark Arcanoi (corrupt tree)
-                        const isDarkArcanoi = ['contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'].includes(tree.tree_id);
+                        const isDarkArcanoi = tree.group === 'dark_arcanos';
                         
                         return (
                           <button
@@ -4938,9 +4945,9 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                           );
                         })}
 
-                      {/* Fallen Paths - Death, Demonology, Madness, Ruin */}
+                      {/* Fallen Paths */}
                       {gameData.powerTrees
-                        .filter(tree => ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id))
+                        .filter(tree => tree.group === 'fallen_path')
                         .map(tree => {
                           const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
                           const canSelect = !isSelected && newCharacter.innateTreeIds.length < 2;
@@ -10818,7 +10825,7 @@ Your character is ready to play!`;
                       {character.faction === 'human' && character.subfaction === 'kinfolk' 
                         ? 'Shifter Powers (Innate: 3/6/9 XP, Learned: 6/9/12 XP)' 
                         : character.faction === 'human' && character.subfaction === 'sorcerer'
-                        ? 'Sorcerer Powers (Basic: 3/6/9 XP, Corrupted Trees: 6/9/12 XP, Fellowship Trees: 6/9/12 XP)'
+                        ? 'Sorcerer Powers (Sorcerer Trees: 3/6/9 XP, Fallen Paths: 6/9/12 XP, Fellowship Trees: 6/9/12 XP)'
                           : character.faction === 'human' && character.subfaction === 'faithful'
                             ? 'Faithful Bounty Powers (3/6/9 XP)'
                             : character.faction === 'human' && character.subfaction === 'claimed_drone'
@@ -10828,7 +10835,7 @@ Your character is ready to play!`;
                               : character.faction === 'human' && character.subfaction === 'claimed_gorgon'
                               ? `Claimed Gorgon Powers (Gorgon Tree: 3/6/9 XP${character.originalSubfaction ? `, Original ${formatDisplayText(character.originalSubfaction)} Powers: Original Costs` : ''})`
                               : character.faction === 'human' && character.subfaction === 'commoner'
-                              ? 'Commoner Talent Powers (Innate: 3/6/9 XP, Other: 6/9/12 XP)'
+                              ? 'Commoner Talent Trees (Innate: 3/6/9 XP, Other Talents: 6/9/12 XP)'
                               : 'Faction Powers (6/9/12 XP)'
                       }
                     </h4>
@@ -10842,7 +10849,7 @@ Your character is ready to play!`;
                     {character.faction === 'human' && character.subfaction === 'sorcerer' && (
                       <div className="mb-2 p-3 bg-purple-600 bg-opacity-20 rounded-lg">
                         <div className="text-purple-300 text-sm">
-                          💫 <strong>Sorcerer:</strong> Your chosen basic trees cost 3/6/9 XP as innate powers. Corrupted trees (Death, Demonology, Madness, Ruin) and all fellowship trees cost 6/9/12 XP as learned powers. Fellowship powers ({character.fellowship ? formatDisplayText(gameData.powerTrees.find(t => t.tree_id === character.fellowship)?.tree_name) || 'None' : 'None'}) provide your specialized magical training.
+                          💫 <strong>Sorcerer:</strong> Your chosen Sorcerer Trees cost 3/6/9 XP as innate powers. Fallen Paths (Death, Demonology, Madness, Ruin) and all Fellowship Trees cost 6/9/12 XP as learned powers. Fellowship powers ({character.fellowship ? formatDisplayText(gameData.powerTrees.find(t => t.tree_id === character.fellowship)?.tree_name) || 'None' : 'None'}) provide your specialized magical training.
                         </div>
                       </div>
                     )}
@@ -10889,88 +10896,52 @@ Your character is ready to play!`;
                             return tree.faction === 'shifter' && 
                                    !tree.tree_id.includes('sorcerer'); // Explicitly exclude sorcerer trees
                           }
-                          // Special handling for Sorcerers - they can learn their faction powers, corrupted trees, and fellowship powers
+                          // Helper: trees accessible from a given original subfaction (excludes any claimed trees)
+                          const isOriginalSubfactionTree = (origSubfaction) => {
+                            if (origSubfaction === 'sorcerer') {
+                              return tree.group === 'sorcerer' || tree.group === 'fellowship' || tree.group === 'fallen_path';
+                            } else if (origSubfaction === 'ghoul') {
+                              return tree.faction === 'vampire';
+                            } else if (origSubfaction === 'kinfolk') {
+                              return tree.faction === 'shifter';
+                            } else if (origSubfaction === 'commoner') {
+                              return tree.group === 'talent';
+                            } else if (origSubfaction === 'faithful') {
+                              return character.innateTreeIds.includes(tree.tree_id);
+                            }
+                            return false;
+                          };
+
+                          // Special handling for Sorcerers - Sorcerer/Fellowship/Fallen Path only, never claimed trees
                           if (character.faction === 'human' && character.subfaction === 'sorcerer') {
-                            const isBasicSorcererPower = tree.faction === character.faction && 
-                              ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
-                            const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
-                            const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
-                            return isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
+                            return tree.group === 'sorcerer' || tree.group === 'fellowship' || tree.group === 'fallen_path';
                           }
-                          // Special handling for Faithful - they can only learn from their chosen bounty tree
+                          // Special handling for Faithful - only their chosen bounty tree
                           if (character.faction === 'human' && character.subfaction === 'faithful') {
                             return character.innateTreeIds.includes(tree.tree_id);
                           }
-                          // Special handling for Ghouls - they can learn vampire powers
+                          // Special handling for Ghouls - vampire powers only
                           if (character.faction === 'human' && character.subfaction === 'ghoul') {
                             return tree.faction === 'vampire';
                           }
-                          // Special handling for Claimed Drones - they can learn from Technocratic trees AND their original subfaction
+                          // Special handling for Claimed Drones - drone trees + original subfaction (no other claimed trees)
                           if (character.faction === 'human' && character.subfaction === 'claimed_drone') {
-                            const isWeaverTree = ['stasis', 'weaver', 'onesong'].includes(tree.tree_id);
-                            // If they have an original subfaction, allow those powers too
-                            if (character.originalSubfaction) {
-                              if (character.originalSubfaction === 'sorcerer') {
-                                const isBasicSorcererPower = tree.faction === 'human' && 
-                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
-                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
-                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
-                                return isWeaverTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
-                              } else if (character.originalSubfaction === 'ghoul') {
-                                return isWeaverTree || tree.faction === 'vampire';
-                              } else if (character.originalSubfaction === 'kinfolk') {
-                                return isWeaverTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
-                              } else if (character.originalSubfaction === 'commoner') {
-                                return isWeaverTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
-                              }
-                            }
-                            return isWeaverTree;
+                            const isOwnTree = tree.group === 'claimed_drone';
+                            return isOwnTree || (character.originalSubfaction ? isOriginalSubfactionTree(character.originalSubfaction) : false);
                           }
-                          // Special handling for Claimed Fomori - they can learn from Bane trees AND their original subfaction
+                          // Special handling for Claimed Fomori - fomori trees + original subfaction (no other claimed trees)
                           if (character.faction === 'human' && character.subfaction === 'claimed_fomori') {
-                            const isBaneTree = ['enticer', 'ferectori', 'gorehound', 'toad'].includes(tree.tree_id);
-                            // If they have an original subfaction, allow those powers too
-                            if (character.originalSubfaction) {
-                              if (character.originalSubfaction === 'sorcerer') {
-                                const isBasicSorcererPower = tree.faction === 'human' && 
-                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
-                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
-                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
-                                return isBaneTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
-                              } else if (character.originalSubfaction === 'ghoul') {
-                                return isBaneTree || tree.faction === 'vampire';
-                              } else if (character.originalSubfaction === 'kinfolk') {
-                                return isBaneTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
-                              } else if (character.originalSubfaction === 'commoner') {
-                                return isBaneTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
-                              }
-                            }
-                            return isBaneTree;
+                            const isOwnTree = tree.group === 'claimed_fomori';
+                            return isOwnTree || (character.originalSubfaction ? isOriginalSubfactionTree(character.originalSubfaction) : false);
                           }
-                          // Special handling for Claimed Gorgon - they can learn from Gorgon tree AND their original subfaction
+                          // Special handling for Claimed Gorgon - gorgon tree + original subfaction (no other claimed trees)
                           if (character.faction === 'human' && character.subfaction === 'claimed_gorgon') {
-                            const isGorgonTree = tree.tree_id === 'gorgon';
-                            // If they have an original subfaction, allow those powers too
-                            if (character.originalSubfaction) {
-                              if (character.originalSubfaction === 'sorcerer') {
-                                const isBasicSorcererPower = tree.faction === 'human' && 
-                                  ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id);
-                                const isCorruptedTree = ['death', 'demonology', 'madness', 'ruin'].includes(tree.tree_id);
-                                const isFellowshipTree = ['ahl_i_batin', 'craftmason', 'messianic_voices', 'old_faith', 'order_of_hermes', 'spirit_talkers', 'valdaermen', 'veneficti'].includes(tree.tree_id);
-                                return isGorgonTree || isBasicSorcererPower || isCorruptedTree || isFellowshipTree;
-                              } else if (character.originalSubfaction === 'ghoul') {
-                                return isGorgonTree || tree.faction === 'vampire';
-                              } else if (character.originalSubfaction === 'kinfolk') {
-                                return isGorgonTree || (tree.faction === 'shifter' && !tree.tree_id.includes('sorcerer'));
-                              } else if (character.originalSubfaction === 'commoner') {
-                                return isGorgonTree || ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
-                              }
-                            }
-                            return isGorgonTree;
+                            const isOwnTree = tree.group === 'claimed_gorgon';
+                            return isOwnTree || (character.originalSubfaction ? isOriginalSubfactionTree(character.originalSubfaction) : false);
                           }
-                          // Special handling for Commoner - they can learn from any talent tree
+                          // Special handling for Commoner - Talent Trees only
                           if (character.faction === 'human' && character.subfaction === 'commoner') {
-                            return ['brash', 'brawny', 'inquisitive', 'sturdy'].includes(tree.tree_id);
+                            return tree.group === 'talent';
                           }
                           // Normal faction filtering for everyone else
                           return tree.faction === character.faction;
@@ -10989,123 +10960,150 @@ Your character is ready to play!`;
                           // Show if any level is missing
                           return !hasLevel1 || !hasLevel2 || !hasLevel3;
                         })
-                        .map(tree => {
-                          const currentLevels = character.powers[tree.tree_id] || {};
-                          const hasAnyLevel = Object.keys(currentLevels).length > 0;
-                          
+                        .sort((a, b) => {
+                          const order = { clan_innate: 0, common: 1, thaumaturgy: 2, auspice: 0, breed: 1, tribe_gift: 2, fera_gift: 3, arcanos: 0, sorcerer: 0, fellowship: 1, bounty: 2, talent: 3, fallen_path: 90, wyrm_gift: 91, dark_arcanos: 92, dark_thaumaturgy: 93, claimed_drone: 94, claimed_fomori: 95, claimed_gorgon: 96 };
+                          const orderDiff = (order[a.group] ?? 50) - (order[b.group] ?? 50);
+                          if (orderDiff !== 0) return orderDiff;
+                          return a.tree_name.localeCompare(b.tree_name);
+                        })
+                        .reduce((acc, tree) => {
+                          const last = acc[acc.length - 1];
+                          if (!last || last.group !== tree.group) {
+                            acc.push({ group: tree.group, trees: [tree] });
+                          } else {
+                            last.trees.push(tree);
+                          }
+                          return acc;
+                        }, [])
+                        .map(({ group, trees }) => {
+                          const CORRUPT_GROUPS = new Set(['fallen_path', 'wyrm_gift', 'dark_arcanos', 'dark_thaumaturgy', 'claimed_drone', 'claimed_fomori', 'claimed_gorgon']);
+                          const GROUP_LABELS = { clan_innate: 'Clan Disciplines', common: 'Common Disciplines', thaumaturgy: 'Thaumaturgy', auspice: 'Auspice', breed: 'Breed', tribe_gift: 'Tribe Gifts', fera_gift: 'Fera Gifts', arcanos: 'Arcanoi Trees', sorcerer: 'Sorcerer Trees', fellowship: 'Fellowship Trees', bounty: 'Bounty Trees', talent: 'Talent Trees', fallen_path: 'Fallen Paths', wyrm_gift: 'Wyrm Gifts', dark_arcanos: 'Dark Arcanoi Trees', dark_thaumaturgy: 'Dark Thaumaturgy', claimed_drone: 'Claimed (Drone)', claimed_fomori: 'Claimed (Fomori)', claimed_gorgon: 'Claimed (Gorgon)' };
+                          const isCorruptGroup = CORRUPT_GROUPS.has(group);
                           return (
-                            <div 
-                              key={tree.tree_id} 
-                              className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                                hasAnyLevel
-                                  ? 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
-                                  : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
-                              }`}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <div className="flex items-center mb-2">
-                                    <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
-                                    {character.faction === 'human' && character.subfaction === 'claimed_fomori' && 
-                                     ['enticer', 'ferectori', 'gorehound', 'toad'].includes(tree.tree_id) &&
-                                     !character.innateTreeIds.includes(tree.tree_id) && (
-                                      <span className="ml-2 px-2 py-1 bg-red-600 bg-opacity-30 border border-red-500 rounded text-xs text-red-300">
-                                        Corrupt Tree
-                                      </span>
-                                    )}
-                                    {hasAnyLevel && (
-                                      <div className="ml-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                        <span className="text-white text-sm">✓</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                  
-                                  <div className="space-y-3">
-                                    {[1, 2, 3].map(level => {
-                                      const hasLevel = currentLevels[level];
-                                      const canLearn = canLearnPower(character, tree.tree_id, level);
-                                      const isRedundant = isRedundantPower(character, tree.tree_id, level);
-                                      const cost = isRedundant ? 0 : calculateXPCost(character, 'power', tree.tree_id, level);
-                                      const canAfford = character.totalXP >= cost;
-                                      const canAdvanceNow = canLearn && canAfford && canAdvanceAtCheckIn(character, 'power', tree.tree_id);
-                                      
-                                      const powers = tree[`level${level}_powers`]?.split('|') || [];
-                                      
-                                      if (hasLevel) {
-                                        return (
-                                          <div key={level} className="p-3 rounded border border-green-400 bg-green-400 bg-opacity-20">
-                                            <div className="flex items-center mb-2">
-                                              <div className="w-4 h-4 rounded-full mr-2 bg-green-500" />
-                                              <span className="font-medium">Level {level} - Learned</span>
-                                            </div>
-                                            <div className="text-sm text-gray-300">
-                                              {powers.join(', ')}
-                                            </div>
+                            <div key={group} className="mb-6">
+                              <h5 className={`text-xs font-semibold uppercase tracking-widest mb-3 pb-1 border-b ${
+                                isCorruptGroup ? 'text-red-400 border-red-800' : 'text-blue-300 border-blue-800'
+                              }`}>
+                                {GROUP_LABELS[group] || group}
+                              </h5>
+                              <div className="space-y-3">
+                                {trees.map(tree => {
+                                  const currentLevels = character.powers[tree.tree_id] || {};
+                                  const hasAnyLevel = Object.keys(currentLevels).length > 0;
+                                  return (
+                                    <div
+                                      key={tree.tree_id}
+                                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                                        hasAnyLevel
+                                          ? isCorruptGroup
+                                            ? 'border-red-500 bg-red-500 bg-opacity-20 shadow-lg'
+                                            : 'border-green-500 bg-green-500 bg-opacity-20 shadow-lg'
+                                          : isCorruptGroup
+                                            ? 'border-red-800 bg-red-900 bg-opacity-20 hover:border-red-600 hover:bg-red-800 hover:bg-opacity-20 hover:shadow-md'
+                                            : 'border-blue-400 bg-blue-400 bg-opacity-10 hover:border-blue-300 hover:bg-blue-400 hover:bg-opacity-20 hover:shadow-md'
+                                      }`}
+                                    >
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                          <div className="flex items-center mb-2">
+                                            <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
+                                            {hasAnyLevel && (
+                                              <div className={`ml-2 w-6 h-6 rounded-full flex items-center justify-center ${isCorruptGroup ? 'bg-red-500' : 'bg-green-500'}`}>
+                                                <span className="text-white text-sm">✓</span>
+                                              </div>
+                                            )}
                                           </div>
-                                        );
-                                      }
-                                      
-                                      return (
-                                        <div key={level} className={`p-3 rounded border transition-all ${
-                                          canAdvanceNow
-                                            ? 'border-blue-400 bg-blue-400 bg-opacity-10 hover:bg-blue-400 hover:bg-opacity-20'
-                                            : canAfford
-                                              ? 'border-yellow-500 bg-yellow-500 bg-opacity-10'
-                                              : 'border-gray-600 bg-gray-700 bg-opacity-30 opacity-60'
-                                        }`}>
-                                          <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center">
-                                              <div className="w-4 h-4 rounded-full mr-2 bg-gray-600" />
-                                              <span className="font-medium">Level {level}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                              <span className={`text-sm font-medium ${
-                                                cost === 0 ? 'text-green-400' : 
-                                                canAfford ? 'text-blue-400' : 'text-red-400'
-                                              }`}>
-                                                {cost === 0 ? 'FREE' : `${cost} XP`}
-                                              </span>
-                                              {!canAfford && cost > 0 && (
-                                                <span className="text-xs text-red-400">
-                                                  (Need {cost - character.totalXP} more XP)
-                                                </span>
-                                              )}
-                                              <button
-                                                onClick={async () => {
-                                                  const updated = advanceCharacter(character, {
-                                                    type: 'power',
-                                                    itemId: tree.tree_id,
-                                                    level,
-                                                    cost
-                                                  });
-                                                  await updateCurrentCharacter(updated);
-                                                }}
-                                                className={`px-4 py-2 rounded font-medium text-sm transition-all ${
+
+                                          <div className="space-y-3">
+                                            {[1, 2, 3].map(level => {
+                                              const hasLevel = currentLevels[level];
+                                              const canLearn = canLearnPower(character, tree.tree_id, level);
+                                              const isRedundant = isRedundantPower(character, tree.tree_id, level);
+                                              const cost = isRedundant ? 0 : calculateXPCost(character, 'power', tree.tree_id, level);
+                                              const canAfford = character.totalXP >= cost;
+                                              const canAdvanceNow = canLearn && canAfford && canAdvanceAtCheckIn(character, 'power', tree.tree_id);
+
+                                              const powers = tree[`level${level}_powers`]?.split('|') || [];
+
+                                              if (hasLevel) {
+                                                return (
+                                                  <div key={level} className="p-3 rounded border border-green-400 bg-green-400 bg-opacity-20">
+                                                    <div className="flex items-center mb-2">
+                                                      <div className="w-4 h-4 rounded-full mr-2 bg-green-500" />
+                                                      <span className="font-medium">Level {level} - Learned</span>
+                                                    </div>
+                                                    <div className="text-sm text-gray-300">
+                                                      {powers.join(', ')}
+                                                    </div>
+                                                  </div>
+                                                );
+                                              }
+
+                                              return (
+                                                <div key={level} className={`p-3 rounded border transition-all ${
                                                   canAdvanceNow
-                                                    ? isRedundant 
-                                                      ? 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-md hover:shadow-lg' 
-                                                      : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
-                                                    : 'bg-gray-700 cursor-not-allowed text-gray-400'
-                                                }`}
-                                                disabled={!canAdvanceNow}
-                                              >
-                                                {canAdvanceNow ? 'Learn' : canAfford ? 'Limit Reached' : 'Cannot Afford'}
-                                              </button>
-                                            </div>
+                                                    ? 'border-blue-400 bg-blue-400 bg-opacity-10 hover:bg-blue-400 hover:bg-opacity-20'
+                                                    : canAfford
+                                                      ? 'border-yellow-500 bg-yellow-500 bg-opacity-10'
+                                                      : 'border-gray-600 bg-gray-700 bg-opacity-30 opacity-60'
+                                                }`}>
+                                                  <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center">
+                                                      <div className="w-4 h-4 rounded-full mr-2 bg-gray-600" />
+                                                      <span className="font-medium">Level {level}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                      <span className={`text-sm font-medium ${
+                                                        cost === 0 ? 'text-green-400' :
+                                                        canAfford ? 'text-blue-400' : 'text-red-400'
+                                                      }`}>
+                                                        {cost === 0 ? 'FREE' : `${cost} XP`}
+                                                      </span>
+                                                      {!canAfford && cost > 0 && (
+                                                        <span className="text-xs text-red-400">
+                                                          (Need {cost - character.totalXP} more XP)
+                                                        </span>
+                                                      )}
+                                                      <button
+                                                        onClick={async () => {
+                                                          const updated = advanceCharacter(character, {
+                                                            type: 'power',
+                                                            itemId: tree.tree_id,
+                                                            level,
+                                                            cost
+                                                          });
+                                                          await updateCurrentCharacter(updated);
+                                                        }}
+                                                        className={`px-4 py-2 rounded font-medium text-sm transition-all ${
+                                                          canAdvanceNow
+                                                            ? isRedundant
+                                                              ? 'bg-yellow-600 hover:bg-yellow-500 text-white shadow-md hover:shadow-lg'
+                                                              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg'
+                                                            : 'bg-gray-700 cursor-not-allowed text-gray-400'
+                                                        }`}
+                                                        disabled={!canAdvanceNow}
+                                                      >
+                                                        {canAdvanceNow ? 'Learn' : canAfford ? 'Limit Reached' : 'Cannot Afford'}
+                                                      </button>
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-sm text-gray-300">
+                                                    {powers.join(', ')}
+                                                  </div>
+                                                  {isRedundant && (
+                                                    <div className="mt-2 text-xs text-yellow-400 italic">
+                                                      ⚡ Redundant power - free due to existing knowledge!
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              );
+                                            })}
                                           </div>
-                                          <div className="text-sm text-gray-300">
-                                            {powers.join(', ')}
-                                          </div>
-                                          {isRedundant && (
-                                            <div className="mt-2 text-xs text-yellow-400 italic">
-                                              ⚡ Redundant power - free due to existing knowledge!
-                                            </div>
-                                          )}
                                         </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           );

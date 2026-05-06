@@ -44,7 +44,7 @@ lasombra,Lasombra,vampire,clan,,,dominate|obtenebration|potence
 malkavian,Malkavian,vampire,clan,,,auspex|dementation|obfuscate
 nosferatu,Nosferatu,vampire,clan,,,animalism|obfuscate|potence
 ratkin,Ratkin,shifter,fera,,,ratkin_gift
-ravnos,Ravnos,vampire,clan,,,animalism|fortitude|chimerstry
+ravnos,Ravnos,vampire,clan,,,celerity|obfuscate|presence
 red_talon,Red Talon,shifter,tribe,Lupus only,,red_talon_gift
 salubri_healer,Salubri (Healer),vampire,clan,,,auspex|fortitude|valeren_healer
 salubri_warrior,Salubri (Warrior),vampire,clan,,,auspex|fortitude|valeren_warrior
