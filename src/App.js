@@ -2372,7 +2372,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
       case 'willpower':
         return 6; // Standard willpower cost
       case 'virtue':
-        return 2; // Standard virtue cost
+        return 0; // Virtue/Angst changes never refund XP
       case 'lore':
         return calculateXPCost(character, 'lore', itemId);
       default:
@@ -10528,17 +10528,16 @@ Your character is ready to play!`;
                                 {character.stats.virtue < 10 && (
                                   <button
                                     onClick={async () => {
-                                      const refund = 2; // Get XP back for increasing Angst
                                       const updated = advanceCharacter(character, {
                                         type: 'virtue',
                                         itemId: 'virtue',
-                                        cost: -refund // Negative cost = gaining XP
+                                        cost: 0
                                       });
                                       await updateCurrentCharacter(updated);
                                     }}
                                     className="px-4 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-500 text-white"
                                   >
-                                    Increase Angst (+2 XP)
+                                    Increase Angst (free)
                                   </button>
                                 )}
                               </>
@@ -10556,7 +10555,7 @@ Your character is ready to play!`;
                                     }}
                                     className="px-3 py-2 rounded font-medium text-sm bg-red-600 hover:bg-red-700 text-white"
                                   >
-                                    Remove Level (+2 XP)
+                                    Remove Level
                                   </button>
                                 )}
                                 <button
