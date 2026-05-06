@@ -2246,12 +2246,11 @@ pleasure,Pleasure,Joy|excitement|comfort`
 
   // Returns true if a character's tree is currently dormant
   const isTreeDormant = (character, tree) => {
-    // Faction change: trees from the original faction are dormant
-    if (character.originalFaction && character.originalFaction !== character.faction) {
-      if (tree.faction === character.originalFaction) return true;
+    // Non-human faction change: any tree from a different faction is a residual and is dormant
+    if (character.faction !== 'human') {
+      return !!tree.faction && tree.faction !== character.faction;
     }
-    // Human subfaction dormancy only applies to human characters
-    if (character.faction !== 'human') return false;
+    // Human subfaction dormancy
     const activeSubfaction = character.subfaction;
     // Claimed Drone makes ALL non-drone trees dormant
     if (activeSubfaction === 'claimed_drone') return tree.group !== 'claimed_drone';
