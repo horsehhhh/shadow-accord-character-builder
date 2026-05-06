@@ -19,6 +19,19 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.4] - 2026-05-06
+
+### 👨‍👩‍👧 Kinfolk Merit Fix (Issue #7)
+
+#### Changed
+- **Kinfolk merit cost**: Changed from 1 XP to 3 XP to match rulebook
+- **Free lores on creation**: A new character who takes the Kinfolk merit may now select their related tribe during character creation — choosing a tribe grants Shifter Faction Lore and that tribe's lore at no additional cost
+
+#### Added
+- **Tribe selection UI**: Step 3 of character creation shows a tribe picker when the Kinfolk merit is selected, so players choose which shifter tribe they are related to (Garou tribes and Fera available, corrupted lineages excluded)
+
+---
+
 ## [v0.4.3] - 2026-05-06
 
 ### 📄 PDF Fundamental Powers & Adv/Disadv Export (Issue #9)
