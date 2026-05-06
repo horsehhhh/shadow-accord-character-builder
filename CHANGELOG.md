@@ -19,6 +19,18 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.3] - 2026-05-06
+
+### 📄 PDF Fundamental Powers & Adv/Disadv Export (Issue #9)
+
+#### Added
+- **Fundamental powers on PDF**: `character.fundamentalPowers` (Regeneration 3, Sense Spirit, Frail, etc.) now populate the Advantages/Weaknesses rows on the character sheet export
+- **Flaws, derangements, mutations on PDF**: `character.selfNerfs` entries (flaws, derangements, mutations, permataint) now appear below fundamental powers in the same row set
+- **Ordering**: Fundamental powers first → self-nerfs → legacy free-text advantages field (fallback)
+- **Extended row support**: Attempts up to 8 `AdvweaknessRow` fields (up from the previous hard limit of 4)
+
+---
+
 ## [v0.4.2] - 2026-05-05
 
 ### 🔄 Faction Change Dormancy + Bug Fix
