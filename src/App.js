@@ -413,6 +413,36 @@ const ShadowAccordComplete = () => {
     if (fixed.some((c, i) => c !== characters[i])) setCharacters(fixed);
   }, [characters, setCharacters]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // One-time migration: clear stale subfaction field on wraith characters (was incorrectly set to 'commoner')
+  const wraithSubfactionMigrated = useRef(false);
+  useEffect(() => {
+    if (wraithSubfactionMigrated.current || !characters.length) return;
+    const fixed = characters.map(char => {
+      if (char.faction !== 'wraith' || !char.subfaction) return char;
+      return { ...char, subfaction: '' };
+    });
+    wraithSubfactionMigrated.current = true;
+    if (fixed.some((c, i) => c !== characters[i])) setCharacters(fixed);
+  }, [characters, setCharacters]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // One-time migration: ensure existing characters have all fundamental powers for their faction
+  const fundamentalPowersMigrated = useRef(false);
+  useEffect(() => {
+    if (fundamentalPowersMigrated.current || !characters.length || !gameData.factions.length) return;
+    const fixed = characters.map(char => {
+      if (!char.faction) return char;
+      const faction = gameData.factions.find(f => f.faction_id === char.faction);
+      if (!faction?.fundamental_powers) return char;
+      const factionPowers = faction.fundamental_powers.split('|');
+      const existing = char.fundamentalPowers || [];
+      const missing = factionPowers.filter(p => !existing.includes(p));
+      if (missing.length === 0) return char;
+      return { ...char, fundamentalPowers: [...existing, ...missing] };
+    });
+    fundamentalPowersMigrated.current = true;
+    if (fixed.some((c, i) => c !== characters[i])) setCharacters(fixed);
+  }, [characters, setCharacters]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Phase 8: Advanced State Management
   const [searchQuery, setSearchQuery] = useState('');
   const [filterFaction, setFilterFaction] = useState('');
@@ -973,7 +1003,7 @@ const ShadowAccordComplete = () => {
 human,Human,Vitality,10,1,10,7,Humanity,
 vampire,Vampire,Vitae,10,1,15,6,Road,Amaranth|Bestial Frenzy|Blood Buff|Draining|Paralyzing Bite|Regeneration 1|Test Faction|Test Vitae
 shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 1|Step Sideways|War Form
-wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Temporary Angst|Umbra Sight`,
+wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Sense Living|Sense Maximum Health|Temporary Angst|Umbra Sight`,
 
     subfactions: `subfaction_id,subfaction_name,faction_id,type,energy_type,restrictions,dormancy_rules,innate_trees
 ananasi,Ananasi,shifter,fera,Gnosis,,,ananasi_gift
@@ -1129,7 +1159,7 @@ potence,Potence,vampire,common,Shatter,Might,Brutal Strike
 presence,Presence,vampire,common,Snarl,Entrancement,Majesty
 protection,Protection,human,sorcerer,Avert,Cloak,Sanctuary
 protean,Protean,vampire,clan_innate,Clawed Form: Wolf Mask|Razor Claws,Meld,Aggravated Claws
-puppetry,Puppetry,wraith,arcanos,Control Voice,Control Body,Possession
+puppetry,Puppetry,wraith,arcanos,Control Voice,Control Body,Puppet Control
 quietus,Quietus,vampire,clan_innate,Silence,Venom,Daze
 ragabash,Ragabash,shifter,auspice,Confusion,Disembodied|Realm Grasp,Mimic
 ratkin_gift,Ratkin Gift,shifter,fera_gift,Cloak,Monsters,Aggravated 1
@@ -1206,12 +1236,11 @@ hidden_amaranth,Hidden Amaranth,1,vampire,false,Always answer Sense Amaranth wit
 hypnotist,Hypnotist,1,,false,Gain Hypnotism power for truth-telling,
 income,Income,1,,true,Gain 6 copper per check-in (or 1 Bit for wraiths),Can purchase multiple times
 kinfolk,Kinfolk,3,non-shifter,false,Related to shifter tribe - select specific tribe,Does not increase cost of future merits
-lost_soul,Lost Soul,2,shifter|vampire,false,Option to become wraith when you die,Cannot have with Mortwight
+lost_soul,Lost Soul,2,shifter|vampire,false,Option to become wraith when you die,
 medium,Medium,1,non-wraith,false,Can hear the Umbra,
 misplaced_heart,Misplaced Heart,1,vampire,false,Heart relocated to arm or leg - choose location,
 mix_morph,Mix Morph,1,shifter,false,Use claws without mask but no war form augment,
 moon_ties,Moon Ties,2,shifter,false,Complex auspice benefits and foibles based on lunar phase,
-mortwight,Mortwight,2,human|shifter|vampire,false,Become Specter when you die,Cannot have with Lost Soul
 nimble,Nimble,1,,false,Resist one damage attack per day,
 oracle,Oracle,2,,false,Receive prophecy at check-in,Requires: Theurge/Dementation 1/Fatalism 1/Guidance 3
 pale_aura,Pale Aura,1,,false,Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality,
@@ -1220,7 +1249,7 @@ strong_will,Strong Will,1,,false,Mental powers last 5 minutes instead of 10,
 tainted_soul,Tainted Soul,1,,false,Permanently tainted,
 taste_of_oblivion,Taste of Oblivion,2,wraith,false,When drained while tainted causes catharsis in drainer,Only active while Tainted
 umbral_affinity,Umbral Affinity,1,shifter,false,Step Sideways takes 30 seconds instead of 60,
-unbondable,Unbondable,2,human,false,Requires three feedings (10 min apart) from the same vampire during the same event to form a Blood Burden instead of two. Does not invalidate existing Blood Burdens.,Lost if no longer Human`,
+unbondable,Unbondable,2,human,false,Must be fed blood three times (at least 10 min apart) from the same Vampire during the same event to become Blood Bound instead of the usual twice. If purchased while already Blood Bound: does not invalidate existing Blood Bonds - applies to future attempts only.,Lost if no longer Human`,
 
     xpCosts: `item_type,base_cost,multiplier,notes
 changing_road,1,0,1 XP to change vampire road
@@ -1542,7 +1571,23 @@ pleasure,Pleasure,Joy|excitement|comfort`
       freeLoreIds.push(factionLoreId);
       console.log('Added faction lore:', factionLoreId);
     }
-    
+
+    // Assign wraith legion and guild lore
+    if (character.faction === 'wraith') {
+      if (character.legion) {
+        const legionLoreId = `${character.legion}_lore`;
+        if (gameData.lores.find(l => l.lore_id === legionLoreId)) {
+          freeLoreIds.push(legionLoreId);
+        }
+      }
+      if (character.guild) {
+        const guildLoreId = `${character.guild}_lore`;
+        if (gameData.lores.find(l => l.lore_id === guildLoreId)) {
+          freeLoreIds.push(guildLoreId);
+        }
+      }
+    }
+
     // Assign subfaction-specific lore
     if (character.subfaction) {
       // Check for tribal lore (Garou tribes)
@@ -2160,9 +2205,12 @@ pleasure,Pleasure,Joy|excitement|comfort`
 
         if (character.originalSubfaction === 'sorcerer') {
           if (treeGroup === 'sorcerer') {
-            isInnate = true; // Original sorcerer basic powers remain innate
-          } else if (treeGroup === 'fallen_path' || treeGroup === 'fellowship') {
-            isInnate = false; // Original sorcerer fallen path/fellowship powers remain learned
+            isInnate = true;
+          } else if (treeGroup === 'fallen_path') {
+            // Fallen paths are innate only if selected as innate during creation
+            isInnate = character.innateTreeIds.includes(itemId);
+          } else if (treeGroup === 'fellowship') {
+            isInnate = false;
           }
         } else if (character.originalSubfaction === 'ghoul') {
           const vampireTrees = gameData.powerTrees.filter(tree => tree.faction === 'vampire').map(tree => tree.tree_id);
@@ -2279,6 +2327,15 @@ pleasure,Pleasure,Joy|excitement|comfort`
         });
       });
     });
+  };
+
+  // Returns 'Living' or 'Unliving' based on faction/subfaction rules
+  const getCharacterTrait = (character) => {
+    if (!character) return 'Living';
+    const { faction, subfaction } = character;
+    if (faction === 'vampire' || faction === 'wraith') return 'Unliving';
+    if (faction === 'human' && subfaction === 'claimed_gorgon') return 'Unliving';
+    return 'Living';
   };
 
   // Returns true if a character's tree is currently dormant
@@ -3528,7 +3585,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   'Pathos Investment', 'Pence from Heaven', 'Poison Immunity', 'Portal Walk', 'Powerful Form',
                   'Ranged 2', 'Read Magic', 'Release Spirit', 'Scion of Evil', 'Secret Angst',
                   'Sense Amaranth', 'Sense Angst', 'Sense Desire', 'Sense Emotion', 'Sense Essence',
-                  'Sense Fetter', 'Sense Gnosis', 'Sense Health', 'Sense Item', 'Sense Mental',
+                  'Sense Fetter', 'Sense Gnosis', 'Sense Health', 'Sense Item', 'Sense Living', 'Sense Mental',
                   'Sense Pathos', 'Sense Rank', 'Sense Shadow', 'Sense Spirit', 'Sense Vitae',
                   'Silver Armor', 'Silver Tongue', 'Smell Fear', 'Step Sideways', 'Taint', 'Telepathy',
                   'Temporary Angst', 'Tentacles', 'Test Faction', 'Test Oath', 'Test Vitae',
@@ -3545,7 +3602,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   'Detect Fetter', 'Fetter Creation', 'Fire 2', 'Fire Weapon', 'Forgetful Mind', 'Gauntlet Walk',
                   'Hallucination', 'Hypnotism', 'Imitate', 'Induce Catharsis', 'Induce Frenzy',
                   'Induce Sin', 'Insight', 'Light Weapon', 'Meditate', 'Mimic', 'Monsters',
-                  'Obedience', 'Passion', 'Possession', 'Ranged 4', 'Razor Claws', 'Realm Grasp',
+                  'Obedience', 'Passion', 'Puppet Control', 'Ranged 4', 'Razor Claws', 'Realm Grasp',
                   'Rend the Lifeweb', 'Reverse Mimic', 'Root', 'Sanctuary', 'Sense Confidence',
                   'Sense Maximum Health', 'Serenity', 'Shadow Coax', 'Shatter',
                   'Silence', 'Silver Claws', 'Snarl', 'Song of Rage', 'Stonehand Punch', 'Subjugate',
@@ -3616,7 +3673,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
             // Helper function to format subfaction display
             const getSubfactionDisplay = (character) => {
               const subfactions = [];
-              if (character.subfaction) subfactions.push(character.subfaction);
+              if (character.subfaction && character.faction !== 'wraith') subfactions.push(character.subfaction);
               if (character.clan) subfactions.push(character.clan);
               if (character.tribe) subfactions.push(character.tribe);
               if (character.breed) subfactions.push(character.breed);
@@ -3647,6 +3704,11 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 breed: character.breed,
                 auspice: character.auspice
               });
+            } else if (character.faction === 'wraith') {
+              // For wraiths: Legion in field 1, Guild in field 2, Specter in field 3
+              setFormField('Subfaction1', formatDisplayText(character.legion || ''));
+              setFormField('Subfaction2', formatDisplayText(character.guild || ''));
+              setFormField('Subfaction3', character.stats?.virtue >= 10 ? 'Specter' : '');
             } else {
               // For non-shifters: use existing logic
               const subfactions = getSubfactionDisplay(character).split(', ').filter(s => s.trim());
@@ -3920,7 +3982,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                   batch.forEach(power => {
                     if (powerIndex <= 105) {
                       setFormField(`Power ${powerIndex}`, formatDisplayText(power));
-                      setFormField(`Cost ${powerIndex}`, 'Free');
+                      setFormField(`Cost ${powerIndex}`, getPowerCost(power) || 'None');
                       powerIndex++;
                       fundPowerCount++;
                     }
@@ -4140,15 +4202,18 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               });
             }
 
-            // Fill notes using correct field names
-            if (character.notes) {
-              const noteLines = character.notes.split('\n');
-              noteLines.forEach((line, index) => {
-                if (index < 6) { // Attunement  NotesRow1 through Attunement  NotesRow6
-                  setFormField(`Attunement  NotesRow${index + 1}`, line);
-                }
-              });
-            }
+            // Fill notes using correct field names — trait always occupies row 1
+            const characterTrait = getCharacterTrait(character);
+            const traitLines = characterTrait === 'Unliving'
+              ? [`Trait: Unliving`, `Cannot be healed by Medicine.`]
+              : [`Trait: Living`];
+            const noteLines = character.notes ? character.notes.split('\n') : [];
+            const allNoteLines = [...traitLines, ...noteLines];
+            allNoteLines.forEach((line, index) => {
+              if (index < 6) { // Attunement  NotesRow1 through Attunement  NotesRow6
+                setFormField(`Attunement  NotesRow${index + 1}`, line);
+              }
+            });
 
             
             // Generate and download the filled PDF
@@ -4744,6 +4809,52 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                 </div>
               )}
               
+              {/* Specter Toggle for Wraiths */}
+              {newCharacter.faction === 'wraith' && (
+                <div className={`${themeClasses.card} p-5`}>
+                  <h4 className="text-xl font-bold mb-1">Are you a Specter?</h4>
+                  <p className="text-gray-400 text-sm mb-4">Specters start with Angst 10 and may select Dark Arcanoi as innate trees.</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        const baseAngst = 4;
+                        const darkFiltered = newCharacter.innateTreeIds.filter(id => {
+                          const tree = gameData.powerTrees.find(t => t.tree_id === id);
+                          return tree?.group !== 'dark_arcanos';
+                        });
+                        setNewCharacter({
+                          ...newCharacter,
+                          specter: false,
+                          innateTreeIds: darkFiltered,
+                          stats: { ...newCharacter.stats, virtue: baseAngst }
+                        });
+                      }}
+                      className={`px-6 py-3 rounded-lg border-2 font-bold transition-all ${
+                        !newCharacter.specter
+                          ? 'border-blue-500 bg-blue-500 bg-opacity-20 text-blue-300'
+                          : 'border-gray-600 text-gray-400 hover:border-gray-400'
+                      }`}
+                    >
+                      No
+                    </button>
+                    <button
+                      onClick={() => setNewCharacter({
+                        ...newCharacter,
+                        specter: true,
+                        stats: { ...newCharacter.stats, virtue: 10 }
+                      })}
+                      className={`px-6 py-3 rounded-lg border-2 font-bold transition-all ${
+                        newCharacter.specter
+                          ? 'border-red-500 bg-red-500 bg-opacity-20 text-red-300'
+                          : 'border-gray-600 text-gray-400 hover:border-gray-400'
+                      }`}
+                    >
+                      Yes — Angst set to 10
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Wraith Tree Selection */}
               {newCharacter.faction === 'wraith' && (
                 <div className={`${themeClasses.card} p-5 mt-5`}>
@@ -4759,19 +4870,19 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                         const canDeselect = isSelected;
                         
                         const isDarkArcanoi = tree.group === 'dark_arcanos';
-                        
+                        const isSpecterLocked = isDarkArcanoi && !newCharacter.specter;
+
                         return (
                           <button
                             key={tree.tree_id}
                             onClick={() => {
+                              if (isSpecterLocked) return;
                               if (isSelected) {
-                                // Deselect tree
                                 setNewCharacter({
                                   ...newCharacter,
                                   innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id)
                                 });
                               } else if (canSelect) {
-                                // Select tree
                                 setNewCharacter({
                                   ...newCharacter,
                                   innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id]
@@ -4779,15 +4890,17 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                               }
                             }}
                             className={`p-3 rounded-lg border-2 transition-all text-left ${
-                              isSelected
-                                ? 'border-green-500 bg-green-500 bg-opacity-20'
-                                : canSelect
-                                  ? isDarkArcanoi
-                                    ? 'border-red-500 hover:border-red-400 cursor-pointer bg-red-500 bg-opacity-10'
-                                    : 'border-gray-600 hover:border-gray-400 cursor-pointer'
-                                  : 'border-gray-700 opacity-50 cursor-not-allowed'
+                              isSpecterLocked
+                                ? 'border-gray-700 opacity-40 cursor-not-allowed bg-gray-800'
+                                : isSelected
+                                  ? 'border-green-500 bg-green-500 bg-opacity-20'
+                                  : canSelect
+                                    ? isDarkArcanoi
+                                      ? 'border-red-500 hover:border-red-400 cursor-pointer bg-red-500 bg-opacity-10'
+                                      : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                                    : 'border-gray-700 opacity-50 cursor-not-allowed'
                             }`}
-                            disabled={!canSelect && !canDeselect}
+                            disabled={isSpecterLocked || (!canSelect && !canDeselect)}
                           >
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center">
@@ -4798,6 +4911,9 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                                   </span>
                                 )}
                               </div>
+                              {isSpecterLocked && (
+                                <span className="text-xs text-gray-500 italic">Specter only</span>
+                              )}
                               {isSelected && (
                                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                   <span className="text-white text-sm">✓</span>
@@ -5093,252 +5209,205 @@ Generated by Shadow Accord Character Builder v${currentVersion}
               {newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && (
                 <div className="space-y-6 mt-5">
                   {/* Sorcerer Power Tree Selection */}
-                  <div className={`${themeClasses.card} p-5`}>
-                    <h4 className="text-xl font-bold mb-2">Select 2 Sorcerer Power Trees</h4>
-                    <p className="text-gray-400 mb-2">Choose 2 sorcerer power trees that will define your magical abilities.</p>
-                    
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {/* Basic Sorcerer Trees */}
-                      {gameData.powerTrees
-                        .filter(tree => tree.faction === 'human' && ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'].includes(tree.tree_id))
-                        .map(tree => {
-                          const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
-                          const canSelect = !isSelected && newCharacter.innateTreeIds.length < 2;
-                          const canDeselect = isSelected;
-                          
-                          return (
-                            <button
-                              key={tree.tree_id}
-                              onClick={() => {
-                                if (isSelected) {
-                                  // Deselect tree
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id)
-                                  });
-                                } else if (canSelect) {
-                                  // Select tree
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id]
-                                  });
-                                }
-                              }}
-                              className={`p-3 rounded-lg border-2 transition-all text-left ${
-                                isSelected
-                                  ? 'border-green-500 bg-green-500 bg-opacity-20'
-                                  : canSelect
-                                    ? 'border-gray-600 hover:border-gray-400 cursor-pointer'
-                                    : 'border-gray-700 opacity-50 cursor-not-allowed'
-                              }`}
-                              disabled={!canSelect && !canDeselect}
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
-                                {isSelected && (
-                                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                                    <span className="text-white text-sm">✓</span>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              {tree.level1_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-gray-400 mb-1">Level 1:</p>
-                                  <p className="text-sm">{tree.level1_powers}</p>
-                                </div>
-                              )}
-                              
-                              {tree.level2_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-gray-400 mb-1">Level 2:</p>
-                                  <p className="text-sm">{tree.level2_powers}</p>
-                                </div>
-                              )}
-                              
-                              {tree.level3_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-gray-400 mb-1">Level 3:</p>
-                                  <p className="text-sm">{tree.level3_powers}</p>
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })}
+                  {(() => {
+                    const SORCERER_IDS = ['animal', 'body', 'curse', 'healer', 'mind', 'patterns', 'perception', 'protection', 'spirit', 'warrior'];
+                    const fallenPathIdSet = new Set(gameData.powerTrees.filter(t => t.group === 'fallen_path').map(t => t.tree_id));
+                    const sorcererCount = newCharacter.innateTreeIds.filter(id => SORCERER_IDS.includes(id)).length;
+                    const fallenPathCount = newCharacter.innateTreeIds.filter(id => fallenPathIdSet.has(id)).length;
+                    const selectionComplete = (sorcererCount === 2 && fallenPathCount === 0) || (fallenPathCount === 1 && sorcererCount === 0);
 
-                      {/* Fallen Paths */}
-                      {gameData.powerTrees
-                        .filter(tree => tree.group === 'fallen_path')
-                        .map(tree => {
-                          const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
-                          const canSelect = !isSelected && newCharacter.innateTreeIds.length < 2;
-                          const canDeselect = isSelected;
-                          
-                          return (
-                            <button
-                              key={tree.tree_id}
-                              onClick={() => {
-                                if (isSelected) {
-                                  // Deselect tree and remove associated derangement if it's madness or ruin
-                                  let updatedSelfNerfs = newCharacter.selfNerfs;
-                                  if (tree.tree_id === 'madness') {
-                                    updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
-                                      nerf.source !== 'madness_tree'
-                                    );
-                                  } else if (tree.tree_id === 'ruin') {
-                                    updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => 
-                                      nerf.source !== 'ruin_tree'
-                                    );
-                                  }
-                                  
-                                  setNewCharacter({
-                                    ...newCharacter,
-                                    innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id),
-                                    selfNerfs: updatedSelfNerfs
-                                  });
-                                } else if (canSelect) {
-                                  // Select tree - if madness or ruin, require derangement selection
-                                  if (tree.tree_id === 'madness' || tree.tree_id === 'ruin') {
-                                    const derangementList = [
-                                      'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
-                                      'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
-                                      'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
-                                    ];
-                                    
-                                    const pathName = tree.tree_id === 'madness' ? 'Madness' : 'Ruin';
-                                    const selectedDerangement = prompt(
-                                      `The ${pathName} path inflicts psychological damage. Choose a derangement:\n\n` +
-                                      derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
-                                      '\n\nEnter the number (1-12) of your chosen derangement:'
-                                    );
-                                    
-                                    const derangementIndex = parseInt(selectedDerangement) - 1;
-                                    if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
-                                      const chosenDerangement = derangementList[derangementIndex];
-                                      
-                                      // Add the tree and the derangement
-                                      const newDerangement = {
-                                        id: Date.now(),
-                                        name: `Deranged - ${chosenDerangement}`,
-                                        description: `Character has the Deranged flaw from practicing the ${pathName} path, specifically manifesting as ${chosenDerangement}.`,
-                                        type: 'derangement',
-                                        category: 'Deranged',
-                                        source: `${tree.tree_id}_tree`
-                                      };
-                                      
-                                      setNewCharacter({
-                                        ...newCharacter,
-                                        innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id],
-                                        selfNerfs: [...newCharacter.selfNerfs, newDerangement]
-                                      });
-                                    } else {
-                                      alert('Invalid selection. Please try again and choose a number from 1-12.');
-                                      return;
+                    return (
+                      <div className={`${themeClasses.card} p-5`}>
+                        <h4 className="text-xl font-bold mb-2">Select Innate Power Trees</h4>
+                        <p className="text-gray-400 mb-3">Choose <strong>2 Sorcerer Trees</strong> — or — <strong>1 Fallen Path</strong>. These are mutually exclusive. Fellowship is a separate optional slot below.</p>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                          {/* Basic Sorcerer Trees */}
+                          {gameData.powerTrees
+                            .filter(tree => tree.faction === 'human' && SORCERER_IDS.includes(tree.tree_id))
+                            .map(tree => {
+                              const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
+                              const isBlockedByFallen = !isSelected && fallenPathCount > 0;
+                              const isSlotsFull = !isSelected && fallenPathCount === 0 && sorcererCount >= 2;
+                              const isLocked = isBlockedByFallen || isSlotsFull;
+                              const canSelect = !isSelected && !isLocked;
+                              const canDeselect = isSelected;
+
+                              return (
+                                <button
+                                  key={tree.tree_id}
+                                  onClick={() => {
+                                    if (isLocked) return;
+                                    if (isSelected) {
+                                      setNewCharacter({ ...newCharacter, innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id) });
+                                    } else if (canSelect) {
+                                      setNewCharacter({ ...newCharacter, innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id] });
                                     }
-                                  } else {
-                                    // Regular tree selection
-                                    setNewCharacter({
-                                      ...newCharacter,
-                                      innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id]
-                                    });
-                                  }
-                                }
-                              }}
-                              className={`p-3 rounded-lg border-2 transition-all text-left relative ${
-                                isSelected
-                                  ? 'border-red-500 bg-red-500 bg-opacity-20'
-                                  : canSelect
-                                    ? 'border-red-800 hover:border-red-600 cursor-pointer bg-red-900 bg-opacity-20'
-                                    : 'border-gray-700 opacity-50 cursor-not-allowed'
-                              }`}
-                              disabled={!canSelect && !canDeselect}
-                            >
-                              {/* Fallen Path Badge */}
-                              <div className="absolute top-2 right-2">
-                                <span className="px-2 py-1 bg-red-600 bg-opacity-60 rounded text-xs text-red-200 font-medium">
-                                  FALLEN PATH
-                                </span>
-                              </div>
-                              
-                              <div className="flex items-center justify-between mb-2">
-                                <h5 className="font-bold text-lg capitalize text-red-300">{tree.tree_name}</h5>
-                                {isSelected && (
-                                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                                    <span className="text-white text-sm">✓</span>
+                                  }}
+                                  className={`p-3 rounded-lg border-2 transition-all text-left relative ${
+                                    isLocked
+                                      ? 'border-gray-700 opacity-40 cursor-not-allowed bg-gray-800'
+                                      : isSelected
+                                        ? 'border-green-500 bg-green-500 bg-opacity-20'
+                                        : 'border-gray-600 hover:border-gray-400 cursor-pointer'
+                                  }`}
+                                  disabled={isLocked || (!canSelect && !canDeselect)}
+                                >
+                                  {isBlockedByFallen && (
+                                    <div className="absolute top-2 right-2">
+                                      <span className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-400 italic">Fallen Path active</span>
+                                    </div>
+                                  )}
+                                  {isSlotsFull && (
+                                    <div className="absolute top-2 right-2">
+                                      <span className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-400 italic">Slots full (2/2)</span>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h5 className="font-bold text-lg capitalize">{tree.tree_name}</h5>
+                                    {isSelected && (
+                                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-sm">✓</span>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              
-                              {tree.level1_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-red-400 mb-1">Level 1:</p>
-                                  <p className="text-sm text-gray-300">{tree.level1_powers}</p>
-                                </div>
-                              )}
-                              
-                              {tree.level2_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-red-400 mb-1">Level 2:</p>
-                                  <p className="text-sm text-gray-300">{tree.level2_powers}</p>
-                                </div>
-                              )}
-                              
-                              {tree.level3_powers && (
-                                <div className="mt-2">
-                                  <p className="text-sm text-red-400 mb-1">Level 3:</p>
-                                  <p className="text-sm text-gray-300">{tree.level3_powers}</p>
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })}
-                    </div>
-                    
-                    <div className="mt-3 p-3 bg-gray-700 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-300">Selected Trees:</span>
-                        <span className={`text-sm font-medium ${
-                          newCharacter.innateTreeIds.length === 2 ? 'text-green-400' : 'text-yellow-400'
-                        }`}>
-                          {newCharacter.innateTreeIds.length} / 2
-                        </span>
-                      </div>
-                      
-                      {newCharacter.innateTreeIds.length !== 2 && (
-                        <p className="text-sm text-yellow-400 mt-2">
-                          {newCharacter.innateTreeIds.length === 0 
-                            ? 'Please select 2 power trees to continue.'
-                            : `Select ${2 - newCharacter.innateTreeIds.length} more tree${2 - newCharacter.innateTreeIds.length === 1 ? '' : 's'} to continue.`
-                          }
-                        </p>
-                      )}
-                      
-                      {newCharacter.innateTreeIds.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {newCharacter.innateTreeIds.map(treeId => {
-                            const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
-                            const isFallenPath = ['death', 'demonology', 'madness', 'ruin'].includes(treeId);
-                            return tree ? (
-                              <span
-                                key={treeId}
-                                className={`px-2 py-1 rounded text-sm capitalize ${
-                                  isFallenPath ? 'bg-red-600 text-red-100' : 'bg-green-600 text-green-100'
-                                }`}
-                              >
-                                {tree.tree_name}
-                              </span>
-                            ) : null;
-                          })}
+                                  {tree.level1_powers && <div className="mt-2"><p className="text-sm text-gray-400 mb-1">Level 1:</p><p className="text-sm">{tree.level1_powers}</p></div>}
+                                  {tree.level2_powers && <div className="mt-2"><p className="text-sm text-gray-400 mb-1">Level 2:</p><p className="text-sm">{tree.level2_powers}</p></div>}
+                                  {tree.level3_powers && <div className="mt-2"><p className="text-sm text-gray-400 mb-1">Level 3:</p><p className="text-sm">{tree.level3_powers}</p></div>}
+                                </button>
+                              );
+                            })}
+
+                          {/* Fallen Paths */}
+                          {gameData.powerTrees
+                            .filter(tree => tree.group === 'fallen_path')
+                            .map(tree => {
+                              const isSelected = newCharacter.innateTreeIds.includes(tree.tree_id);
+                              const isBlockedBySorcerer = !isSelected && sorcererCount > 0;
+                              const isOnePathMax = !isSelected && fallenPathCount >= 1;
+                              const isLocked = isBlockedBySorcerer || isOnePathMax;
+                              const canSelect = !isSelected && !isLocked;
+                              const canDeselect = isSelected;
+
+                              return (
+                                <button
+                                  key={tree.tree_id}
+                                  onClick={() => {
+                                    if (isLocked) return;
+                                    if (isSelected) {
+                                      let updatedSelfNerfs = newCharacter.selfNerfs;
+                                      if (tree.tree_id === 'madness') {
+                                        updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => nerf.source !== 'madness_tree');
+                                      } else if (tree.tree_id === 'ruin') {
+                                        updatedSelfNerfs = newCharacter.selfNerfs.filter(nerf => nerf.source !== 'ruin_tree');
+                                      }
+                                      setNewCharacter({ ...newCharacter, innateTreeIds: newCharacter.innateTreeIds.filter(id => id !== tree.tree_id), selfNerfs: updatedSelfNerfs });
+                                    } else if (canSelect) {
+                                      if (tree.tree_id === 'madness' || tree.tree_id === 'ruin') {
+                                        const derangementList = [
+                                          'Amnesia', 'Aphasia', 'Melancholia', 'Delusional', 'Masochism',
+                                          'Megalomania', 'Multiple Personality Disorder', 'Obsessive Compulsion',
+                                          'Paranoia', 'Regression', 'Schizophrenia', 'Synesthesia'
+                                        ];
+                                        const pathName = tree.tree_id === 'madness' ? 'Madness' : 'Ruin';
+                                        const selectedDerangement = prompt(
+                                          `The ${pathName} path inflicts psychological damage. Choose a derangement:\n\n` +
+                                          derangementList.map((d, i) => `${i + 1}. ${d}`).join('\n') +
+                                          '\n\nEnter the number (1-12) of your chosen derangement:'
+                                        );
+                                        const derangementIndex = parseInt(selectedDerangement) - 1;
+                                        if (derangementIndex >= 0 && derangementIndex < derangementList.length) {
+                                          const chosenDerangement = derangementList[derangementIndex];
+                                          const newDerangement = {
+                                            id: Date.now(),
+                                            name: `Deranged - ${chosenDerangement}`,
+                                            description: `Character has the Deranged flaw from practicing the ${pathName} path, specifically manifesting as ${chosenDerangement}.`,
+                                            type: 'derangement',
+                                            category: 'Deranged',
+                                            source: `${tree.tree_id}_tree`
+                                          };
+                                          setNewCharacter({ ...newCharacter, innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id], selfNerfs: [...newCharacter.selfNerfs, newDerangement] });
+                                        } else {
+                                          alert('Invalid selection. Please try again and choose a number from 1-12.');
+                                          return;
+                                        }
+                                      } else {
+                                        setNewCharacter({ ...newCharacter, innateTreeIds: [...newCharacter.innateTreeIds, tree.tree_id] });
+                                      }
+                                    }
+                                  }}
+                                  className={`p-3 rounded-lg border-2 transition-all text-left relative ${
+                                    isLocked
+                                      ? 'border-gray-700 opacity-40 cursor-not-allowed bg-gray-800'
+                                      : isSelected
+                                        ? 'border-red-500 bg-red-500 bg-opacity-20'
+                                        : 'border-red-800 hover:border-red-600 cursor-pointer bg-red-900 bg-opacity-20'
+                                  }`}
+                                  disabled={isLocked || (!canSelect && !canDeselect)}
+                                >
+                                  <div className="absolute top-2 right-2">
+                                    {isBlockedBySorcerer ? (
+                                      <span className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-400 italic">Sorcerer path active</span>
+                                    ) : isOnePathMax ? (
+                                      <span className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-400 italic">1 path only</span>
+                                    ) : (
+                                      <span className="px-2 py-1 bg-red-600 bg-opacity-60 rounded text-xs text-red-200 font-medium">FALLEN PATH</span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h5 className="font-bold text-lg capitalize text-red-300">{tree.tree_name}</h5>
+                                    {isSelected && (
+                                      <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-sm">✓</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  {tree.level1_powers && <div className="mt-2"><p className="text-sm text-red-400 mb-1">Level 1:</p><p className="text-sm text-gray-300">{tree.level1_powers}</p></div>}
+                                  {tree.level2_powers && <div className="mt-2"><p className="text-sm text-red-400 mb-1">Level 2:</p><p className="text-sm text-gray-300">{tree.level2_powers}</p></div>}
+                                  {tree.level3_powers && <div className="mt-2"><p className="text-sm text-red-400 mb-1">Level 3:</p><p className="text-sm text-gray-300">{tree.level3_powers}</p></div>}
+                                </button>
+                              );
+                            })}
                         </div>
-                      )}
-                    </div>
-                    
-                    <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
-                      <p className="text-sm text-red-300">
-                        ⚠️ <strong>Warning:</strong> Fallen paths (Death, Demonology, Madness, Ruin) are dangerous magical traditions that corrupt the soul. They offer great power but at terrible personal cost.
-                      </p>
-                    </div>
-                  </div>
+
+                        <div className="mt-3 p-3 bg-gray-700 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-300">Selected Trees:</span>
+                            <span className={`text-sm font-medium ${selectionComplete ? 'text-green-400' : 'text-yellow-400'}`}>
+                              {fallenPathCount > 0 ? 'Fallen Path (1/1)' : `Sorcerer (${sorcererCount}/2)`}
+                            </span>
+                          </div>
+                          {!selectionComplete && (
+                            <p className="text-sm text-yellow-400 mt-2">
+                              {sorcererCount === 0 && fallenPathCount === 0
+                                ? 'Select 2 Sorcerer Trees — or — 1 Fallen Path to continue.'
+                                : sorcererCount === 1
+                                  ? 'Select 1 more Sorcerer Tree (or deselect to switch to a Fallen Path).'
+                                  : ''}
+                            </p>
+                          )}
+                          {newCharacter.innateTreeIds.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {newCharacter.innateTreeIds.map(treeId => {
+                                const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
+                                return tree ? (
+                                  <span key={treeId} className={`px-2 py-1 rounded text-sm capitalize ${fallenPathIdSet.has(treeId) ? 'bg-red-600 text-red-100' : 'bg-green-600 text-green-100'}`}>
+                                    {tree.tree_name}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mt-3 p-3 bg-red-600 bg-opacity-20 rounded-lg border border-red-500">
+                          <p className="text-sm text-red-300">
+                            ⚠️ <strong>Fallen Paths:</strong> Selecting a Fallen Path is mutually exclusive with Sorcerer Trees — deselect your current trees first to switch. Fallen Paths are innate (3/6/9 XP) but require being Tainted and having a Demon Patron approved by CG before any powers can be used in-game.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Fellowship Selection */}
                   <div className={`${themeClasses.card} p-5`}>
@@ -9155,6 +9224,18 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                       };
                     }
                     
+                    // Handle Specter creation — max Angst and strip wizard-only flag
+                    if (finalCharacter.specter) {
+                      finalCharacter = {
+                        ...finalCharacter,
+                        stats: { ...finalCharacter.stats, virtue: 10 },
+                        specter: undefined
+                      };
+                    } else {
+                      const { specter: _specter, ...withoutSpecter } = finalCharacter;
+                      finalCharacter = withoutSpecter;
+                    }
+
                     // Handle fundamental powers for claimed status
                     if (finalCharacter.claimedStatus === 'gorgon') {
                       const currentFundamentals = finalCharacter.fundamentalPowers || [];
@@ -9494,7 +9575,12 @@ Your character is ready to play!`;
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction !== 'sorcerer' && newCharacter.subfaction !== 'faithful' && newCharacter.subfaction !== 'claimed_drone' && newCharacter.subfaction !== 'claimed_fomori' && newCharacter.subfaction !== 'claimed_gorgon' && newCharacter.subfaction !== 'commoner' && newCharacter.subfaction !== 'ghoul' && newCharacter.subfaction !== 'kinfolk' && !newCharacter.subfaction) ||
                   (creationStep === 1 && newCharacter.faction === 'wraith' && (newCharacter.innateTreeIds.length !== 3 || !newCharacter.shadowArchetype || !newCharacter.selectedThorn || !newCharacter.legion || newCharacter.selectedPassions.length !== 2)) ||
                   (creationStep === 1 && newCharacter.faction === 'vampire' && newCharacter.subfaction === 'caitiff' && newCharacter.innateTreeIds.length !== 3) ||
-                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && newCharacter.innateTreeIds.length !== 2) ||
+                  (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'sorcerer' && !(
+                    (newCharacter.innateTreeIds.filter(id => ['animal','body','curse','healer','mind','patterns','perception','protection','spirit','warrior'].includes(id)).length === 2 &&
+                     newCharacter.innateTreeIds.filter(id => gameData.powerTrees.find(t => t.tree_id === id)?.group === 'fallen_path').length === 0) ||
+                    (newCharacter.innateTreeIds.filter(id => gameData.powerTrees.find(t => t.tree_id === id)?.group === 'fallen_path').length === 1 &&
+                     newCharacter.innateTreeIds.filter(id => ['animal','body','curse','healer','mind','patterns','perception','protection','spirit','warrior'].includes(id)).length === 0)
+                  )) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'faithful' && newCharacter.innateTreeIds.length !== 1) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_drone' && newCharacter.innateTreeIds.length !== 3) ||
                   (creationStep === 1 && newCharacter.faction === 'human' && newCharacter.subfaction === 'claimed_fomori' && newCharacter.innateTreeIds.length !== 1) ||
@@ -9637,10 +9723,29 @@ Your character is ready to play!`;
                   <span>Faction:</span>
                   <span className="capitalize">{formatDisplayText(character.faction || '')}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Subfaction:</span>
-                  <span className="capitalize">{formatDisplayText(character.subfaction || '')}</span>
-                </div>
+                {character.faction === 'wraith' ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span>Legion:</span>
+                      <span className="capitalize">{formatDisplayText(character.legion || '—')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Guild:</span>
+                      <span className="capitalize">{formatDisplayText(character.guild || '—')}</span>
+                    </div>
+                    {character.stats?.virtue >= 10 && (
+                      <div className="flex justify-between">
+                        <span>Specter:</span>
+                        <span className="text-red-400 font-semibold">Yes</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex justify-between">
+                    <span>Subfaction:</span>
+                    <span className="capitalize">{formatDisplayText(character.subfaction || '')}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Available XP:</span>
                   <span>{character.totalXP || 0}</span>
@@ -9887,7 +9992,15 @@ Your character is ready to play!`;
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-5 space-y-3 sm:space-y-0">
             <div>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">{character.name}</h2>
-              <p className={themeClasses.text}>{character.player} • {character.faction} {character.subfaction}</p>
+              <p className={themeClasses.text}>{character.player} • {character.faction}{
+                character.faction === 'wraith'
+                  ? [
+                      character.legion,
+                      character.guild,
+                      character.stats?.virtue >= 10 ? 'Specter' : null
+                    ].filter(Boolean).map(s => ` · ${s === 'Specter' ? s : formatDisplayText(s)}`).join('')
+                  : character.subfaction ? ` · ${formatDisplayText(character.subfaction)}` : ''
+              }</p>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="text-right">
@@ -10148,6 +10261,29 @@ Your character is ready to play!`;
                       💡 <strong>Missing Information:</strong> {!character.name && 'Character name'}{!character.name && !character.player && ' and '}{!character.player && 'Player name'} {(!character.name || !character.player) ? 'should be filled in' : ''} for a complete character sheet.
                     </div>
                   </div>
+                )}
+              </div>
+
+              {/* Character Traits */}
+              <div className={`${themeClasses.card} p-3`}>
+                <h3 className="text-xl font-bold mb-3">Character Traits</h3>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const trait = getCharacterTrait(character);
+                    const isUnliving = trait === 'Unliving';
+                    return (
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                        isUnliving
+                          ? 'bg-purple-900 bg-opacity-40 border-purple-500 text-purple-300'
+                          : 'bg-green-900 bg-opacity-40 border-green-500 text-green-300'
+                      }`}>
+                        {trait}
+                      </span>
+                    );
+                  })()}
+                </div>
+                {getCharacterTrait(character) === 'Unliving' && (
+                  <p className="text-xs text-gray-400 mt-2">Cannot be healed by Medicine.</p>
                 )}
               </div>
 
@@ -11986,17 +12122,40 @@ Your character is ready to play!`;
           )}
 
           {activeTab === 'notes' && (
-            <div className={`${themeClasses.card} p-5`}>
-              <h3 className="text-xl font-bold mb-2">Character Notes</h3>
-              <textarea
-                value={character.notes || ''}
-                onChange={async (e) => {
-                  const updated = { ...character, notes: e.target.value, lastModified: new Date().toISOString() };
-                  await updateCurrentCharacter(updated);
-                }}
-                className={`${themeClasses.input} h-64 resize-none`}
-                placeholder="Add notes about your character, their goals, relationships, etc..."
-              />
+            <div className="space-y-4">
+              <div className={`${themeClasses.card} p-5`}>
+                <h3 className="text-xl font-bold mb-3">Character Traits</h3>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const trait = getCharacterTrait(character);
+                    const isUnliving = trait === 'Unliving';
+                    return (
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                        isUnliving
+                          ? 'bg-purple-900 bg-opacity-40 border-purple-500 text-purple-300'
+                          : 'bg-green-900 bg-opacity-40 border-green-500 text-green-300'
+                      }`}>
+                        {trait}
+                      </span>
+                    );
+                  })()}
+                </div>
+                {getCharacterTrait(character) === 'Unliving' && (
+                  <p className="text-xs text-gray-400 mt-2">Cannot be healed by Medicine.</p>
+                )}
+              </div>
+              <div className={`${themeClasses.card} p-5`}>
+                <h3 className="text-xl font-bold mb-2">Character Notes</h3>
+                <textarea
+                  value={character.notes || ''}
+                  onChange={async (e) => {
+                    const updated = { ...character, notes: e.target.value, lastModified: new Date().toISOString() };
+                    await updateCurrentCharacter(updated);
+                  }}
+                  className={`${themeClasses.input} h-64 resize-none`}
+                  placeholder="Add notes about your character, their goals, relationships, etc..."
+                />
+              </div>
             </div>
           )}
 

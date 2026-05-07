@@ -969,11 +969,20 @@ function PowerIndex({ onBack, embedded = false }) {
     {
       name: "POSSESSION",
       type: "MENTAL",
-      sources: "W3",
+      sources: "ST Power",
       cost: "1 Energy",
       call: "\"Breach Possession\"",
-      description: "You must be in the Umbra and the target must be in the Realm. Roleplay puppetting the target for 10 seconds then place your hands on the target's shoulders.\n\nThe target may only perform actions that you instruct them to do. The target may not activate any powers but retains the use of any passive powers. You may direct the target to use your powers by spending the appropriate cost yourself and having the target perform any associated actions. You and the player of the target character should work together to maintain hand-on-shoulder contact.",
-      searchableText: "possession breach umbra realm roleplay puppetting 10 seconds hands shoulders perform actions instruct activate powers passive direct spending cost associated actions player character hand-on-shoulder contact"
+      description: "ST Power only — no longer available to player characters.\n\nYou must be in the Umbra and the target must be in the Realm. Roleplay puppetting the target for 10 seconds then place your hands on the target's shoulders.\n\nThe target may only perform actions that you instruct them to do. The target may not activate any powers but retains the use of any passive powers. You may direct the target to use your powers by spending the appropriate cost yourself and having the target perform any associated actions. You and the player of the target character should work together to maintain hand-on-shoulder contact.",
+      searchableText: "possession breach umbra realm roleplay puppetting 10 seconds hands shoulders perform actions instruct activate powers passive direct spending cost associated actions player character hand-on-shoulder contact st power"
+    },
+    {
+      name: "PUPPET CONTROL",
+      type: "MENTAL",
+      sources: "W3",
+      cost: "1 Energy",
+      call: "\"Breach Puppetry: [Command]\"",
+      description: "You must be in the Umbra and the target must be in the Realm. The command part of the sig call is OOG. The command must be an action or an action and a targeted noun described in no more than 10 seconds of speech. The action should specify what the target does (a verb), and if relevant, include the method, tool, or location needed to complete it. If you include a duration or condition (such as \"until X happens\"), the target must continue the action until that condition is met. Otherwise, the command ends after the target fulfills it once.\n\nThe target must immediately obey the command to the best of their ability. They may attack and defend themselves as normal, unless prohibited by the command. This power may be used to cause a target to do something that the target knows will cause them to directly take damage.\n\nThis power ends early when the command is obeyed to its fullest once.\n\nNote: This power can never be made Unresistable (example: via Conditioning).\n\nExamples:\n• \"Breach Puppetry: Kill your Friend\" — Target must attack their friend and will continue trying to take them to the dead state.\n• \"Breach Puppetry: Go stand in a Fireplace\" — Target walks to a fireplace, stands for 1 second taking exposure damage, then the command is fulfilled.\n• \"Breach Puppetry: Go stand in the Fireplace in [Place] until you die\" — Target must remain in the fireplace until they drop to 0 Health.",
+      searchableText: "puppet control breach puppetry umbra realm command action verb condition duration obey attack defend unresistable conditioning"
     },
     {
       name: "POWERFUL FORM",
@@ -1237,13 +1246,22 @@ function PowerIndex({ onBack, embedded = false }) {
       searchableText: "sense item stare 10 seconds answer oog yes no carrying magical items attunement marked talisman relics power read item tag information in-game sensory"
     },
     {
+      name: "SENSE LIVING",
+      type: "SENSORY",
+      sources: "Wf",
+      cost: "None",
+      call: "\"Sense Living\"",
+      description: "Stare at the target for 10 seconds. They must answer OOG \"yes\" or \"no\" if their faction is Living.\n\nNote: This power is fooled by Pale Aura (the target answers as if Living regardless of their true faction).",
+      searchableText: "sense living stare 10 seconds answer oog yes no living unliving faction pale aura fooled wraith fundamental sensory"
+    },
+    {
       name: "SENSE MAXIMUM HEALTH",
       type: "SENSORY",
-      sources: "Vr1",
+      sources: "Vr1 Wf",
       cost: "1 Energy",
       call: "\"Sense Maximum Health\"",
       description: "Stare at the target for 10 seconds. They must answer OOG with their current maximum Health.",
-      searchableText: "sense maximum health stare 10 seconds answer oog current maximum health vampire rare sensory"
+      searchableText: "sense maximum health stare 10 seconds answer oog current maximum health vampire rare wraith fundamental sensory"
     },
     {
       name: "SENSE MENTAL",

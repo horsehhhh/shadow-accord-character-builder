@@ -19,6 +19,41 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.6] - 2026-05-06
+
+### 🌑 Wraith Overhaul, Living/Unliving Traits & 2026 Rulebook Sync
+
+#### Added
+- **Living/Unliving trait system**: New `getCharacterTrait()` helper returns `'Living'` or `'Unliving'` based on faction/subfaction (Vampire + Wraith → Unliving; Human `claimed_gorgon` → Unliving; all others → Living). Displayed as a coloured badge in the Overview tab's new "Character Traits" card. Unliving characters also show a "Cannot be healed by Medicine" note
+- **Trait note in PDF**: Attunement/Notes rows now prepend `Trait: Unliving` + `Cannot be healed by Medicine.` (2 rows) or `Trait: Living` (1 row) before the character's own notes
+- **Deathsight fundamentals**: Wraith characters now have two new faction fundamental powers — `Sense Maximum Health` and `Sense Living` — automatically added via the fundamental-powers migration on load. Costs follow the standard power-cost lookup rather than being hardcoded as Free
+- **Specter creation path**: New "Are you a Specter?" toggle in wraith creation (Step 1). Selecting Yes sets Angst to 10 and unlocks Dark Arcanoi trees for innate selection. Selecting No resets Angst to 4 and removes any dark arcanos innates. The `specter` boolean is a creation-only flag — it is stripped from the saved character on finalisation (Specter status is inferred from `stats.virtue >= 10`)
+- **Dark Arcanoi creation gating**: Dark Arcanoi trees in wraith creation are disabled with a "Specter only" corner label unless the Specter toggle is set to Yes
+- **Wraith PDF subfaction fields**: Exported sheet now populates `Subfaction1` = Legion, `Subfaction2` = Guild, `Subfaction3` = "Specter" (if `stats.virtue >= 10`) instead of the generic `character.subfaction`
+- **Wraith free lores at creation**: `assignFreeLore` now grants the matching legion lore and guild lore automatically for new wraith characters (e.g. `iron_legion_lore`, `monitors_lore`)
+- **Wraith character sheet info**: Overview tab replaces the single Subfaction row with separate Legion, Guild, and conditional Specter rows for wraith characters
+- **Wraith header subtitle**: Character card subtitle now shows `· Legion · Guild · Specter` (formatted) instead of the raw subfaction field
+- **Puppet Control power**: New Wraith Level 3 Puppetry power added to both the power tree CSV and PowerIndex. Type MENTAL, cost 1 Energy, call "Breach Puppetry: [Command]", Unresistable. Replaces Possession at level 3
+- **Sense Living power**: New Wraith fundamental power added to PowerIndex. Type SENSORY, cost None, call "Sense Living", includes Pale Aura interaction note
+- **Innate Fallen Paths for Sorcerers**: Sorcerers can now select Fallen Path trees as their innate selection during character creation. Fallen Paths use the same innate cost tier (3/6/9 XP) but require Taint + Demon Patron approved by CG before use in-game. Section description updated to explain the slot rules
+
+#### Changed
+- **Puppetry level 3**: Renamed from Possession to Puppet Control in both the power tree CSV and PowerIndex. Possession moved to "ST Powers" section in PowerIndex
+- **Sorcerer innate tree selection — mutual exclusivity fix**: The creation wizard now correctly enforces that sorcerers choose **either** 2 Sorcerer Trees **or** 1 Fallen Path (never a mix). Sorcerer tree cards show "Fallen Path active" or "Slots full (2/2)" corner labels when locked; Fallen Path cards show "Sorcerer path active" or "1 path only" corner labels. Next button now accepts either 2 sorcerer trees or 1 fallen path as a valid completion state
+- **Unbondable merit**: Updated description to use Blood Bond terminology per 2026 rulebook — requires three feedings (at least 10 min apart) from the same Vampire during the same event instead of the usual twice; clarified that existing Blood Bonds are not invalidated if purchased after bonding
+- **Sense Maximum Health**: Updated sources in PowerIndex from "Vr1" to "Vr1 Wf" (now a wraith fundamental as well as a vampire power)
+- **PDF fundamental power costs**: Fundamental powers now display their correct cost via `getPowerCost()` instead of hardcoded `'Free'` (e.g. Puppet Control correctly shows "1 Energy")
+
+#### Fixed
+- **Wraith "Commoner" subfaction bug**: Old wraith characters with a stale `subfaction: 'commoner'` (from before the legion/guild system) are now automatically migrated to `subfaction: ''` on load. All display, sheet, and PDF code skips `character.subfaction` for wraith characters entirely
+- **Wraith missing fundamental powers**: Migration now automatically adds missing faction fundamental powers (including new Deathsight powers) to existing characters on load
+- **PDF `getSubfactionDisplay`**: No longer includes `character.subfaction` in the display string for wraith characters
+
+#### Removed
+- **Mortwight**: Decommissioned. The Mortwight merit has been removed from the merits CSV. `lost_soul` special notes no longer reference Mortwight
+
+---
+
 ## [v0.4.5] - 2026-05-06
 
 ### 📋 Merit Updates, Character Fields & 2026 Rulebook Sync

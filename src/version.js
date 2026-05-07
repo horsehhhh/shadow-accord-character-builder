@@ -1,5 +1,5 @@
 // Application version - update this when releasing new versions
-export const APP_VERSION = '0.4.5';
+export const APP_VERSION = '0.4.6';
 
 // Minimum version required for cloud connectivity
 export const MIN_CLOUD_VERSION = '0.3.8';
