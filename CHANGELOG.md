@@ -19,6 +19,27 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.5] - 2026-05-06
+
+### 📋 Merit Updates, Character Fields & 2026 Rulebook Sync
+
+#### Added
+- **Sire / Deed Name / Shadow fields**: New character state fields (`sire`, `deedname`) for Vampire and Shifter characters; displayed and editable in the Overview tab's Character Information panel; exported to the `Shadow/Deed Name/Sire` fields on the PDF (label auto-selects "Sire", "Deedname", or "Shadow" based on faction)
+- **Character Information panel moved to Overview**: Name, Player, and the new Sire/Deedname fields are now in the Overview tab instead of the Advancement tab
+
+#### Changed
+- **Delirium merit**: Cost is now a flat 3 XP (non-progressive) for all non-Commoner characters; Commoners may still take it for free; added correct rulebook description text
+- **Oracle merit prereq gating**: Oracle is now greyed out with a tooltip if the character does not meet at least one prerequisite (Theurge Auspice, Dementation 1, Fatalism 1, or Guidance skill ≥ 3); only non-dormant trees count toward power prerequisites
+- **Pale Aura merit**: Updated description to reflect 2026 rulebook ("Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality")
+- **Unbondable merit**: Updated description to reflect 2026 rulebook (requires three feedings 10 min apart from the same vampire during the same event, instead of two)
+- **Rituals skill**: Updated level descriptions to match 2026 rulebook (Scribe / Journey Scribe / Expert Scribe progression with scroll turn-in mechanics)
+- **Test Oath → Test Blood Bond**: Thaumaturgy Rego Vitae Level 1 power renamed to match 2026 rulebook
+
+#### Fixed
+- **Input keystroke drops**: Character Information text inputs now use `defaultValue` + `onBlur` instead of `value` + `onChange`, preventing dropped characters when typing quickly into async-state-bound fields
+
+---
+
 ## [v0.4.4] - 2026-05-06
 
 ### 👨‍👩‍👧 Kinfolk Merit Fix + Merit Math Overhaul (Issue #7)
