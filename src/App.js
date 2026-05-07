@@ -10066,18 +10066,19 @@ Your character is ready to play!`;
           {/* Tab Content */}
           {activeTab === 'overview' && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {/* Character Information Editor */}
-              <div className={`${themeClasses.card} p-5 md:col-span-2 lg:col-span-3`}>
+              {/* Character Information Editor — key forces re-init when switching characters */}
+              <div key={character.id || character._id} className={`${themeClasses.card} p-5 md:col-span-2 lg:col-span-3`}>
                 <h3 className="text-xl font-bold mb-2">Character Information</h3>
                 <div className="grid md:grid-cols-2 gap-2">
                   <div>
                     <label className={themeClasses.label}>Character Name</label>
                     <input
                       type="text"
-                      value={character.name || ''}
-                      onChange={async (e) => {
-                        const updated = { ...character, name: e.target.value, lastModified: new Date().toISOString() };
-                        await updateCurrentCharacter(updated);
+                      defaultValue={character.name || ''}
+                      onBlur={async (e) => {
+                        if (e.target.value !== (character.name || '')) {
+                          await updateCurrentCharacter({ ...character, name: e.target.value, lastModified: new Date().toISOString() });
+                        }
                       }}
                       className={themeClasses.input}
                       placeholder="Enter character name..."
@@ -10087,10 +10088,11 @@ Your character is ready to play!`;
                     <label className={themeClasses.label}>Player Name</label>
                     <input
                       type="text"
-                      value={character.player || ''}
-                      onChange={async (e) => {
-                        const updated = { ...character, player: e.target.value, lastModified: new Date().toISOString() };
-                        await updateCurrentCharacter(updated);
+                      defaultValue={character.player || ''}
+                      onBlur={async (e) => {
+                        if (e.target.value !== (character.player || '')) {
+                          await updateCurrentCharacter({ ...character, player: e.target.value, lastModified: new Date().toISOString() });
+                        }
                       }}
                       className={themeClasses.input}
                       placeholder="Enter player name..."
@@ -10102,10 +10104,11 @@ Your character is ready to play!`;
                       <label className={themeClasses.label}>Sire</label>
                       <input
                         type="text"
-                        value={character.sire || ''}
-                        onChange={async (e) => {
-                          const updated = { ...character, sire: e.target.value, lastModified: new Date().toISOString() };
-                          await updateCurrentCharacter(updated);
+                        defaultValue={character.sire || ''}
+                        onBlur={async (e) => {
+                          if (e.target.value !== (character.sire || '')) {
+                            await updateCurrentCharacter({ ...character, sire: e.target.value, lastModified: new Date().toISOString() });
+                          }
                         }}
                         className={themeClasses.input}
                         placeholder="Enter your sire's name..."
@@ -10118,10 +10121,11 @@ Your character is ready to play!`;
                       <label className={themeClasses.label}>Deed Name</label>
                       <input
                         type="text"
-                        value={character.deedname || ''}
-                        onChange={async (e) => {
-                          const updated = { ...character, deedname: e.target.value, lastModified: new Date().toISOString() };
-                          await updateCurrentCharacter(updated);
+                        defaultValue={character.deedname || ''}
+                        onBlur={async (e) => {
+                          if (e.target.value !== (character.deedname || '')) {
+                            await updateCurrentCharacter({ ...character, deedname: e.target.value, lastModified: new Date().toISOString() });
+                          }
                         }}
                         className={themeClasses.input}
                         placeholder="Enter your deed name..."
