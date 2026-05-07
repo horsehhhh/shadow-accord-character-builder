@@ -466,6 +466,13 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.4.7',
+      date: '2026-05-06',
+      changes: [
+        '📖 Rituals skill updated: level 2 renamed to "Journey Level Scribe", level 3 to "Expert Level Scribe"; Research reward clarified as Complex Public/Guarded; Thesis reward clarified as Expert Public/Guarded/Secret (p. 122)'
+      ]
+    },
+    {
       version: '0.4.3',
       date: '2026-05-06',
       changes: [
@@ -1094,7 +1101,7 @@ holy_water,Holy Water,PRODUCTION,Holy Water production; Purify - Cleanse power; 
 locksmith,Locksmith,PRODUCTION,Keysmith; Lock production; Lockpick,
 medicine,Medicine,OTHER,Health Check - Medicine 2/Sense Health; First Aid - Medicine 4/Detect Dead/Dying/Incapacitated; Diagnosis - Medicine 6/Detect Condition,
 melee,Melee,COMBAT,Martial weapon proficiency; Great Weapons - 2 damage; Flourish - Disarm power,
-rituals,Rituals,OTHER,1: Scribe - receive 1 Simple Public ritual; 2: Journey Scribe - receive 1 Simple/Guarded ritual OR Research (turn in 3 Simple+ scrolls for 1 Complex ritual); 3: Expert Scribe - receive 1 Simple/Guarded/Secret ritual OR Thesis (turn in 3 Complex+ scrolls for 1 Expert ritual),
+rituals,Rituals,OTHER,1: Scribe - receive 1 Simple Public ritual; 2: Journey Level Scribe - receive 1 Simple Public or Guarded ritual OR Research (turn in 3 Simple+ scrolls for 1 Complex Public/Guarded ritual); 3: Expert Level Scribe - receive 1 Simple/Guarded/Secret ritual OR Thesis (turn in 3 Complex+ scrolls for 1 Expert Public/Guarded/Secret ritual),
 shields,Shields,COMBAT,Shield proficiency; Glancing Blow - Withstand power; Deflection - Avoidance power,`,
 
     powerTrees: `tree_id,tree_name,faction,group,level1_powers,level2_powers,level3_powers

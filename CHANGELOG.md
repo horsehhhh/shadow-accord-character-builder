@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.7] - 2026-05-06
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Rituals skill**: Updated level 2 name to "Journey Level Scribe" (was "Journey Scribe") and level 3 to "Expert Level Scribe" (was "Expert Scribe"); Research reward now specifies "Complex Public/Guarded" ritual; Thesis reward now specifies "Expert Public/Guarded/Secret" ritual (p. 122)
+
+---
+
 ## [v0.4.6] - 2026-05-06
 
 ### 🌑 Wraith Overhaul, Living/Unliving Traits & 2026 Rulebook Sync
