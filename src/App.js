@@ -1064,7 +1064,7 @@ holy_water,Holy Water,PRODUCTION,Holy Water production; Purify - Cleanse power; 
 locksmith,Locksmith,PRODUCTION,Keysmith; Lock production; Lockpick,
 medicine,Medicine,OTHER,Health Check - Medicine 2/Sense Health; First Aid - Medicine 4/Detect Dead/Dying/Incapacitated; Diagnosis - Medicine 6/Detect Condition,
 melee,Melee,COMBAT,Martial weapon proficiency; Great Weapons - 2 damage; Flourish - Disarm power,
-rituals,Rituals,OTHER,Ritual Casting and Identification; Scribe common rituals; Duplicate rituals,
+rituals,Rituals,OTHER,1: Scribe - receive 1 Simple Public ritual; 2: Journey Scribe - receive 1 Simple/Guarded ritual OR Research (turn in 3 Simple+ scrolls for 1 Complex ritual); 3: Expert Scribe - receive 1 Simple/Guarded/Secret ritual OR Thesis (turn in 3 Complex+ scrolls for 1 Expert ritual),
 shields,Shields,COMBAT,Shield proficiency; Glancing Blow - Withstand power; Deflection - Avoidance power,`,
 
     powerTrees: `tree_id,tree_name,faction,group,level1_powers,level2_powers,level3_powers
@@ -1142,7 +1142,7 @@ silver_fang_gift,Silver Fang Gift,shifter,tribe_gift,Detect Taint,True Form,Obed
 spirit,Spirit,human,sorcerer,Resist Gauntlet,Cleanse,Exorcism
 thaumaturgy_creo_ignem,Thaumaturgy: Creo Ignem,vampire,thaumaturgy,Fire 2,<Fire> Weapon,Fire 4
 thaumaturgy_rego_aquam,Thaumaturgy: Rego Aquam,vampire,thaumaturgy,Silence,Fabricate Armor,Paralyze
-thaumaturgy_rego_vitae,Thaumaturgy: Rego Vitae,vampire,thaumaturgy,Sense Vitae|Test Generation|Test Oath,Ranged 2 <Blood>,Aggravated 1
+thaumaturgy_rego_vitae,Thaumaturgy: Rego Vitae,vampire,thaumaturgy,Sense Vitae|Test Generation|Test Blood Bond,Ranged 2 <Blood>,Aggravated 1
 thaumaturgy_path_of_the_defiler,Path of the Defiler,vampire,dark_thaumaturgy,Taint,Derange,Balefire
 thaumaturgy_rego_dolor,Rego Dolor (Path of Pain),vampire,dark_thaumaturgy,Silence,Body Wrack,Horrid Reality
 thaumaturgy_rego_manes,Rego Manes (Path of Spirit),vampire,dark_thaumaturgy,Scion of Evil|Sense Demon|Sense Spirit,Umbra Sight,Subjugate
@@ -1214,13 +1214,13 @@ moon_ties,Moon Ties,2,shifter,false,Complex auspice benefits and foibles based o
 mortwight,Mortwight,2,human|shifter|vampire,false,Become Specter when you die,Cannot have with Lost Soul
 nimble,Nimble,1,,false,Resist one damage attack per day,
 oracle,Oracle,2,,false,Receive prophecy at check-in,Requires: Theurge/Dementation 1/Fatalism 1/Guidance 3
-pale_aura,Pale Aura,1,,false,Answer Sense Faction as Human,
+pale_aura,Pale Aura,1,,false,Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality,
 steel_trap,Steel Trap,1,,false,Aware when targeted by Forgetful Mind,
 strong_will,Strong Will,1,,false,Mental powers last 5 minutes instead of 10,
 tainted_soul,Tainted Soul,1,,false,Permanently tainted,
 taste_of_oblivion,Taste of Oblivion,2,wraith,false,When drained while tainted causes catharsis in drainer,Only active while Tainted
 umbral_affinity,Umbral Affinity,1,shifter,false,Step Sideways takes 30 seconds instead of 60,
-unbondable,Unbondable,2,human,false,Requires three feedings for blood oath instead of two,Lost if no longer Human`,
+unbondable,Unbondable,2,human,false,Requires three feedings (10 min apart) from the same vampire during the same event to form a Blood Burden instead of two. Does not invalidate existing Blood Burdens.,Lost if no longer Human`,
 
     xpCosts: `item_type,base_cost,multiplier,notes
 changing_road,1,0,1 XP to change vampire road
