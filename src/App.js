@@ -2390,7 +2390,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
 
   const getEffectiveMaxHealth = useCallback((character) => {
     let max = character.stats?.maxHealth || 0;
-    max += (character.merits?.healthy || 0) * 2;
+    if (character.merits?.healthy) max += 2;
     const hasToughness = gameData.powerTrees?.some(
       t => t.level3_powers?.split('|').includes('Toughness') && character.powers?.[t.tree_id]?.[3]
     );
