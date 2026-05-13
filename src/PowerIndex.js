@@ -441,8 +441,8 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "Hr3 Hc2 Sr2 V2 Wc2",
       cost: "1 Energy",
       call: "\"Entrancement\"",
-      description: "The target behaves as though they are Oathed to you. The power ends if you attack the target. The target may choose to resist this power even though they are under an Oath.",
-      searchableText: "entrancement oathed attack resist oath mental"
+      description: "The target behaves as though they have a Blood Bond to you for the duration of this power. The Burden ends if you attack the target. The target may spend Willpower to resist this power even though they normally could not while under a Blood Bond.",
+      searchableText: "entrancement blood bond burden attack resist willpower blood bond mental"
     },
     {
       name: "ESCAPE",

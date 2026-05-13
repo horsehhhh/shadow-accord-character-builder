@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.5.3] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Entrancement**: Updated Blood Oath references to Blood Burden — target is now "Blood Bound", effect called "Burden", Willpower resistance explicitly permitted even when normally prohibited under a Blood Bond
+
+---
+
 ## [v0.5.2] - 2026-05-12
 
 ### 📖 Rulebook Sync

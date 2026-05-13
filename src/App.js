@@ -466,6 +466,13 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.5.3',
+      date: '2026-05-12',
+      changes: [
+        '📖 Entrancement: updated to Blood Burden terminology — target is Blood Bound, effect called Burden, Willpower resistance explicitly permitted'
+      ]
+    },
+    {
       version: '0.5.2',
       date: '2026-05-12',
       changes: [
