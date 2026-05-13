@@ -466,6 +466,14 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.5.1',
+      date: '2026-05-12',
+      changes: [
+        '📖 Shatter: sig call volume updated to "as loud as you safely can" (p. 144)',
+        '📖 Telepathy: added "does not count as an attack" and Gauntlet use via Breach meta call (p. 147)'
+      ]
+    },
+    {
       version: '0.5.0',
       date: '2026-05-12',
       changes: [

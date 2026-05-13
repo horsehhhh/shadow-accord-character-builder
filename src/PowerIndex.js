@@ -1341,8 +1341,8 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "H1 S1 V1 W2",
       cost: "1 Energy",
       call: "\"SHATTER!\" (shouted)",
-      description: "Roleplay breaking an object for 10 seconds while touching it with both hands. You must then shout the sig call, loud enough that if you were in a two-story building, anyone else inside could hear you.\n\nRemove and destroy the item tag. If used on Restraints, free yourself from them. This power cannot destroy Wards.\n*Breachable Umbra → Realm*",
-      searchableText: "shatter roleplay breaking object 10 seconds touching both hands shout sig call loud two-story building anyone inside hear remove destroy item tag restraints free wards breachable umbra realm"
+      description: "Roleplay breaking an object for 10 seconds while touching it with both hands. You must then shout the sig call as loud as you safely can.\n\nRemove and destroy the item tag. If used on Restraints, free yourself from them. This power cannot destroy Wards.\n*Breachable Umbra → Realm*",
+      searchableText: "shatter roleplay breaking object 10 seconds touching both hands shout sig call loud safely remove destroy item tag restraints free wards breachable umbra realm"
     },
     {
       name: "SILENCE",
@@ -1458,8 +1458,8 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "H2 Hc2 S2 V2 W2 Wc2",
       cost: "None",
       call: "\"Telepathy\"",
-      description: "Hold two fingers to your temple and whisper to a target you can see who is within Mental range. This can be used across the Gauntlet. These whispered words are heard only in the target's mind. The target may hold two fingers to their temple to respond. This power ends if either of you remove your fingers from your temples or if you move outside of Mental range of each other.\n\nYou may also hear in-game any words spoken by other characters who are using this power, without placing your fingers on your temple.",
-      searchableText: "telepathy hold two fingers temple whisper target mental range gauntlet whispered words heard mind respond remove outside hear in-game spoken characters placing"
+      description: "Hold two fingers to your temple and whisper to a target you can see who is within Mental range. These whispered words are heard only in the target's mind. The target may hold two fingers to their temple to respond. This power ends if either of you remove your fingers from your temples or if you move outside of Mental range of each other.\n\nUsing Telepathy does not count as an attack. This can be used across the Gauntlet by adding the \"Breach\" meta call.\n\nYou may also hear in-game any words spoken by other characters who are using this power, without placing your fingers on your temple.",
+      searchableText: "telepathy hold two fingers temple whisper target mental range not attack breach gauntlet whispered words heard mind respond remove outside hear in-game spoken characters placing"
     },
     {
       name: "TEMPORARY ANGST",

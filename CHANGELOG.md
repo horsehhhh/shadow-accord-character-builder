@@ -19,6 +19,16 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.5.1] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Shatter**: Sig call volume requirement updated to "as loud as you safely can" (p. 144)
+- **Telepathy**: Added "does not count as an attack" and Gauntlet use via "Breach" meta call (p. 147)
+
+---
+
 ## [v0.5.0] - 2026-05-12
 
 ### 📖 Rulebook Sync
