@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.5.2] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Test Oath → Test Blood Bond**: Renamed power and call; updated description to reference Blood Bond instead of Blood Oath (p. 149)
+
+---
+
 ## [v0.5.1] - 2026-05-12
 
 ### 📖 Rulebook Sync

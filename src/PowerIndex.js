@@ -1507,13 +1507,13 @@ function PowerIndex({ onBack, embedded = false }) {
       searchableText: "test generation consume 1 point target vitae state oog generation not vampires no effect vampire sensory"
     },
     {
-      name: "TEST OATH",
+      name: "TEST BLOOD BOND",
       type: "SENSORY",
       sources: "V1",
       cost: "None",
-      call: "\"Test Blood Oath\"",
-      description: "Consume at least 1 point of a target's blood or Vitae. The target must answer OOG \"yes\" or \"no\" if they are currently under the effect of a Blood Oath.",
-      searchableText: "test oath consume 1 point target blood vitae answer oog yes no currently under effect blood oath vampire sensory"
+      call: "\"Test Blood Bond\"",
+      description: "Consume at least 1 point of the target's blood or Vitae. The target must answer OOG \"yes\" or \"no\" if they are currently under the effect of a Blood Bond.",
+      searchableText: "test blood bond consume 1 point target blood vitae answer oog yes no currently under effect blood bond vampire sensory"
     },
     {
       name: "TEST VITAE",
