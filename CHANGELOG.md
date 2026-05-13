@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.9] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Mask of a Thousand Faces**: Clarified garb requirements — can disguise without face covering or with a second layer of garb, and may wear a different set of garb (p. 137)
+
+---
+
 ## [v0.4.8] - 2026-05-12
 
 ### 📖 Rulebook Sync

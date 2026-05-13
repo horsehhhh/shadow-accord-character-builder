@@ -765,8 +765,8 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "Hr2 Sr2 V2",
       cost: "None",
       call: "None",
-      description: "You may put on any Transformation mask you desire. You may disregard any Makeup Requirements. You may Disguise yourself without a face covering, as though adopting a new identity (not as any existing PC or NPC).",
-      searchableText: "mask thousand faces transformation desire disregard makeup requirements disguise face covering identity existing"
+      description: "You may put on any Transformation mask you desire. You may disregard any Makeup Requirements. You may Disguise yourself without a face covering, or wearing a second layer of garb, as though adopting a new identity (not as any existing PC or NPC). You may wear a different set of garb.",
+      searchableText: "mask thousand faces transformation desire disregard makeup requirements disguise face covering second layer garb identity existing"
     },
     {
       name: "MASS TAUNT",

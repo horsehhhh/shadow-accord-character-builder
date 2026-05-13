@@ -466,6 +466,13 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.4.9',
+      date: '2026-05-12',
+      changes: [
+        '📖 Mask of a Thousand Faces: clarified garb requirements — can disguise without face covering or with a second layer of garb; may wear a different set of garb (p. 137)'
+      ]
+    },
+    {
       version: '0.4.8',
       date: '2026-05-12',
       changes: [
