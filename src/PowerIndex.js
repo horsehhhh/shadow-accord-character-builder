@@ -756,8 +756,8 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "Hr3 V3 Wt",
       cost: "2 Energy",
       call: "\"Mass Entrancement\"",
-      description: "All targets behave as though they are Oathed to you for the duration of this power. The Oath ends for an individual target if you attack them. Targets may spend Willpower to resist this power even though they are under an Oath.",
-      searchableText: "majesty mass entrancement targets oathed duration oath individual attack willpower resist"
+      description: "All targets behave as though they are Blood Bound to you for the duration of this power. The Burden ends for an individual target if you attack them. Targets may spend Willpower to resist this power even though they normally could not while under a Blood Bond.",
+      searchableText: "majesty mass entrancement targets blood bound burden duration blood bond individual attack willpower resist"
     },
     {
       name: "MASK OF A THOUSAND FACES",

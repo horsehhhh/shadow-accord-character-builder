@@ -466,6 +466,13 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.5.0',
+      date: '2026-05-12',
+      changes: [
+        '📖 Majesty: Blood Oath references updated to Blood Burden — targets are Blood Bound, effect called Burden, Willpower resistance explicitly permitted (p. 137)'
+      ]
+    },
+    {
       version: '0.4.9',
       date: '2026-05-12',
       changes: [

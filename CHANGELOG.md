@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.5.0] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Majesty**: Updated Blood Oath references to Blood Burden — targets are now "Blood Bound", the effect is called "Burden", and Willpower resistance is explicitly permitted even when it normally wouldn't be under a Blood Bond (p. 137)
+
+---
+
 ## [v0.4.9] - 2026-05-12
 
 ### 📖 Rulebook Sync
