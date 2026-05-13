@@ -19,6 +19,15 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.4.8] - 2026-05-12
+
+### 📖 Rulebook Sync
+
+#### Changed
+- **Leech of Fear**: Added max Energy cap — "to a maximum of 10 more Energy" (p. 134)
+
+---
+
 ## [v0.4.7] - 2026-05-06
 
 ### 📖 Rulebook Sync

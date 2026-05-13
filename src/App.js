@@ -466,6 +466,13 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.4.8',
+      date: '2026-05-12',
+      changes: [
+        '📖 Leech of Fear: added max Energy cap "to a maximum of 10 more Energy" (p. 134)'
+      ]
+    },
+    {
       version: '0.4.7',
       date: '2026-05-06',
       changes: [

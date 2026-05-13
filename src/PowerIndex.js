@@ -738,7 +738,7 @@ function PowerIndex({ onBack, embedded = false }) {
       sources: "Vc3",
       cost: "None",
       call: "None",
-      description: "Each time you use the Dreamshape power on a target, your maximum Energy is increased by one for the remainder of the event. This bonus can only be received once per target per event.",
+      description: "Each time you use the Dreamshape power on a target, your maximum Energy is increased by one for the remainder of the event, to a maximum of 10 more Energy. This bonus can only be received once per target per event.",
       searchableText: "leech fear dreamshape maximum energy increased remainder event bonus once target vampire corrupt passive"
     },
     {
