@@ -2388,6 +2388,20 @@ pleasure,Pleasure,Joy|excitement|comfort`
     return 'Living';
   };
 
+  const getEffectiveMaxHealth = useCallback((character) => {
+    let max = character.stats?.maxHealth || 0;
+    max += (character.merits?.healthy || 0) * 2;
+    const hasToughness = gameData.powerTrees?.some(
+      t => t.level3_powers?.split('|').includes('Toughness') && character.powers?.[t.tree_id]?.[3]
+    );
+    if (hasToughness) max += 4;
+    const hasHideOfWyrm = gameData.powerTrees?.some(
+      t => t.level1_powers?.split('|').includes('Hide of the Wyrm') && character.powers?.[t.tree_id]?.[1]
+    );
+    if (hasHideOfWyrm) max += 2;
+    return max;
+  }, [gameData.powerTrees]);
+
   // Returns true if a character's tree is currently dormant
   const isTreeDormant = useCallback((character, tree) => {
     // Non-human faction change: any tree from a different faction is a residual and is dormant
@@ -10343,7 +10357,7 @@ Your character is ready to play!`;
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span>Health</span>
-                    <span className="font-medium">{character.stats.health} / {character.stats.maxHealth}</span>
+                    <span className="font-medium">{character.stats.health} / {getEffectiveMaxHealth(character)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Willpower</span>
