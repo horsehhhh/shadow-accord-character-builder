@@ -1569,6 +1569,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
     sharedWith: [], // For character sharing
     factionChanges: [], // For tracking faction transformations
     tempFactionChangePowers: 0, // Track free powers to assign after faction change
+    inventory: { coin: { silvers: 0, coppers: 0 }, items: [] },
     version: '0.3.3' // Current version for data migration
   });
 
@@ -10349,7 +10350,7 @@ Your character is ready to play!`;
           {/* Tabs - Scrollable on mobile */}
           <div className="overflow-x-auto mb-5 border-b border-gray-700">
             <div className="flex space-x-1 min-w-max">
-              {['overview', 'advancement', 'powers', 'power-index', 'lore', 'history', 'xp-tracking', 'notes', 'faction-change', 'self-nerf', 'rank-gen'].map(tab => (
+              {['overview', 'advancement', 'powers', 'power-index', 'lore', 'history', 'xp-tracking', 'notes', 'inventory', 'faction-change', 'self-nerf', 'rank-gen'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -11275,6 +11276,54 @@ Your character is ready to play!`;
                   )}
                 </div>
               </div>
+
+              {/* Starting Coin — freebie XP only, before first check-in */}
+              {(character.checkInCount || 0) === 0 && (
+                <div className={`${themeClasses.card} p-3 md:col-span-2 lg:col-span-3`}>
+                  <h3 className="text-xl font-bold mb-1">Starting Coin</h3>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Spend freebie XP on extra starting coin. All characters also receive{' '}
+                    <strong className="text-yellow-300">5 Silvers free</strong> at first Check-In.
+                    {character.faction === 'wraith' && ' Wraiths receive coin as Oboli (Silvers) and Bits (Coppers).'}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-3 bg-gray-700 rounded-lg p-3">
+                      <div>
+                        <div className="font-medium">{character.faction === 'wraith' ? '1 Obulus' : '1 Silver'}</div>
+                        <div className="text-xs text-gray-400">= 12 {character.faction === 'wraith' ? 'Bits' : 'Copper'}</div>
+                      </div>
+                      <span className="text-blue-300 font-bold">3 XP</span>
+                      <button
+                        onClick={async () => {
+                          if (character.totalXP < 3) { alert('Insufficient XP'); return; }
+                          const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                          const xpEntry = { timestamp: new Date().toISOString(), type: 'loss', amount: 3, reason: `Purchased 1 ${character.faction === 'wraith' ? 'Obulus' : 'Silver'} (starting coin)`, previousTotal: character.totalXP, newTotal: character.totalXP - 3 };
+                          await updateCurrentCharacter({ ...character, totalXP: character.totalXP - 3, xpSpent: character.xpSpent + 3, inventory: { ...inv, coin: { ...inv.coin, silvers: (inv.coin?.silvers || 0) + 1 } }, xpHistory: [...(character.xpHistory || []), xpEntry], lastModified: new Date().toISOString() });
+                        }}
+                        disabled={character.totalXP < 3}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded text-sm font-medium"
+                      >Buy</button>
+                    </div>
+                    <div className="flex items-center gap-3 bg-gray-700 rounded-lg p-3">
+                      <div>
+                        <div className="font-medium">4 {character.faction === 'wraith' ? 'Bits' : 'Copper'}</div>
+                      </div>
+                      <span className="text-blue-300 font-bold">1 XP</span>
+                      <button
+                        onClick={async () => {
+                          if (character.totalXP < 1) { alert('Insufficient XP'); return; }
+                          const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                          const xpEntry = { timestamp: new Date().toISOString(), type: 'loss', amount: 1, reason: `Purchased 4 ${character.faction === 'wraith' ? 'Bits' : 'Copper'} (starting coin)`, previousTotal: character.totalXP, newTotal: character.totalXP - 1 };
+                          await updateCurrentCharacter({ ...character, totalXP: character.totalXP - 1, xpSpent: character.xpSpent + 1, inventory: { ...inv, coin: { ...inv.coin, coppers: (inv.coin?.coppers || 0) + 4 } }, xpHistory: [...(character.xpHistory || []), xpEntry], lastModified: new Date().toISOString() });
+                        }}
+                        disabled={character.totalXP < 1}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded text-sm font-medium"
+                      >Buy</button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Coin can only be purchased with freebie XP (before first Check-In). Use the Inventory tab to manage coin manually at any time.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -13214,6 +13263,157 @@ Your character is ready to play!`;
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <div className="space-y-5">
+              {/* Starting grant notice */}
+              {(character.checkInCount || 0) === 0 && (
+                <div className="p-4 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
+                  <h4 className="font-bold text-yellow-300 mb-1">Starting Grant</h4>
+                  <p className="text-sm text-yellow-200">
+                    New characters receive <strong>5 Silvers</strong> of starting coin/gear at first Check-In.
+                    {character.faction === 'wraith' && ' Wraiths receive coin as Oboli (Silvers) and Bits (Coppers).'}
+                    {' '}Use the <strong>Advancement</strong> tab to buy extra coin with freebie XP.
+                  </p>
+                </div>
+              )}
+
+              {/* Coin */}
+              <div className={`${themeClasses.card} p-4`}>
+                <h3 className="text-xl font-bold mb-1">{character.faction === 'wraith' ? 'Currency' : 'Coin'}</h3>
+                <p className="text-xs text-gray-400 mb-4">
+                  12 {character.faction === 'wraith' ? 'Bits' : 'Copper'} = 1 {character.faction === 'wraith' ? 'Obulus' : 'Silver'}
+                </p>
+                <div className="grid grid-cols-2 gap-6 mb-4">
+                  {[
+                    { key: 'silvers', label: character.faction === 'wraith' ? 'Oboli' : 'Silvers' },
+                    { key: 'coppers', label: character.faction === 'wraith' ? 'Bits' : 'Coppers' },
+                  ].map(({ key, label }) => (
+                    <div key={key} className="text-center">
+                      <div className="text-sm text-gray-400 mb-2">{label}</div>
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={async () => {
+                            const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                            const cur = inv.coin?.[key] || 0;
+                            if (cur <= 0) return;
+                            await updateCurrentCharacter({ ...character, inventory: { ...inv, coin: { ...inv.coin, [key]: cur - 1 } }, lastModified: new Date().toISOString() });
+                          }}
+                          className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600 font-bold"
+                        >-</button>
+                        <span className="text-2xl font-bold w-12 text-center">{character.inventory?.coin?.[key] || 0}</span>
+                        <button
+                          onClick={async () => {
+                            const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                            await updateCurrentCharacter({ ...character, inventory: { ...inv, coin: { ...inv.coin, [key]: (inv.coin?.[key] || 0) + 1 } }, lastModified: new Date().toISOString() });
+                          }}
+                          className="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600 font-bold"
+                        >+</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={async () => {
+                      const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                      if ((inv.coin?.silvers || 0) < 1) { alert(`No ${character.faction === 'wraith' ? 'Oboli' : 'Silvers'} to break`); return; }
+                      await updateCurrentCharacter({ ...character, inventory: { ...inv, coin: { silvers: inv.coin.silvers - 1, coppers: (inv.coin?.coppers || 0) + 12 } }, lastModified: new Date().toISOString() });
+                    }}
+                    className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded"
+                  >
+                    Break 1 {character.faction === 'wraith' ? 'Obulus' : 'Silver'} → 12 {character.faction === 'wraith' ? 'Bits' : 'Copper'}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                      if ((inv.coin?.coppers || 0) < 12) { alert(`Not enough ${character.faction === 'wraith' ? 'Bits' : 'Copper'}`); return; }
+                      await updateCurrentCharacter({ ...character, inventory: { ...inv, coin: { silvers: (inv.coin?.silvers || 0) + 1, coppers: inv.coin.coppers - 12 } }, lastModified: new Date().toISOString() });
+                    }}
+                    className="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded"
+                  >
+                    12 {character.faction === 'wraith' ? 'Bits' : 'Copper'} → 1 {character.faction === 'wraith' ? 'Obulus' : 'Silver'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Items */}
+              <div className={`${themeClasses.card} p-4`}>
+                <h3 className="text-xl font-bold mb-3">Items &amp; Equipment</h3>
+                <div className="space-y-2 mb-3">
+                  {(character.inventory?.items || []).length === 0 && (
+                    <p className="text-gray-400 text-sm">No items. Add weapons, armor, rituals, or other gear.</p>
+                  )}
+                  {(character.inventory?.items || []).map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                      <span className="text-sm">{item}</span>
+                      <button
+                        onClick={async () => {
+                          const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                          await updateCurrentCharacter({ ...character, inventory: { ...inv, items: inv.items.filter((_, i) => i !== idx) }, lastModified: new Date().toISOString() });
+                        }}
+                        className="text-red-400 hover:text-red-300 text-sm px-2 ml-2"
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+                {(() => {
+                  let addItemInput = null;
+                  const addItem = async () => {
+                    if (!addItemInput?.value?.trim()) return;
+                    const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                    await updateCurrentCharacter({ ...character, inventory: { ...inv, items: [...(inv.items || []), addItemInput.value.trim()] }, lastModified: new Date().toISOString() });
+                    addItemInput.value = '';
+                  };
+                  return (
+                    <div className="flex gap-2">
+                      <input
+                        ref={el => { addItemInput = el; }}
+                        type="text"
+                        placeholder="Add item (e.g. Light Armor, Silver Dagger)..."
+                        className={`${themeClasses.input} flex-1 text-sm`}
+                        onKeyDown={e => { if (e.key === 'Enter') addItem(); }}
+                      />
+                      <button onClick={addItem} className={`${themeClasses.button} text-sm px-4`}>Add</button>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Gear Reference */}
+              <div className={`${themeClasses.card} p-4`}>
+                <h3 className="text-xl font-bold mb-3">Gear Reference</h3>
+                <div className="grid md:grid-cols-2 gap-5">
+                  <div>
+                    <h4 className="font-semibold text-gray-300 mb-2">Mundane Items</h4>
+                    <table className="w-full text-sm">
+                      <tbody>
+                        {[['Light Armor','8 Copper'],['Medium Armor','1 Silver'],['Heavy Armor','1 Silver, 9 Copper'],['Ranged Weapon','1 Silver'],['Martial Weapon','1 Silver'],['Shield','1 Silver, 6 Copper'],['Silver Dagger','15 Silver'],['Key','2 Copper'],['Lock','1 Silver']].map(([item, cost]) => (
+                          <tr key={item} className="border-b border-gray-700">
+                            <td className="py-1 pr-3">{item}</td>
+                            <td className="py-1 text-yellow-300 whitespace-nowrap">{cost}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-300 mb-2">Supernatural Items</h4>
+                    <table className="w-full text-sm">
+                      <tbody>
+                        {[['Antidote','4 Copper'],['Healing Potion','5 Copper'],['Simple Ritual','1 Silver'],['Complex Ritual','3 Silver'],['Expert Ritual','10 Silver'],['Relic (Generic)','6 Silver'],['Melee – Iron','5 Silver'],['Melee – Silver','15 Silver'],['Melee – Gold','30 Silver'],['Bit (Wraith)','6 Copper'],['Obulus (Wraith)','2 Silver']].map(([item, cost]) => (
+                          <tr key={item} className="border-b border-gray-700">
+                            <td className="py-1 pr-3">{item}</td>
+                            <td className="py-1 text-yellow-300 whitespace-nowrap">{cost}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
