@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { ChevronRight, ChevronDown, Menu, X } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -17,7 +18,27 @@ const DOCUMENTS = [
   { id: 'other',     label: 'Other Rituals',      file: '/Shadow Accord Other Rituals List (2025).pdf' },
 ];
 
-// â”€â”€â”€ Recursive outline tree with depth-based visual hierarchy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Pre-resolve all outline item destinations to page numbers up front
+const resolveOutlineItems = async (doc, items) => {
+  if (!items?.length) return [];
+  const resolved = await Promise.all(
+    items.map(async (item) => {
+      let pageNum = null;
+      if (item.dest) {
+        try {
+          let dest = item.dest;
+          if (typeof dest === 'string') dest = await doc.getDestination(dest);
+          if (dest?.[0] != null) pageNum = (await doc.getPageIndex(dest[0])) + 1;
+        } catch { /* ignore unresolvable destinations */ }
+      }
+      const children = await resolveOutlineItems(doc, item.items);
+      return { title: item.title, pageNum, items: children };
+    })
+  );
+  return resolved;
+};
+
+// Recursive TOC tree with depth-based visual hierarchy
 const OutlineTree = ({ items, onNavigate, depth = 0 }) => {
   const [expanded, setExpanded] = useState({});
 
@@ -38,14 +59,18 @@ const OutlineTree = ({ items, onNavigate, depth = 0 }) => {
             }`}>
               <button
                 onClick={() => hasChildren && setExpanded(e => ({ ...e, [i]: !e[i] }))}
-                className={`text-xs w-3 flex-shrink-0 mt-0.5 transition-colors ${
-                  hasChildren ? 'text-gray-500 hover:text-gray-300 cursor-pointer' : 'cursor-default text-transparent'
+                className={`flex-shrink-0 mt-0.5 transition-colors ${
+                  hasChildren ? 'text-gray-500 hover:text-gray-300 cursor-pointer' : 'cursor-default opacity-0'
                 }`}
+                tabIndex={hasChildren ? 0 : -1}
               >
-                {hasChildren ? (isExpanded ? 'â–¾' : 'â–¸') : 'Â·'}
+                {hasChildren
+                  ? (isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />)
+                  : <span className="w-3 h-3 block" />
+                }
               </button>
               <button
-                onClick={() => onNavigate(item)}
+                onClick={() => item.pageNum && onNavigate(item.pageNum)}
                 className={`text-left leading-snug break-words transition-colors hover:text-red-400 ${
                   isTopLevel
                     ? 'text-xs font-semibold text-gray-100'
@@ -67,31 +92,31 @@ const OutlineTree = ({ items, onNavigate, depth = 0 }) => {
   );
 };
 
-// â”€â”€â”€ Main viewer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Main viewer
 const RulesViewer = ({ onBack, themeClasses }) => {
-  const [activeDocId, setActiveDocId]       = useState('rulebook');
-  const [numPages, setNumPages]             = useState(null);
-  const [pageInput, setPageInput]           = useState('1');
-  const [scale, setScale]                   = useState(1.0);
-  const [pdfDoc, setPdfDoc]                 = useState(null);
-  const [outline, setOutline]               = useState([]);
-  const [hasOutline, setHasOutline]         = useState(false);
-  const [sidebarOpen, setSidebarOpen]       = useState(true);
-  const [visiblePages, setVisiblePages]     = useState(new Set([1, 2, 3]));
+  const [activeDocId, setActiveDocId]         = useState('rulebook');
+  const [numPages, setNumPages]               = useState(null);
+  const [pageInput, setPageInput]             = useState('1');
+  const [scale, setScale]                     = useState(1.0);
+  const [pdfDoc, setPdfDoc]                   = useState(null);
+  const [outline, setOutline]                 = useState([]);
+  const [hasOutline, setHasOutline]           = useState(false);
+  const [sidebarOpen, setSidebarOpen]         = useState(true);
+  const [visiblePages, setVisiblePages]       = useState(new Set([1, 2, 3]));
 
   // Search state
-  const [searchQuery, setSearchQuery]       = useState('');
+  const [searchQuery, setSearchQuery]         = useState('');
   const [activeHighlight, setActiveHighlight] = useState('');
-  const [searchResults, setSearchResults]   = useState([]);
-  const [searchIdx, setSearchIdx]           = useState(0);
-  const [isSearching, setIsSearching]       = useState(false);
-  const [searchDone, setSearchDone]         = useState(false);
+  const [searchResults, setSearchResults]     = useState([]);
+  const [searchIdx, setSearchIdx]             = useState(0);
+  const [isSearching, setIsSearching]         = useState(false);
+  const [searchDone, setSearchDone]           = useState(false);
 
-  const pageRefs   = useRef({});
+  const pageRefs    = useRef({});
   const observerRef = useRef(null);
   const currentDoc  = DOCUMENTS.find(d => d.id === activeDocId);
 
-  // â”€â”€ Set up IntersectionObserver for lazy page rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Set up IntersectionObserver for lazy page rendering
   useEffect(() => {
     if (!numPages) return;
 
@@ -104,14 +129,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           if (isNaN(pageNum)) return;
           setVisiblePages(prev => {
             const next = new Set(prev);
-            for (let p = Math.max(1, pageNum - 2); p <= Math.min(numPages, pageNum + 2); p++) {
+            for (let p = Math.max(1, pageNum - 1); p <= Math.min(numPages, pageNum + 1); p++) {
               next.add(p);
             }
             return next;
           });
         });
       },
-      { rootMargin: '400px', threshold: 0 }
+      { rootMargin: '100px', threshold: 0 }
     );
 
     Object.values(pageRefs.current).forEach(el => {
@@ -121,7 +146,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return () => observerRef.current?.disconnect();
   }, [numPages]);
 
-  // â”€â”€ Switch document â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Switch document
   const switchDoc = useCallback((docId) => {
     setActiveDocId(docId);
     setNumPages(null);
@@ -138,46 +163,46 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     pageRefs.current = {};
   }, []);
 
-  // â”€â”€ Document load success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Document load - also pre-resolves all outline destinations in parallel
   const onLoadSuccess = useCallback(async (doc) => {
     setPdfDoc(doc);
     setNumPages(doc.numPages);
     setPageInput('1');
     try {
-      const ol = await doc.getOutline();
-      if (ol?.length) { setOutline(ol); setHasOutline(true); }
-      else            { setOutline([]); setHasOutline(false); }
+      const rawOutline = await doc.getOutline();
+      if (rawOutline?.length) {
+        const resolved = await resolveOutlineItems(doc, rawOutline);
+        setOutline(resolved);
+        setHasOutline(true);
+      } else {
+        setOutline([]);
+        setHasOutline(false);
+      }
     } catch {
-      setOutline([]); setHasOutline(false);
+      setOutline([]);
+      setHasOutline(false);
     }
   }, []);
 
-  // â”€â”€ Scroll to a page number â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Scroll to page - synchronous, no async work
   const scrollToPage = useCallback((pageNum) => {
     pageRefs.current[pageNum]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setPageInput(String(pageNum));
   }, []);
 
-  // â”€â”€ Resolve outline bookmark â†’ page number â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const handleOutlineClick = useCallback(async (item) => {
-    if (!pdfDoc || !item?.dest) return;
-    try {
-      let destArray = item.dest;
-      if (typeof destArray === 'string') destArray = await pdfDoc.getDestination(destArray);
-      if (!destArray) return;
-      const pageIndex = await pdfDoc.getPageIndex(destArray[0]);
-      scrollToPage(pageIndex + 1);
-    } catch { /* ignore bad destinations */ }
-  }, [pdfDoc, scrollToPage]);
+  // Outline click - pageNum already resolved, instant response
+  const handleOutlineClick = useCallback((pageNum) => {
+    scrollToPage(pageNum);
+  }, [scrollToPage]);
 
-  // â”€â”€ Page jump â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Jump to page from input
   const jumpToPage = useCallback(() => {
     const val = parseInt(pageInput, 10);
     if (!isNaN(val) && val >= 1 && val <= (numPages || 1)) scrollToPage(val);
     else setPageInput('1');
   }, [pageInput, numPages, scrollToPage]);
 
-  // â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Search through all pages
   const performSearch = useCallback(async () => {
     if (!searchQuery.trim() || !pdfDoc) return;
     setIsSearching(true);
@@ -206,10 +231,9 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setActiveHighlight(searchQuery.trim());
 
     if (results.length > 0) {
-      // Pre-render nearby result pages
       setVisiblePages(prev => {
         const next = new Set(prev);
-        results.slice(0, 10).forEach(p => {
+        results.slice(0, 5).forEach(p => {
           for (let i = Math.max(1, p - 1); i <= Math.min(pdfDoc.numPages, p + 1); i++) next.add(i);
         });
         return next;
@@ -225,7 +249,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setTimeout(() => scrollToPage(searchResults[next]), 50);
   }, [searchIdx, searchResults, scrollToPage]);
 
-  // â”€â”€ Search term highlight renderer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Search term highlight renderer for PDF text layer
   const customTextRenderer = useCallback(({ str }) => {
     if (!activeHighlight || !str) return str;
     const query    = activeHighlight.toLowerCase();
@@ -252,14 +276,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return parts;
   }, [activeHighlight]);
 
-  // â”€â”€ Android fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Android fallback - open PDFs externally
   const isAndroid = typeof window !== 'undefined' && window.Capacitor?.getPlatform?.() === 'android';
 
   if (isAndroid) {
     return (
       <div className={`min-h-screen ${themeClasses.base}`}>
         <div className="max-w-lg mx-auto px-4 py-6">
-          <button onClick={onBack} className="text-gray-400 hover:text-white mb-6 text-sm flex items-center gap-1">â† Back</button>
+          <button onClick={onBack} className="text-gray-400 hover:text-white mb-6 text-sm">Back</button>
           <h1 className="text-2xl font-bold text-red-400 mb-2">Rules &amp; Rituals</h1>
           <p className="text-gray-400 text-sm mb-6">Tap a document to open it.</p>
           <div className="space-y-3">
@@ -267,7 +291,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
               <a key={doc.id} href={doc.file} target="_blank" rel="noopener noreferrer"
                 className={`${themeClasses.card} p-4 flex items-center justify-between hover:shadow-lg transition-all`}>
                 <span className="font-medium">{doc.label}</span>
-                <span className="text-gray-400 text-sm">Open â†’</span>
+                <span className="text-gray-400 text-sm">Open</span>
               </a>
             ))}
           </div>
@@ -276,13 +300,12 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     );
   }
 
-  // â”€â”€ Full viewer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className={`${themeClasses.base} flex flex-col`} style={{ height: '100vh' }}>
 
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-700 flex-shrink-0">
-        <button onClick={onBack} className="text-gray-400 hover:text-white text-sm mr-2">â† Back</button>
+        <button onClick={onBack} className="text-gray-400 hover:text-white text-sm mr-2">Back</button>
         <h1 className="text-lg font-bold text-red-400 mr-auto">Rules &amp; Rituals</h1>
       </div>
 
@@ -304,10 +327,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
         {/* TOC toggle */}
         {hasOutline && (
           <button onClick={() => setSidebarOpen(o => !o)}
-            className={`px-2 py-1 rounded text-xs transition-colors flex-shrink-0 ${
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors flex-shrink-0 ${
               sidebarOpen ? 'bg-red-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
             }`}>
-            â˜° TOC
+            <Menu className="w-3 h-3" /> TOC
           </button>
         )}
 
@@ -315,7 +338,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
         <div className="flex items-center gap-1 flex-1 min-w-0">
           <input
             type="text"
-            placeholder="Search and highlightâ€¦"
+            placeholder="Search and highlight..."
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setSearchDone(false); }}
             onKeyDown={e => e.key === 'Enter' && performSearch()}
@@ -323,7 +346,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           />
           <button onClick={performSearch} disabled={isSearching || !pdfDoc}
             className="px-2 py-1 bg-blue-700 text-white rounded text-sm disabled:opacity-40 whitespace-nowrap flex-shrink-0">
-            {isSearching ? 'â€¦' : 'Find'}
+            {isSearching ? '...' : 'Find'}
           </button>
           {searchDone && (
             <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
@@ -331,15 +354,17 @@ const RulesViewer = ({ onBack, themeClasses }) => {
             </span>
           )}
           {searchResults.length > 1 && <>
-            <button onClick={() => navigateResult(-1)} className="px-1 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0">â€¹</button>
-            <button onClick={() => navigateResult(1)}  className="px-1 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0">â€º</button>
+            <button onClick={() => navigateResult(-1)} className="px-2 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Prev</button>
+            <button onClick={() => navigateResult(1)}  className="px-2 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Next</button>
           </>}
           {activeHighlight && (
             <button
               onClick={() => { setActiveHighlight(''); setSearchResults([]); setSearchDone(false); }}
-              className="px-1 py-1 text-gray-500 hover:text-white text-xs flex-shrink-0"
+              className="flex-shrink-0 text-gray-500 hover:text-white p-1"
               title="Clear highlights"
-            >âœ•</button>
+            >
+              <X className="w-3 h-3" />
+            </button>
           )}
         </div>
 
@@ -365,10 +390,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
         {/* Zoom */}
         <div className="flex items-center gap-1 flex-shrink-0">
           <button onClick={() => setScale(s => Math.max(0.4, parseFloat((s - 0.15).toFixed(2))))}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm">âˆ’</button>
+            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm font-bold">-</button>
           <span className="text-gray-300 text-xs w-10 text-center">{Math.round(scale * 100)}%</span>
           <button onClick={() => setScale(s => Math.min(3.0, parseFloat((s + 0.15).toFixed(2))))}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm">+</button>
+            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm font-bold">+</button>
           <button onClick={() => setScale(1.0)}
             className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-400">
             Reset
@@ -398,13 +423,11 @@ const RulesViewer = ({ onBack, themeClasses }) => {
             onLoadSuccess={onLoadSuccess}
             loading={
               <div className="text-gray-400 mt-20 text-center">
-                <div className="text-3xl mb-3">ðŸ“„</div>
-                <div>Loading PDFâ€¦</div>
+                <div className="text-lg mb-2">Loading PDF...</div>
               </div>
             }
             error={
               <div className="text-red-400 mt-20 text-center">
-                <div className="text-3xl mb-3">âš ï¸</div>
                 <div>Failed to load PDF. Make sure the file is in the public folder.</div>
               </div>
             }
@@ -429,7 +452,6 @@ const RulesViewer = ({ onBack, themeClasses }) => {
                     className="shadow-2xl"
                   />
                 ) : (
-                  /* Placeholder keeps scroll height stable before page renders */
                   <div
                     style={{ width: Math.round(612 * scale), height: Math.round(792 * scale) }}
                     className="bg-gray-800 rounded flex items-center justify-center text-gray-600 text-sm select-none"
