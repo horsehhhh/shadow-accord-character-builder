@@ -1676,6 +1676,1006 @@ function PowerIndex({ onBack, embedded = false }) {
       call: "\"Wounding Lies\"",
       description: "Each time the target makes an untruthful statement per character knowledge, they suffer one aggravated damage that cannot be resisted or soaked by armor. The target must cry out in pain if they take damage from this power.",
       searchableText: "wounding lies time target makes untruthful statement character knowledge suffer one aggravated damage resisted soaked armor cry out pain take damage shifter wraith thorn mental"
+    },
+    // ── ST / Charm Powers (source prefix C) ──────────────────────────────────
+    {
+      name: "ABSOLUTION",
+      type: "TOUCH",
+      sources: "C",
+      cost: "5 Energy",
+      call: "\"Absolution\"",
+      description: "Legendary, NPC Only. Place your hand on the target's head and pray for 60 Uninterrupted seconds. Demons or characters with a Demon Patron drop to 0 Maximum Health. Vampires, Wraiths, Shifters and Fae drop to 0 Health. If the target is Claimed or possessed (via the Possession power), these effects end immediately. The target is also cleansed as per the Cleanse power.",
+      searchableText: "absolution touch legendary npc demon patron maximum health vampire wraith shifter fae claimed possession cleanse charm"
+    },
+    {
+      name: "ABSORB FETISH",
+      type: "SELF",
+      sources: "C2",
+      cost: "None",
+      call: "\"Absorb Fetish\"",
+      description: "Spend 60 Uninterrupted seconds with both hands holding a Fetish. Remove the Fetish Tag. Gain Energy equal to double the Fetish's Attunement. If there is no Attunement, you gain 4 Energy.",
+      searchableText: "absorb fetish self 60 seconds hands holding fetish tag energy attunement charm"
+    },
+    {
+      name: "ABSORB MAGIC",
+      type: "SELF",
+      sources: "C3",
+      cost: "None",
+      call: "\"Absorb Magic\"",
+      description: "Spend 60 Uninterrupted seconds with both hands holding a magic item. Remove the item Tag. Gain Energy equal to double the magical item's Attunement. If there is no Attunement, you gain 4 Energy.",
+      searchableText: "absorb magic self 60 seconds hands magic item tag energy attunement charm"
+    },
+    {
+      name: "AGGRAVATED 4",
+      type: "DAMAGE",
+      sources: "C3",
+      cost: "2 Energy",
+      call: "\"Agg 4\"",
+      description: "Throw a packet that does 4 Aggravated damage.",
+      searchableText: "aggravated 4 damage packet throw 2 energy charm"
+    },
+    {
+      name: "APOCALYPTIC FORM",
+      type: "MASK",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only, Demon Only. You have a makeup requirement of wearing a Demon Mask or prosthetics. This cannot be suppressed by True Form, but can be hidden by Mask of a Thousand Faces. You may also use claw natural weapons.",
+      searchableText: "apocalyptic form mask legendary npc demon mask prosthetics true form mask thousand faces claws charm"
+    },
+    {
+      name: "<TYPE> ATTACK",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "\"<Type><Damage>\"",
+      description: "NPC Only. Add <type> to damage calls using natural weapons, where <type> is indicated by the power's source. You must use this <type> when making damage calls with natural weapons.",
+      searchableText: "type attack passive npc natural weapons damage calls charm"
+    },
+    {
+      name: "BANISH DEMON",
+      type: "TOUCH",
+      sources: "C3",
+      cost: "3 Willpower",
+      call: "\"Banish Demon\"",
+      description: "NPC Only. If the target is a Demon they immediately go OOG as though they were Dead. If the target is not a Demon, they call \"No Effect\".",
+      searchableText: "banish demon touch npc willpower dead no effect charm"
+    },
+    {
+      name: "BARTER PATHOS",
+      type: "TOUCH",
+      sources: "C1",
+      cost: "1 Energy",
+      call: "\"Barter Pathos\", \"Granting <X> Pathos\" or \"Taking <X> Pathos\"",
+      description: "NPC Only. Shake hands with a willing target. You gain or lose the stated amount of Pathos. Pathos exchanged this way cannot exceed your maximum or the target's maximum Energy pool. Targets who don't have Pathos call \"No Effect\".",
+      searchableText: "barter pathos touch npc shake hands willing target gain lose maximum energy no effect charm"
+    },
+    {
+      name: "BESTOW PATRON",
+      type: "OTHER",
+      sources: "C3",
+      cost: "None",
+      call: "\"Bestow Patron <Patron>\"",
+      description: "NPC Only. You must state the name of your Patron, if you have one. The target may choose to take that Patron as their own and record it on their character sheet. If the target already has a Patron, the new Patron replaces the previous one.",
+      searchableText: "bestow patron other npc patron name character sheet replace charm"
+    },
+    {
+      name: "BESTOW POWER <POWER>",
+      type: "TOUCH",
+      sources: "C",
+      cost: "1 Energy",
+      call: "\"Bestow Power <Power>, <Duration>\"",
+      description: "Legendary, NPC Only. The target may use the stated power for the stated duration, as though it was on their character sheet. Duration options: \"for a single use\", \"three times\", \"until sunset\", \"until sunrise\", \"until the next full/new moon\", or \"as long as you are tainted this weekend/this moon\". The target cannot use the power to cast rituals or to teach. Only one Bestowed power at a time; subsequent Bestowings overwrite previous ones.",
+      searchableText: "bestow power touch legendary npc duration single use sunset sunrise moon tainted teach rituals charm"
+    },
+    {
+      name: "BLAST",
+      type: "DAMAGE",
+      sources: "C2",
+      cost: "1 Energy",
+      call: "\"<Type> <Damage>\"",
+      description: "NPC Only. Throw a packet of the specified <type> for your full damage amount.",
+      searchableText: "blast damage npc packet type full damage charm"
+    },
+    {
+      name: "BLOOD SUCKING",
+      type: "COUNTED TOUCH",
+      sources: "C2",
+      cost: "None",
+      call: "\"Biting 1, Biting 2, Biting 3, Paralyzing Bite\"",
+      description: "NPC Only. You may bite and drain Health as per the rules for Vampires (using the powers Paralyzing Bite, Test Faction, and Draining). Health or Energy drained becomes Energy.",
+      searchableText: "blood sucking counted touch npc bite drain health vampire paralyzing bite test faction draining energy charm"
+    },
+    {
+      name: "BREAK ATTUNEMENT",
+      type: "TOUCH",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "\"Break Attunement\"",
+      description: "NPC Only. For the rest of the event, the target cannot activate any items attuned to them at the time this power was used on them (they may still attune to new items).",
+      searchableText: "break attunement touch npc event items attuned activate new charm"
+    },
+    {
+      name: "BREACH (ST)",
+      type: "SELF",
+      sources: "C3",
+      cost: "1 Energy",
+      call: "\"Breach <attack call>\"",
+      description: "While in the Umbra, you may make a Status or Mental attack on a target in the Realm.",
+      searchableText: "breach self umbra status mental attack realm charm"
+    },
+    {
+      name: "CANNOT TEACH",
+      type: "PASSIVE",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. You cannot teach Power Trees or Skills.",
+      searchableText: "cannot teach passive npc power trees skills charm"
+    },
+    {
+      name: "CHAMELEON",
+      type: "SELF",
+      sources: "C3",
+      cost: "2 Energy",
+      call: "None",
+      description: "NPC Only. As a passive effect without spending Energy, you know when a Sensory power is used on you and what question was asked. You may spend 2 Energy when a Sensory power is used on you to give a false answer. False answers given must still be valid responses to the Sensory power used.",
+      searchableText: "chameleon self npc sensory power false answer passive energy charm"
+    },
+    {
+      name: "CLAWS",
+      type: "SELF",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. You may use claw natural weapons.",
+      searchableText: "claws self npc natural weapons charm"
+    },
+    {
+      name: "<TYPE> CLAWS",
+      type: "DAMAGE",
+      sources: "C2",
+      cost: "1 Energy",
+      call: "\"<Type> <Damage>\"",
+      description: "NPC Only. Add the <Type> onto a single natural weapon attack, where <Type> is indicated by the power source.",
+      searchableText: "type claws damage npc natural weapon attack type source charm"
+    },
+    {
+      name: "CONDUIT",
+      type: "SELF",
+      sources: "C2",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. Spend 60 Uninterrupted seconds meditating at a Node, then gain the Energy listed on the Node. As a passive effect, you can see Nodes in the Umbra, even without Umbra Sight.",
+      searchableText: "conduit self npc node meditate energy umbra sight passive charm"
+    },
+    {
+      name: "CRAFT",
+      type: "SELF",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "None",
+      description: "NPC Only. Spend 60 Uninterrupted seconds roleplaying with an appropriate prop, then attach an Item tag to the prop. Creates magic items in-game without a ritual.",
+      searchableText: "craft self npc roleplay prop item tag magic items ritual charm"
+    },
+    {
+      name: "DARK KNOWLEDGE <CORRUPTED TREE TYPE>",
+      type: "SELF",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. Choose one: Fallen Paths, Dark Arcanoi, Dark Thaumaturgy, or Wyrm Gifts. You may teach those trees.",
+      searchableText: "dark knowledge corrupted tree type self npc fallen paths dark arcanoi thaumaturgy wyrm gifts teach charm"
+    },
+    {
+      name: "DIVINE POTENCY",
+      type: "PASSIVE",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only, Demon Only. You gain Augment determined by your Demonic Vice. Gluttony/Lust/Sloth: Augment 2. Envy/Greed/Pride: Augment 3. Wrath: Augment 4. Different sources of Augment stack.",
+      searchableText: "divine potency passive legendary npc demon augment vice gluttony lust sloth envy greed pride wrath charm"
+    },
+    {
+      name: "DRAIN THE EARTH",
+      type: "SELF",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "Spend 60 Uninterrupted seconds meditating at a Gaian node, then gain 2 Energy. May only do this at each node once per event. As a passive effect, you can see Nodes in the Umbra even without Umbra Sight.",
+      searchableText: "drain earth self gaian node meditate energy once event umbra sight passive charm"
+    },
+    {
+      name: "EMPATH",
+      type: "SELF",
+      sources: "C2",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. Spend 60 Uninterrupted seconds meditating at a Haunt, then gain the Energy listed on the card. May only do this at each Haunt once per event. Can see Haunts in the Umbra as a passive effect.",
+      searchableText: "empath self npc haunt meditate energy once event umbra passive charm"
+    },
+    {
+      name: "EMPOWER WEAPON",
+      type: "SELF",
+      sources: "C2",
+      cost: "3 Energy",
+      call: "None",
+      description: "NPC Only. Spend 60 Uninterrupted seconds meditating with a non-natural weapon. You may deal 1 additional damage with that weapon for the rest of the event.",
+      searchableText: "empower weapon self npc meditate non-natural weapon additional damage event charm"
+    },
+    {
+      name: "ENCHANT WEAPON",
+      type: "OTHER",
+      sources: "C3",
+      cost: "2 Energy",
+      call: "\"Enchant Weapon\"",
+      description: "NPC Only. Meditate with a martial weapon for at least 10 seconds, then attach an Enchanted Weapon tag to that weapon.",
+      searchableText: "enchant weapon other npc meditate martial weapon enchanted weapon tag charm"
+    },
+    {
+      name: "ENERGY EXCHANGE",
+      type: "COUNTED TOUCH",
+      sources: "C3",
+      cost: "None",
+      call: "\"Breach\", \"Giving Energy,\" or \"Draining Energy\"",
+      description: "NPC Only. May use Paralyzing Touch (optionally with Breach meta call). After successfully using Paralyzing Touch, choose to give or drain the target's Energy. For every \"Giving Energy\" call the target gains 1 Energy and you lose 1; for every \"Draining Energy\" call the target loses 1 and you gain 1. Your target becomes Tainted if you are, and vice versa.",
+      searchableText: "energy exchange counted touch npc paralyzing touch breach giving draining energy tainted charm"
+    },
+    {
+      name: "FALSE MEMORY",
+      type: "TOUCH",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "\"Condition: False Memory <description>\"",
+      description: "NPC Only. Have a conversation for at least 60 Uninterrupted consecutive seconds immediately before using this power. Describe a short memory (two sentences max). The target cannot distinguish it from their own memories. If the condition is removed, they still remember it as an errant idea.",
+      searchableText: "false memory touch npc condition 60 seconds conversation implanted memory two sentences charm"
+    },
+    {
+      name: "FLUID FORM",
+      type: "MASK",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. You may put on or take off any Transformation mask.",
+      searchableText: "fluid form mask npc transformation mask charm"
+    },
+    {
+      name: "FORTITUDE (ST)",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "NPC Only. Your Maximum Health is increased by 4.",
+      searchableText: "fortitude passive npc maximum health increased 4 charm"
+    },
+    {
+      name: "FREE SPIRIT",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "\"No Effect\"",
+      description: "NPC Only. You are immune to the Rite of the Fetishcraft ritual.",
+      searchableText: "free spirit passive npc immune rite fetishcraft ritual charm"
+    },
+    {
+      name: "GAIAN CLEANSE",
+      type: "TOUCH",
+      sources: "C2",
+      cost: "1 Energy",
+      call: "\"Cleanse Taint\"",
+      description: "NPC Only. The target is cleansed of Taint.",
+      searchableText: "gaian cleanse touch npc taint cleanse charm"
+    },
+    {
+      name: "GIVE ENERGY",
+      type: "TOUCH",
+      sources: "C3",
+      cost: "<X> Energy",
+      call: "\"Giving <X> Energy\"",
+      description: "NPC Only. The target gains the number of Energy called, not exceeding their maximum Energy. This transfers Taint.",
+      searchableText: "give energy touch npc maximum taint transfer charm"
+    },
+    {
+      name: "GRACE",
+      type: "TOUCH",
+      sources: "C",
+      cost: "5 Energy",
+      call: "\"Grace, heal all Agg\"",
+      description: "Legendary, NPC Only. The target is healed of all Aggravated damage. Their Current Health is unchanged.",
+      searchableText: "grace touch legendary npc heal all aggravated damage current health unchanged charm"
+    },
+    {
+      name: "GRANT ENERGY",
+      type: "PASSIVE",
+      sources: "C1",
+      cost: "None",
+      call: "\"Grant Energy 4\"",
+      description: "NPC Only. The target must have just successfully used Release Spirit on you. The target receives 4 Energy in addition to the 1 Willpower they receive for Release Spirit. This power may be purchased multiple times, each purchase increasing the Energy granted by 4.",
+      searchableText: "grant energy passive npc release spirit willpower multiple times charm"
+    },
+    {
+      name: "GRANT POWER <POWER>",
+      type: "TOUCH",
+      sources: "C",
+      cost: "1 Energy",
+      call: "\"Grant <Power>\"",
+      description: "Legendary, NPC Only. The target may use the stated power as though it was on their character sheet. The target cannot use it to cast rituals or to teach. The target must pay any costs needed. Multiple powers may be Granted simultaneously (unlike Bestow Power).",
+      searchableText: "grant power touch legendary npc character sheet rituals teach multiple charm"
+    },
+    {
+      name: "HARDENED",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Energy",
+      call: "\"Resist\"",
+      description: "Legendary, NPC Only. Resist a single Status attack.",
+      searchableText: "hardened self legendary npc resist status attack charm"
+    },
+    {
+      name: "HEALING TOUCH 10",
+      type: "TOUCH",
+      sources: "C",
+      cost: "2 Energy",
+      call: "\"Healing Touch 10\"",
+      description: "Legendary, NPC Only. The target gains 10 Health, not to exceed their Maximum Health.",
+      searchableText: "healing touch 10 touch legendary npc health maximum charm"
+    },
+    {
+      name: "IMBUE CURIO",
+      type: "OTHER",
+      sources: "C3",
+      cost: "2 Energy",
+      call: "\"Imbue\"",
+      description: "NPC Only. Meditate with an object for at least 10 seconds, then attach an Imbued Curio tag to that object.",
+      searchableText: "imbue curio other npc meditate object imbued curio tag charm"
+    },
+    {
+      name: "<TYPE> IMMUNITY",
+      type: "PASSIVE",
+      sources: "C2",
+      cost: "None",
+      call: "\"No Effect\"",
+      description: "NPC Only. You are immune to damage of the specified <type>. The <type> cannot be regular damage (i.e. <Iron>). Cannot be used to grant immunity to a type you are Scorched by.",
+      searchableText: "type immunity passive npc damage immune scorched no effect charm"
+    },
+    {
+      name: "INDOMITABLE",
+      type: "SELF",
+      sources: "C",
+      cost: "2 Energy",
+      call: "\"Resist\"",
+      description: "Legendary, NPC Only. Immediately resist a Mental attack. Cannot use this power to resist Mentals after they have taken effect.",
+      searchableText: "indomitable self legendary npc resist mental attack charm"
+    },
+    {
+      name: "LEGENDARY AVOIDANCE",
+      type: "SELF",
+      sources: "C",
+      cost: "2 Energy",
+      call: "\"Resist\"",
+      description: "Legendary, NPC Only. Resist a single damage attack and any Meta calls associated with it.",
+      searchableText: "legendary avoidance self npc resist damage attack meta calls charm"
+    },
+    {
+      name: "LEGENDARY STRENGTH <NUMBER>",
+      type: "PASSIVE",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only. You gain Augment <Number>, where Number is defined by the power. Different sources of Augment stack. Total Augment cannot exceed 9.",
+      searchableText: "legendary strength passive npc augment number stack maximum 9 charm"
+    },
+    {
+      name: "MANIPULATE GLADE",
+      type: "OTHER",
+      sources: "C2",
+      cost: "4-14 Energy",
+      call: "None",
+      description: "NPC Only. Hang a temporary Glade tag at an appropriate location; its value is half the Energy spent (rounded down). Lasts for the Event. Only one temporary Glade at a time. May also spend twice the value of a Glade to close it for that event.",
+      searchableText: "manipulate glade other npc temporary glade tag energy event close charm"
+    },
+    {
+      name: "MASS CONFUSION",
+      type: "MENTAL",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "\"(Breach) Mass Confusion\"",
+      description: "All targets are affected by the power Confusion. May be used from the Umbra to the Realm by adding \"Breach\" before the call.",
+      searchableText: "mass confusion mental 3 energy breach umbra realm all targets charm"
+    },
+    {
+      name: "MASS DERANGE",
+      type: "MENTAL",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "\"Mass Derange <Derangement>\"",
+      description: "All targets are affected by the power Derange. The Derangement selected must be one that is present on your character sheet.",
+      searchableText: "mass derange mental 3 energy all targets derangement character sheet charm"
+    },
+    {
+      name: "MASS <MENTAL>",
+      type: "MENTAL",
+      sources: "C",
+      cost: "2 Energy",
+      call: "\"Mass <Mental>\"",
+      description: "Legendary, NPC Only. Add the \"Mass\" call to one use of the Mental specified in the power source. Mass powers can never be Unresistable. Cannot be used with: Avert, Control Voice, Hypnotism, or any mental that already calls \"Mass\".",
+      searchableText: "mass mental legendary npc 2 energy unresistable avert control voice hypnotism charm"
+    },
+    {
+      name: "NATURAL ARMOR",
+      type: "PASSIVE",
+      sources: "C2",
+      cost: "None",
+      call: "None",
+      description: "A pool of 4 armor points which refreshes each sunrise. These armor points do not require a phys-rep and are added to any other armor you have except those gained from this power. Used before any other armor and not regained until the next sunrise.",
+      searchableText: "natural armor passive 4 armor points sunrise phys-rep stack charm"
+    },
+    {
+      name: "OCCULT ACCLIMATION <ENERGY TYPE>",
+      type: "PASSIVE",
+      sources: "C2",
+      cost: "None",
+      call: "None",
+      description: "Not intended for items. Choose an Energy type. You may attune to and use items that require this Energy type as though you had the required Energy type.",
+      searchableText: "occult acclimation energy type passive attune items required charm"
+    },
+    {
+      name: "OCCULT MASTERY <RITUAL TYPE>",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "Not intended for items. Choose one: Mystic, Glyph, Blood, or Arcanos. You may read and use these rituals as if you have the required Energy type and Power Tree requirements, unless the ritual is marked \"Faction Locked\". You must still possess powers used as part of the casting instructions. Requires Rituals skill.",
+      searchableText: "occult mastery ritual type passive mystic glyph blood arcanos faction locked energy power tree rituals skill charm"
+    },
+    {
+      name: "OMNISCIENCE",
+      type: "PASSIVE",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only. You hear all OOG sig calls, knowing what powers are used, who their casters and targets are, and whether or not they are resisted.",
+      searchableText: "omniscience passive legendary npc oog sig calls powers casters targets resisted charm"
+    },
+    {
+      name: "PASS WARD",
+      type: "SELF",
+      sources: "C",
+      cost: "5 Energy",
+      call: "None",
+      description: "Legendary, NPC Only. Meditate for 30 seconds before a ward. You may pass through it a single time as if it were not there.",
+      searchableText: "pass ward self legendary npc meditate 30 seconds ward charm"
+    },
+    {
+      name: "PATTERN SENSE",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "Not intended for items. You hear all OOG sig calls used against you, knowing what powers are used and their casters. You hear \"Resist\" calls against powers and attacks made by you.",
+      searchableText: "pattern sense passive oog sig calls powers casters resist charm"
+    },
+    {
+      name: "POISON",
+      type: "SELF",
+      sources: "C2",
+      cost: "1 Energy",
+      call: "None",
+      description: "NPC Only. Affix a poison tag to a food or drink container prop without needing to use a vial prop to pour the poison in.",
+      searchableText: "poison self npc poison tag food drink container prop vial charm"
+    },
+    {
+      name: "PORTAL MASTERY",
+      type: "SELF",
+      sources: "C1",
+      cost: "1 Energy",
+      call: "\"Portal Mastery\"",
+      description: "Open or close a locked door.",
+      searchableText: "portal mastery self open close locked door charm"
+    },
+    {
+      name: "PURIFY (ST)",
+      type: "TOUCH",
+      sources: "C2",
+      cost: "1 Willpower",
+      call: "\"Purify\"",
+      description: "The target immediately exits Frenzy and every condition affecting the target ends. Note: this power was removed from PC trees in 2019; kept as ST power for items still in use.",
+      searchableText: "purify touch willpower frenzy condition end st item charm"
+    },
+    {
+      name: "Q: AUTUMN'S CHAMPION",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Unresistable Daze\" and \"Mass Disquiet\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Unresistable Daze and Mass Disquiet at no cost.",
+      searchableText: "autumn champion self legendary npc quintessence unresistable daze mass disquiet 10 minutes charm"
+    },
+    {
+      name: "Q: CALL TO ADVENTURE",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Craving\" and \"Mass Meditate\"",
+      description: "Legendary, NPC Only. Spend 10 minutes telling a story to activate. For the next 10 minutes, gain and may use Mass Craving and Mass Meditate at no cost.",
+      searchableText: "call adventure self legendary npc quintessence story mass craving meditate 10 minutes charm"
+    },
+    {
+      name: "Q: CALL BACK THE SPIRITS",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Heal 8\" and \"Mass Revive\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, concentrate for 10 seconds to call \"Mass Heal 8\" at no cost. Concentrate for 60 seconds to call \"Mass Revive\" at no cost, ending this power early.",
+      searchableText: "call back spirits self legendary npc quintessence mass heal 8 revive 10 minutes charm"
+    },
+    {
+      name: "Q: COMMANDING VOICE",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Obedience\" and \"Conditioning\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Obedience and Conditioning at no cost.",
+      searchableText: "commanding voice self legendary npc quintessence mass obedience conditioning 10 minutes charm"
+    },
+    {
+      name: "Q: CONTROL CROWD",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Induce Frenzy\" and \"Mass Serenity\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Induce Frenzy and Mass Serenity at no cost.",
+      searchableText: "control crowd self legendary npc quintessence mass induce frenzy serenity 10 minutes charm"
+    },
+    {
+      name: "Q: CONTROL FREAK",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Obedience\" and \"Unresistable Obedience\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain Mass Obedience at no cost. Also gain Unresistable Obedience on any Demon or target with a Demon Patron at no cost (must know in-game they are a Demon/have Patron).",
+      searchableText: "control freak self legendary npc quintessence mass obedience unresistable demon patron 10 minutes charm"
+    },
+    {
+      name: "Q: DISTANT WAILS",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Tainted Brittle Bones\" and \"Tainted Derange <Derangement>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Tainted Brittle Bones and Tainted Derange at no cost. Any Derangement selected must be present on your character sheet.",
+      searchableText: "distant wails self legendary npc quintessence tainted brittle bones derange derangement 10 minutes charm"
+    },
+    {
+      name: "Q: EMPOWER SELF",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "None",
+      description: "Legendary, NPC Only. For the next 10 minutes, you may replace the numeric call of all damage powers, melee attacks, and healing powers with your current Quintessence.",
+      searchableText: "empower self legendary npc quintessence damage melee healing numeric call 10 minutes charm"
+    },
+    {
+      name: "Q: ENHANCE CONSCIOUSNESS",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"No Effect\" and \"Restore 2 Willpower\"",
+      description: "Legendary, NPC Only. All Mental powers and Despair end on you and Willpower is fully refreshed. For the next 10 minutes, immune to Mental powers and may touch characters to \"Restore 2 Willpower\" once per target at no cost.",
+      searchableText: "enhance consciousness legendary npc quintessence mental despair willpower immune restore 10 minutes charm"
+    },
+    {
+      name: "Q: ESSENCE FONT",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Restore Essence\"",
+      description: "Legendary, NPC Only. Your Essence is fully refreshed. For the next 10 minutes, gain and may use Restore Essence at no cost, and use any packet-throwing powers at no cost.",
+      searchableText: "essence font legendary npc quintessence restore essence refreshed packet powers 10 minutes charm"
+    },
+    {
+      name: "Q: FEAR ME",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Taunt\" and \"Mass Terror\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Taunt and Mass Terror at no cost.",
+      searchableText: "fear me legendary npc quintessence mass taunt terror 10 minutes charm"
+    },
+    {
+      name: "Q: FRENZIED WARRIOR",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"No Effect\" and \"Brutal <Number>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain all mechanical benefits and immunities of Frenzy but may still act rationally and use powers. Also gain the Brutal Strike power at normal cost.",
+      searchableText: "frenzied warrior legendary npc quintessence frenzy benefits immunities rational brutal strike 10 minutes charm"
+    },
+    {
+      name: "Q: GOD'S GRACE",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Grace, heal all Agg\" and \"Mass Serenity\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Grace and Mass Serenity at no cost.",
+      searchableText: "god grace legendary npc quintessence grace heal aggravated mass serenity 10 minutes charm"
+    },
+    {
+      name: "Q: INFERNAL TORMENT",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Tainted Body Wrack\" and \"Tainted Decay\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Tainted Body Wrack and Tainted Decay at no cost.",
+      searchableText: "infernal torment legendary npc quintessence tainted body wrack decay 10 minutes charm"
+    },
+    {
+      name: "Q: KNOW THE TRUTH",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass True Form\", \"Grant Power (Umbra Sight)\", \"Grant Power (Cloak Sight)\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass True Form, Grant Power (Umbra Sight), and Grant Power (Cloak Sight) at no cost.",
+      searchableText: "know truth legendary npc quintessence mass true form grant power umbra sight cloak sight 10 minutes charm"
+    },
+    {
+      name: "Q: MANIPULATE CRAY",
+      type: "OTHER",
+      sources: "C",
+      cost: "1-5 Quintessence",
+      call: "None",
+      description: "Legendary, NPC Only. Requires 3+ maximum Quintessence. Hang a temporary Cray tag at an appropriate location equal to Quintessence spent. Lasts the Event. Only one temporary Cray at a time. May spend half a Cray's value (rounded up) to close it for the event.",
+      searchableText: "manipulate cray other legendary npc quintessence temporary cray tag event close charm"
+    },
+    {
+      name: "Q: MASTER OF CORRUPTION",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Induce Sin <Sin>\" and \"Mass Derange <Derangement>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Induce Sin and Mass Derange at no cost. Derangement selected must be present on your character sheet.",
+      searchableText: "master corruption legendary npc quintessence mass induce sin derange derangement 10 minutes charm"
+    },
+    {
+      name: "Q: MASTER OF DREAMS",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Daze\", \"Mass Daze\", and \"Dreamshape\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Daze, Mass Daze, and Dreamshape at no cost.",
+      searchableText: "master dreams legendary npc quintessence daze mass dreamshape 10 minutes charm"
+    },
+    {
+      name: "Q: MASTER OF HELL",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Virtue and <X> Quintessence",
+      call: "\"Bind Demon\"",
+      description: "Legendary, NPC Only. Must be at ST camp to activate. Summon a Demon and create a temporary body for it via Possession. Demon power determined by Quintessence spent. Must follow your commands but may subvert or tempt you. Ends if you become Incapacitated, have no Quintessence, or go OOG.",
+      searchableText: "master hell legendary npc virtue quintessence bind demon summon st camp possession commands incapacitated charm"
+    },
+    {
+      name: "Q: MASTER OF ILLUSION",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Monsters\" and \"Mass Horrid Reality <description>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Monsters and Mass Horrid Reality at no cost.",
+      searchableText: "master illusion legendary npc quintessence mass monsters horrid reality 10 minutes charm"
+    },
+    {
+      name: "Q: OUT OF TOUCH",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Cloak\" and \"No Effect\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Cloak at no cost. While Cloaked, immune to melee attacks.",
+      searchableText: "out of touch legendary npc quintessence cloak immune melee attacks 10 minutes charm"
+    },
+    {
+      name: "Q: PERFECT BODY",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"No Effect\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain a Regeneration Rate of 3 or your current Quintessence (whichever is higher). Can regenerate without concentrating and are immune to damage calls.",
+      searchableText: "perfect body legendary npc quintessence regeneration rate immune damage calls concentrate 10 minutes charm"
+    },
+    {
+      name: "Q: RATIONALIZE",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Status Disable\" and \"No Effect\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Mass Status Disable at no cost. Also immune to packet powers.",
+      searchableText: "rationalize legendary npc quintessence mass status disable immune packet powers 10 minutes charm"
+    },
+    {
+      name: "Q: RAW POWER",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"<Damage>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, your boffer and packet damage becomes either 6 or twice your current Quintessence, whichever is higher.",
+      searchableText: "raw power legendary npc quintessence boffer packet damage 6 twice 10 minutes charm"
+    },
+    {
+      name: "Q: REFORM",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Reform\"",
+      description: "Legendary, NPC Only. Spend 60 seconds totally still (may be Cloaked or in either Realm). Go OOG for at least 4 hours. When you return, current and Maximum Health are fully restored.",
+      searchableText: "reform legendary npc quintessence still cloaked realm oog 4 hours health restored charm"
+    },
+    {
+      name: "Q: RIGHT HAND OF GOD",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Mass Entrancement\" and \"Unresistable Absolution\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Majesty and Unresistable Absolution at no cost.",
+      searchableText: "right hand god legendary npc quintessence mass entrancement majesty unresistable absolution 10 minutes charm"
+    },
+    {
+      name: "Q: SECRET IDENTITY",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "None",
+      description: "Legendary, NPC Only. Must be at ST camp. Create a second character sheet as a non-Mage Human, Shifter, Vampire, or Wraith. Switch character sheets and play with the new sheet. Must be at ST camp to deactivate and return to original sheet.",
+      searchableText: "secret identity legendary npc quintessence second character sheet human shifter vampire wraith st camp charm"
+    },
+    {
+      name: "Q: SPRING'S BOUNTY",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Fabricate Armor 10\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Fabricate Armor at no cost creating 10 armor points. Also may spend any amount of Energy to instantly heal the same amount of Aggravated damage.",
+      searchableText: "spring bounty legendary npc quintessence fabricate armor 10 energy heal aggravated 10 minutes charm"
+    },
+    {
+      name: "Q: SUMMER'S FURY",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Fire <Damage>\"",
+      description: "Legendary, NPC Only. Double Maximum Health and fully restore Current Health. For the next 10 minutes, add Fire <type> to all damage attacks. After 10 minutes, Maximum Health returns to normal.",
+      searchableText: "summer fury legendary npc quintessence double maximum health fire damage attacks 10 minutes charm"
+    },
+    {
+      name: "Q: TOUCH OF DEATH",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Agg <Damage>\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, add Agg <Type> to all damage attacks. Packet powers have no cost during this time.",
+      searchableText: "touch of death legendary npc quintessence agg aggravated damage packet powers 10 minutes charm"
+    },
+    {
+      name: "Q: UNCHAINED",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"No Effect\"",
+      description: "Legendary, NPC Only. End any Mental, Status, and/or Touch effect(s) on yourself. For the next 10 minutes, immune to all Mental, Status, and Touch powers.",
+      searchableText: "unchained legendary npc quintessence end mental status touch immune 10 minutes charm"
+    },
+    {
+      name: "Q: UNDYING",
+      type: "OTHER",
+      sources: "C",
+      cost: "2 Virtue and 1 Quintessence",
+      call: "None",
+      description: "Legendary, NPC Only. May use the Zombi Ritual without casting time or components. Also, if Dead or Dying, may spend 2 Virtue and 1 Quintessence to go OOG then return at the edge of game with 1 Health and 1 Energy.",
+      searchableText: "undying legendary npc virtue quintessence zombi ritual dead dying return health energy charm"
+    },
+    {
+      name: "Q: VOICE OF MALFEAS",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Tainted Induce Sin <Sin>\" and \"Mass Subjugate\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Tainted Induce Sin and Mass Subjugate at no cost.",
+      searchableText: "voice malfeas legendary npc quintessence tainted induce sin mass subjugate 10 minutes charm"
+    },
+    {
+      name: "Q: WINTER'S TOUCH",
+      type: "SELF",
+      sources: "C",
+      cost: "1 Quintessence",
+      call: "\"Unresistable Brittle Bones\" and \"Ice 4\"",
+      description: "Legendary, NPC Only. For the next 10 minutes, gain and may use Unresistable Brittle Bones and Ranged 4 <Ice> at no cost.",
+      searchableText: "winter touch legendary npc quintessence unresistable brittle bones ranged 4 ice 10 minutes charm"
+    },
+    {
+      name: "READ / WRITE INFERNAL TEXT",
+      type: "SELF",
+      sources: "C3",
+      cost: "3 Energy",
+      call: "None",
+      description: "Receive one Infernal Text tag at Check-In (free). May attach the Infernal Text tag to a paper after writing/drawing on it and paying the cost. The Derangement selected must be present on your character sheet. You are immune to the effects of any document with an Infernal Text tag.",
+      searchableText: "read write infernal text self 3 energy check-in tag paper derangement immune document charm"
+    },
+    {
+      name: "RESTORE ESSENCE",
+      type: "TOUCH",
+      sources: "C",
+      cost: "5 Energy",
+      call: "\"Restore Essence\"",
+      description: "Legendary, NPC Only. If the target's current Energy type is Essence, they regain Energy up to their maximum.",
+      searchableText: "restore essence touch legendary npc energy essence maximum charm"
+    },
+    {
+      name: "RITUAL MASTER",
+      type: "PASSIVE",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only. If you have Rituals 3, you may cast Legendary Potency rituals that you meet the other casting requirements for.",
+      searchableText: "ritual master passive legendary npc rituals 3 legendary potency charm"
+    },
+    {
+      name: "<TYPE> SCORCHED",
+      type: "PASSIVE",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "You take Aggravated damage from the specified <type>. If already Scorched by that type or cannot take Aggravated damage, double the damage from all attacks of that <type>. Also take Exposure damage from contact with the <type>. If the <type> is <Light>, gain Sunsickness from sun exposure instead of Exposure damage.",
+      searchableText: "type scorched passive aggravated damage exposure sunsickness light double charm"
+    },
+    {
+      name: "SENSE FACTION",
+      type: "SENSORY",
+      sources: "C1",
+      cost: "None",
+      call: "\"Sense Faction\"",
+      description: "Stare at the target for 10 seconds. They must answer OOG with their Faction.",
+      searchableText: "sense faction sensory 10 seconds oog faction charm"
+    },
+    {
+      name: "SENSE FAE OATH",
+      type: "SENSORY",
+      sources: "C2",
+      cost: "None",
+      call: "\"Sense Fae Oath\"",
+      description: "Stare at the target for 10 seconds. Ask one or both: \"Do you have any Fae Oaths or bargains?\" or \"Have you broken any Fae Oaths or bargains this weekend?\". Target must answer OOG truthfully.",
+      searchableText: "sense fae oath sensory 10 seconds oog fae oaths bargains broken weekend charm"
+    },
+    {
+      name: "SENSE PATRON",
+      type: "SENSORY",
+      sources: "C3",
+      cost: "None",
+      call: "\"Sense Patron\"",
+      description: "NPC Only. Stare at the target for 10 seconds. They must answer OOG with their Patron, or \"No Effect\" if they do not have one.",
+      searchableText: "sense patron sensory npc 10 seconds oog patron no effect charm"
+    },
+    {
+      name: "SENSE POWER",
+      type: "SENSORY",
+      sources: "C1",
+      cost: "1 Energy",
+      call: "\"Sense Power <Power>\"",
+      description: "Stare at the target for 10 seconds. They must answer OOG \"yes\" or \"no\" if the stated power is listed on their character sheet. Powers gained through Mimic or magical items are not powers on the character's sheet.",
+      searchableText: "sense power sensory 10 seconds oog yes no character sheet mimic magic items charm"
+    },
+    {
+      name: "SENSE <SUBFACTION>",
+      type: "SENSORY",
+      sources: "C",
+      cost: "None",
+      call: "\"Sense <subfaction>\"",
+      description: "Legendary, NPC Only. Stare at the target for 10 seconds. They must answer OOG with their requested subfaction, or \"No Effect\" if they do not have such a subfaction. Examples: Sense Auspice, Sense Changing Breed, Sense Claimed Type, Sense Clan, Sense Fae Court, Sense Fellowship, Sense Guild, Sense Legion, Sense Spectre.",
+      searchableText: "sense subfaction sensory legendary npc 10 seconds oog auspice clan fellowship guild legion spectre charm"
+    },
+    {
+      name: "SENSE TORMENT",
+      type: "SENSORY",
+      sources: "C1",
+      cost: "None",
+      call: "\"Sense Torment\"",
+      description: "Stare at the target for 10 seconds. They must answer OOG their current Torment rating. Targets without a Torment rating call \"No Effect\".",
+      searchableText: "sense torment sensory 10 seconds oog torment rating no effect charm"
+    },
+    {
+      name: "SENSE TRIBE",
+      type: "SENSORY",
+      sources: "C3",
+      cost: "None",
+      call: "\"Sense Tribe\"",
+      description: "NPC Only. Stare at the target for 10 seconds. They answer OOG with their Tribe (Garou/Kinfolk), changing breed (Fera/Fera Kinfolk), \"Ronin\" if Ronin, or \"No Effect\" otherwise.",
+      searchableText: "sense tribe sensory npc 10 seconds oog garou kinfolk fera ronin no effect charm"
+    },
+    {
+      name: "SENSE VIRTUE",
+      type: "SENSORY",
+      sources: "C1",
+      cost: "None",
+      call: "\"Sense Virtue\"",
+      description: "Stare at the target for 10 seconds. They must answer OOG their current Virtue rating (numeric value only, not the type).",
+      searchableText: "sense virtue sensory 10 seconds oog virtue rating numeric charm"
+    },
+    {
+      name: "SHARED MEMORY",
+      type: "PASSIVE",
+      sources: "C",
+      cost: "None",
+      call: "None",
+      description: "Legendary, NPC Only. Your character knowledge is shared with all other spirits of the same kind, even if you die.",
+      searchableText: "shared memory passive legendary npc character knowledge spirits same kind die charm"
+    },
+    {
+      name: "SHIFT REALM",
+      type: "SELF",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "Spend 60 Uninterrupted seconds concentrating. Travel from the Realm to the Umbra or from the Umbra to the Realm.",
+      searchableText: "shift realm self 60 seconds concentrating realm umbra travel charm"
+    },
+    {
+      name: "SHOW / HIDE MEIN",
+      type: "SELF",
+      sources: "C3",
+      cost: "None",
+      call: "None",
+      description: "NPC Only, Fae Only. Put on or take off masks, prosthetics, and other optional costuming representing your Mein. Shift into or out of your Mein form.",
+      searchableText: "show hide mein self npc fae masks prosthetics costuming mein form charm"
+    },
+    {
+      name: "SHUNT",
+      type: "TOUCH",
+      sources: "C3",
+      cost: "1 Energy",
+      call: "\"Breach Shunt\"",
+      description: "NPC Only. The target falls from the Realm into the Umbra or from the Umbra into the Realm. You must provide the target a white headband to force them into the Umbra.",
+      searchableText: "shunt touch npc breach realm umbra white headband charm"
+    },
+    {
+      name: "STRENGTH (ST)",
+      type: "PASSIVE",
+      sources: "C2",
+      cost: "None",
+      call: "None",
+      description: "You gain Augment 1. Different sources of Augment stack with one another.",
+      searchableText: "strength passive augment 1 stack charm"
+    },
+    {
+      name: "TEACH TREE <POWER TREE>",
+      type: "PASSIVE",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "NPC Only, Spirit Only. You may teach the appropriate Power Tree to characters of the appropriate Faction. You must have at least one power from said Tree. All other rules around Teaching and Learning are normal.",
+      searchableText: "teach tree power tree passive npc spirit faction appropriate teaching learning charm"
+    },
+    {
+      name: "TOUGH FORM",
+      type: "MASK",
+      sources: "C2",
+      cost: "None",
+      call: "\"Resist\"",
+      description: "NPC Only. While wearing any transformation mask you may resist Status attacks for 1 Energy. Note: removed from PC trees in 2023; kept as ST power for items still in use.",
+      searchableText: "tough form mask npc transformation resist status energy st item charm"
+    },
+    {
+      name: "VIGOR",
+      type: "PASSIVE",
+      sources: "C1",
+      cost: "None",
+      call: "None",
+      description: "Your Regeneration Rate is increased by 1.",
+      searchableText: "vigor passive regeneration rate increased 1 charm"
+    },
+    {
+      name: "WYRM'S HERALD",
+      type: "PASSIVE",
+      sources: "C3",
+      cost: "None",
+      call: "\"No Effect\"",
+      description: "You are immune to the Subjugate and Sanctuary powers.",
+      searchableText: "wyrm herald passive immune subjugate sanctuary no effect charm"
     }
   ], []);
 
@@ -1799,7 +2799,11 @@ function PowerIndex({ onBack, embedded = false }) {
                 className="w-full pl-10 pr-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
               >
                 <option value="">All Sources</option>
-                {uniqueSources.map(source => (
+                <option value="C">C — All Charm Powers (ST rulebook)</option>
+                <option value="C1">C1 — Charm Level 1</option>
+                <option value="C2">C2 — Charm Level 2</option>
+                <option value="C3">C3 — Charm Level 3</option>
+                {uniqueSources.filter(s => !/^C\d?$/.test(s)).map(source => (
                   <option key={source} value={source}>{source}</option>
                 ))}
               </select>
