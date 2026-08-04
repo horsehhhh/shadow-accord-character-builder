@@ -317,6 +317,7 @@ const ShadowAccordComplete = () => {
   const [newCharacter, setNewCharacter] = useState(null);
   const [creationStep, setCreationStep] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
+  const [freebieWizardTab, setFreebieWizardTab] = useState('merits');
 
   // Cloud features - primary character management with enhanced debugging
   const { 
@@ -1569,7 +1570,8 @@ pleasure,Pleasure,Joy|excitement|comfort`
     sharedWith: [], // For character sharing
     factionChanges: [], // For tracking faction transformations
     tempFactionChangePowers: 0, // Track free powers to assign after faction change
-    inventory: { coin: { silvers: 0, coppers: 0 }, items: [] },
+    inventory: { coin: { silvers: 5, coppers: 0 }, items: [] },
+    freebieWizardComplete: false,
     version: '0.3.3' // Current version for data migration
   });
 
@@ -2295,7 +2297,13 @@ pleasure,Pleasure,Joy|excitement|comfort`
       // For Wraiths: all Dark Arcanoi use innate pricing (corrupt trees)
       if (character.faction === 'wraith' && 
           ['contaminate', 'hive_mind', 'larceny', 'maleficence', 'tempest_weaving'].includes(itemId)) {
-        isInnate = true; // All Dark Arcanoi use innate pricing for wraiths
+        isInnate = true;
+      }
+
+      // Corrupt trees always use innate pricing
+      const corruptTree = gameData.powerTrees.find(t => t.tree_id === itemId);
+      if (corruptTree?.group === 'dark_thaumaturgy' || corruptTree?.group === 'fallen_path') {
+        isInnate = true;
       }
       
       // For Sorcerers: fellowship powers are treated as learned powers, not innate
@@ -10347,6 +10355,656 @@ Your character is ready to play!`;
             </div>
           </div>
 
+          {/* ── Freebie XP Wizard (shown until freebieWizardComplete) ── */}
+          {character.freebieWizardComplete === false ? (
+            <div className="space-y-4 pb-6">
+              {/* XP counter banner */}
+              <div className={`${themeClasses.card} p-4`}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-xl font-bold">Spend Your Freebie XP</h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      All 27 freebie XP must be allocated now. Any unspent XP is <span className="text-red-400 font-semibold">permanently lost</span> — freebie points cannot be saved for later advancement.
+                    </p>
+                  </div>
+                  <div className="text-center min-w-[80px]">
+                    <div className={`text-4xl font-bold ${character.totalXP === 0 ? 'text-green-400' : 'text-yellow-300'}`}>
+                      {character.totalXP}
+                    </div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide">XP Left</div>
+                  </div>
+                </div>
+                {character.totalXP === 0 && (
+                  <div className="mt-3 p-2 bg-green-900 bg-opacity-50 rounded border border-green-600 text-green-300 text-sm text-center">
+                    ✅ All freebie XP spent — click <strong>Finalize Character</strong> below.
+                  </div>
+                )}
+              </div>
+
+              {/* Wizard sub-tabs */}
+              <div className="flex gap-1 border-b border-gray-700">
+                {[
+                  { key: 'powers', label: 'Powers' },
+                  { key: 'merits', label: 'Merits' },
+                  { key: 'lores', label: 'Lores' },
+                  { key: 'coin', label: 'Starting Coin' },
+                  { key: 'items', label: 'Buy Items' },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setFreebieWizardTab(key)}
+                    className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                      freebieWizardTab === key
+                        ? 'text-blue-400 border-blue-400'
+                        : 'text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-500'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* ── Powers tab ── */}
+              {freebieWizardTab === 'powers' && (() => {
+                const innateTreeIds = character.faction === 'human' && character.subfaction === 'ghoul' &&
+                  (!character.innateTreeIds || !character.innateTreeIds.includes('celerity'))
+                  ? ['celerity', 'fortitude', 'potence']
+                  : (character.innateTreeIds || []);
+
+                const isOriginalSubfactionTree = (origSubfaction) => {
+                  if (!origSubfaction) return () => false;
+                  const subfactionGroups = {
+                    vampire: ['clan_innate', 'common', 'thaumaturgy'],
+                    shifter: ['auspice', 'breed', 'tribe_gift', 'fera_gift'],
+                    wraith: ['arcanos', 'dark_arcanos'],
+                    human: ['sorcerer', 'fellowship', 'fallen_path', 'talent', 'bounty'],
+                  };
+                  return (tree) => {
+                    const factionMap = { assamite: 'vampire', baali: 'vampire', brujah: 'vampire', caitiff: 'vampire', cappadocian: 'vampire', gangrel: 'vampire', giovanni: 'vampire', lamia: 'vampire', lasombra: 'vampire', malkavian: 'vampire', nosferatu: 'vampire', ravnos: 'vampire', salubri_healer: 'vampire', salubri_warrior: 'vampire', toreador: 'vampire', tremere: 'vampire', tzimisce: 'vampire', ventrue: 'vampire', corax: 'shifter', ceilican: 'shifter', garou: 'shifter', nuwisha: 'shifter', ratkin: 'shifter', rokea: 'shifter' };
+                    const origFaction = factionMap[origSubfaction] || 'human';
+                    const allowedGroups = subfactionGroups[origFaction] || [];
+                    return allowedGroups.includes(tree.group) && !character.innateTreeIds.includes(tree.tree_id);
+                  };
+                };
+
+                const factionTrees = gameData.powerTrees.filter(tree => {
+                  if (character.faction === 'human' && character.subfaction === 'kinfolk') return tree.faction === 'shifter';
+                  if (character.faction === 'human' && character.subfaction === 'sorcerer') return tree.group === 'sorcerer' || tree.group === 'fellowship' || tree.group === 'fallen_path';
+                  if (character.faction === 'human' && character.subfaction === 'faithful') return innateTreeIds.includes(tree.tree_id);
+                  if (character.faction === 'human' && character.subfaction === 'ghoul') return tree.faction === 'vampire';
+                  if (character.faction === 'human' && character.subfaction === 'claimed_drone') return tree.group === 'claimed_drone' || isOriginalSubfactionTree(character.originalSubfaction)(tree);
+                  if (character.faction === 'human' && character.subfaction === 'claimed_fomori') return tree.group === 'claimed_fomori' || isOriginalSubfactionTree(character.originalSubfaction)(tree);
+                  if (character.faction === 'human' && character.subfaction === 'claimed_gorgon') return tree.group === 'claimed_gorgon' || isOriginalSubfactionTree(character.originalSubfaction)(tree);
+                  if (character.faction === 'human' && character.subfaction === 'commoner') return tree.group === 'talent';
+                  return tree.faction === character.faction;
+                }).filter(tree => !innateTreeIds.includes(tree.tree_id));
+
+                const LORE_REQUIRED_GROUPS = new Set(['clan_innate', 'tribe_gift', 'fera_gift']);
+                const CORRUPT_GROUPS = new Set(['wyrm_gift', 'dark_arcanos', 'dark_thaumaturgy', 'fallen_path', 'claimed_drone', 'claimed_fomori', 'claimed_gorgon']);
+                const CORRUPT_NOTES = {
+                  fallen_path: '⚠️ Requires Demon Patron (3/6/9 XP)',
+                  dark_thaumaturgy: '⚠️ Requires Demon Patron (3/6/9 XP)',
+                  wyrm_gift: '⚠️ Wyrm Corruption (3/6/9 XP)',
+                  dark_arcanos: '⚠️ Dark Arcanoi — Specter path (3/6/9 XP)',
+                  claimed_drone: '⚠️ Claimed (Drone) powers (3/6/9 XP)',
+                  claimed_fomori: '⚠️ Claimed (Fomori) powers (3/6/9 XP)',
+                  claimed_gorgon: '⚠️ Claimed (Gorgon) powers (3/6/9 XP)',
+                };
+                // Maps tree_id → correct clan/tribe lore name
+                const TREE_LORE_NAME = {
+                  daimoinon: 'Baali Lore', dementation: 'Malkavian Lore', deimos: 'Lamia Lore',
+                  mortis: 'Cappadocian Lore', necromancy: 'Giovanni Lore', obtenebration: 'Lasombra Lore',
+                  protean: 'Gangrel Lore', quietus: 'Assamite Lore',
+                  valeren_healer: 'Salubri Lore', valeren_warrior: 'Salubri Lore',
+                  vicissitude: 'Tzimisce Lore',
+                  black_fury_gift: 'Black Fury Lore', bone_gnawer_gift: 'Bone Gnawer Lore',
+                  child_of_gaia_gift: 'Child of Gaia Lore', fenrir_gift: 'Fenrir Lore',
+                  fianna_gift: 'Fianna Lore', red_talon_gift: 'Red Talon Lore',
+                  shadow_lord_gift: 'Shadow Lord Lore', silent_strider_gift: 'Silent Strider Lore',
+                  silver_fang_gift: 'Silver Fang Lore', warder_of_man_gift: 'Warder of Man Lore',
+                  ananasi_gift: 'Ananasi Lore', bagheera_gift: 'Bagheera Lore',
+                  bubasti_gift: 'Bubasti Lore', ceilican_gift: 'Ceilican Lore',
+                  corax_gift: 'Corax Lore', swara_gift: 'Swara Lore', ratkin_gift: 'Ratkin Lore',
+                };
+                // Per-tree warnings for specific disciplines with side effects
+                const TREE_WARNINGS = {
+                  daimoinon: { color: 'red', note: '🩸 Permanently Taints you — learning this discipline marks you as infernally corrupted.' },
+                  dementation: { color: 'yellow', note: '⚠️ Gives a Derangement — each level learned requires you to take or already have a Derangement.' },
+                  valeren_healer: { color: 'yellow', note: '👁️ Requires third-eye makeup — must be visible to use any Valeren Healer power.' },
+                  valeren_warrior: { color: 'yellow', note: '👁️ Requires third-eye makeup — must be visible to use any Valeren Warrior power.' },
+                };
+                // Visceratika cannot be learned — Gargoyle innate only
+                const UNLEARNABLE = new Set(['visceratika']);
+                const renderTree = (treeId, isInnate) => {
+                  const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
+                  if (!tree) return null;
+                  if (!isInnate && UNLEARNABLE.has(treeId)) return null;
+                  const currentLevels = character.powers[treeId] || {};
+                  const allLearned = currentLevels[1] && currentLevels[2] && currentLevels[3];
+                  if (allLearned) return null;
+                  const needsLore = !isInnate && LORE_REQUIRED_GROUPS.has(tree.group);
+                  const loreName = TREE_LORE_NAME[treeId] || `${tree.tree_name} Lore`;
+                  const isCorrupt = CORRUPT_GROUPS.has(tree.group);
+                  const treeWarning = TREE_WARNINGS[treeId];
+                  const isRedWarning = treeWarning?.color === 'red';
+                  return (
+                    <div key={treeId} className={`p-3 rounded-lg border ${
+                      isCorrupt || isRedWarning
+                        ? 'border-red-700 bg-red-900 bg-opacity-20'
+                        : themeClasses.card
+                    }`}>
+                      <div className={`font-bold mb-1 capitalize ${isCorrupt || isRedWarning ? 'text-red-400' : ''}`}>{tree.tree_name}</div>
+                      {isCorrupt && CORRUPT_NOTES[tree.group] && (
+                        <div className="text-xs text-red-400 mb-2 font-medium">{CORRUPT_NOTES[tree.group]}</div>
+                      )}
+                      {treeWarning && (
+                        <div className={`text-xs mb-2 font-medium ${treeWarning.color === 'red' ? 'text-red-400' : 'text-yellow-400'}`}>
+                          {treeWarning.note}
+                        </div>
+                      )}
+                      {needsLore && (
+                        <div className="text-xs text-yellow-400 mb-2">
+                          ⚠️ Requires <span className="font-semibold">{loreName}</span>
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        {[1, 2, 3].map(level => {
+                          const hasLevel = currentLevels[level];
+                          const canLearn = canLearnPower(character, treeId, level);
+                          const isRedundant = isRedundantPower(character, treeId, level);
+                          const cost = isRedundant ? 0 : calculateXPCost(character, 'power', treeId, level);
+                          const canAfford = character.totalXP >= cost;
+                          const powers = tree[`level${level}_powers`]?.split('|') || [];
+                          if (hasLevel) {
+                            return (
+                              <div key={level} className="flex items-start gap-2 p-2 rounded bg-green-500 bg-opacity-10 border border-green-500 border-opacity-40">
+                                <span className="text-green-400 text-xs mt-0.5">✓</span>
+                                <div className="text-xs">
+                                  <span className="font-medium">Lv{level}:</span> {powers.join(', ')}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div key={level} className={`flex items-start justify-between gap-2 p-2 rounded border ${
+                              canLearn && canAfford ? 'border-blue-500 border-opacity-50 bg-blue-500 bg-opacity-5' : 'border-gray-700 opacity-60'
+                            }`}>
+                              <div className="text-xs flex-1">
+                                <span className="font-medium text-gray-300">Lv{level}:</span> {powers.join(', ')}
+                                {!canLearn && <div className="text-yellow-500 mt-0.5">Must learn level {level - 1} first</div>}
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className={`text-xs font-bold ${
+                                  cost === 0 ? 'text-green-400' : canAfford ? 'text-blue-300' : 'text-red-400'
+                                }`}>{cost === 0 ? 'FREE' : `${cost} XP`}</span>
+                                <button
+                                  onClick={async () => {
+                                    const updated = advanceCharacter(character, { type: 'power', itemId: treeId, level, cost });
+                                    await updateCurrentCharacter(updated);
+                                  }}
+                                  disabled={!canLearn || !canAfford}
+                                  className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded"
+                                >Learn</button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                };
+
+                const GROUP_ORDER = ['common','breed','auspice','arcanos','thaumaturgy','sorcerer','fellowship','bounty','talent','clan_innate','tribe_gift','fera_gift','fallen_path','wyrm_gift','dark_arcanos','dark_thaumaturgy','claimed_drone','claimed_fomori','claimed_gorgon'];
+                const GROUP_LABELS = { common:'Common Powers', breed:'Breed Gifts', auspice:'Auspice Gifts', arcanos:'Arcanoi', thaumaturgy:'Thaumaturgy', sorcerer:'Sorcerer Trees', fellowship:'Fellowship Trees', bounty:'Bounty Trees', talent:'Talent Trees', clan_innate:'Clan Disciplines (Lore Required)', tribe_gift:'Tribe Gifts (Lore Required)', fera_gift:'Fera Gifts (Lore Required)', fallen_path:'Fallen Paths', wyrm_gift:'Wyrm Gifts', dark_arcanos:'Dark Arcanoi', dark_thaumaturgy:'Dark Thaumaturgy', claimed_drone:'Claimed (Drone)', claimed_fomori:'Claimed (Fomori)', claimed_gorgon:'Claimed (Gorgon)' };
+
+                const groupedFactionTrees = factionTrees
+                  .slice()
+                  .sort((a, b) => a.tree_name.localeCompare(b.tree_name))
+                  .reduce((acc, tree) => {
+                    const g = tree.group || 'common';
+                    if (!acc[g]) acc[g] = [];
+                    acc[g].push(tree);
+                    return acc;
+                  }, {});
+
+                return (
+                  <div className="space-y-4">
+                    {innateTreeIds.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-green-400 mb-2">Innate Trees (3/6/9 XP)</h4>
+                        <div className="space-y-3">{innateTreeIds.map(id => renderTree(id, true))}</div>
+                      </div>
+                    )}
+                    {Object.keys(groupedFactionTrees).length > 0 && (
+                      <div className="space-y-5">
+                        {GROUP_ORDER.filter(g => groupedFactionTrees[g])
+                          .map(g => (
+                            <div key={g}>
+                              <h4 className={`text-sm font-semibold mb-2 ${LORE_REQUIRED_GROUPS.has(g) ? 'text-yellow-400' : 'text-blue-400'}`}>
+                                {GROUP_LABELS[g] || g}
+                              </h4>
+                              <div className="space-y-3">
+                                {groupedFactionTrees[g].map(t => renderTree(t.tree_id, false))}
+                              </div>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    )}
+                    {innateTreeIds.length === 0 && Object.keys(groupedFactionTrees).length === 0 && (
+                      <p className="text-gray-400 text-sm text-center py-8">No power trees available.</p>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* ── Merits tab ── */}
+              {freebieWizardTab === 'merits' && (() => {
+                const merits = getAvailableMerits(character, true);
+                return merits.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-8">No merits available for your faction.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {merits.map(merit => {
+                      const hasMerit = (character.merits || {})[merit.merit_id];
+                      const cost = calculateXPCost(character, 'merit', merit.merit_id);
+                      const prereq = getMeritPrereqStatus(character, merit.merit_id);
+                      const canAfford = character.totalXP >= cost && prereq.met;
+                      return (
+                        <div
+                          key={merit.merit_id}
+                          className={`${themeClasses.card} p-3 flex items-start justify-between gap-3 ${
+                            hasMerit ? 'border border-green-500 border-opacity-70' : ''
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium flex items-center gap-2">
+                              {merit.merit_name}
+                              {merit.can_purchase_multiple === 'true' && hasMerit && (
+                                <span className="text-xs text-blue-400">(×{hasMerit})</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-400 mt-1">{merit.description}</div>
+                            {merit.special_notes && (
+                              <div className="text-xs text-yellow-400 italic mt-1">{merit.special_notes}</div>
+                            )}
+                            {!prereq.met && prereq.label && (
+                              <div className="text-xs text-red-400 mt-1">⛔ {prereq.label}</div>
+                            )}
+                          </div>
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <span className={`text-sm font-bold ${
+                              cost === 0 ? 'text-green-400' : canAfford || hasMerit ? 'text-blue-300' : 'text-gray-500'
+                            }`}>
+                              {cost === 0 ? 'FREE' : `${cost} XP`}
+                            </span>
+                            {hasMerit && merit.can_purchase_multiple !== 'true' ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-400 text-xs">✓ Owned</span>
+                                <button
+                                  onClick={async () => {
+                                    const updated = reduceCharacter(character, { type: 'merit', itemId: merit.merit_id });
+                                    await updateCurrentCharacter(updated);
+                                  }}
+                                  className="text-xs text-red-400 hover:text-red-300"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={async () => {
+                                  if (!canAfford) return;
+                                  const updated = advanceCharacter(character, {
+                                    type: 'merit',
+                                    itemId: merit.merit_id,
+                                    level: (hasMerit || 0) + 1,
+                                    cost,
+                                  });
+                                  await updateCurrentCharacter(updated);
+                                }}
+                                disabled={!canAfford}
+                                className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded font-medium"
+                              >
+                                Buy
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {/* ── Lores tab ── */}
+              {freebieWizardTab === 'lores' && (() => {
+                const lores = getAvailableLores(character, true);
+                return lores.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-8">No lores available for your faction.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {lores.map(lore => {
+                      const owned = (character.lores || []).some(l =>
+                        (typeof l === 'string' ? l : l.lore_id) === lore.lore_id
+                      );
+                      const cost = calculateXPCost(character, 'lore', lore.lore_id);
+                      const canAfford = character.totalXP >= cost && !owned;
+                      return (
+                        <div
+                          key={lore.lore_id}
+                          className={`${themeClasses.card} p-3 flex items-start justify-between gap-3 ${
+                            owned ? 'border border-green-500 border-opacity-70' : ''
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium">{lore.lore_name}</div>
+                            <div className="text-xs text-gray-400 mt-1">{lore.description}</div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <span className={`text-sm font-bold ${canAfford || owned ? 'text-blue-300' : 'text-gray-500'}`}>
+                              {cost} XP
+                            </span>
+                            {owned ? (
+                              <span className="text-green-400 text-xs">✓ Owned</span>
+                            ) : (
+                              <button
+                                onClick={async () => {
+                                  if (!canAfford) return;
+                                  const updated = advanceCharacter(character, {
+                                    type: 'lore',
+                                    itemId: lore.lore_id,
+                                    level: 1,
+                                    cost,
+                                  });
+                                  await updateCurrentCharacter(updated);
+                                }}
+                                disabled={!canAfford}
+                                className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded font-medium"
+                              >
+                                Buy
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+              {/* ── Coin tab ── */}
+              {freebieWizardTab === 'coin' && (
+                <div className="space-y-4">
+                  <div className={`${themeClasses.card} p-4`}>
+                    <p className="text-sm text-gray-400 mb-4">
+                      All characters start with <span className="text-yellow-300 font-semibold">5 {character.faction === 'wraith' ? 'Oboli' : 'Silvers'}</span> already in your purse.
+                      You may spend freebie XP here to start with additional coin.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      {[
+                        {
+                          label: `1 ${character.faction === 'wraith' ? 'Obulus' : 'Silver'}`,
+                          sub: `= 12 ${character.faction === 'wraith' ? 'Bits' : 'Copper'}`,
+                          cost: 3,
+                          coinKey: 'silvers',
+                          amount: 1,
+                        },
+                        {
+                          label: `4 ${character.faction === 'wraith' ? 'Bits' : 'Copper'}`,
+                          sub: '',
+                          cost: 1,
+                          coinKey: 'coppers',
+                          amount: 4,
+                        },
+                      ].map(({ label, sub, cost, coinKey, amount }) => (
+                        <div key={coinKey} className="flex items-center gap-3 bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                          <div>
+                            <div className="font-medium text-sm">{label}</div>
+                            {sub && <div className="text-xs text-gray-400">{sub}</div>}
+                          </div>
+                          <span className="text-blue-300 font-bold text-sm">{cost} XP</span>
+                          <button
+                            onClick={async () => {
+                              if (character.totalXP < cost) return;
+                              const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                              const now = new Date().toISOString();
+                              await updateCurrentCharacter({
+                                ...character,
+                                totalXP: character.totalXP - cost,
+                                xpSpent: character.xpSpent + cost,
+                                inventory: {
+                                  ...inv,
+                                  coin: {
+                                    ...inv.coin,
+                                    [coinKey]: (inv.coin?.[coinKey] || 0) + amount,
+                                  },
+                                },
+                                xpHistory: [
+                                  ...(character.xpHistory || []),
+                                  {
+                                    timestamp: now,
+                                    type: 'loss',
+                                    amount: cost,
+                                    reason: `Freebie: purchased ${label} (starting coin)`,
+                                    previousTotal: character.totalXP,
+                                    newTotal: character.totalXP - cost,
+                                  },
+                                ],
+                                lastModified: now,
+                              });
+                            }}
+                            disabled={character.totalXP < cost}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded text-sm font-medium"
+                          >
+                            Buy
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-4 text-center">
+                      <div>
+                        <div className="text-xs text-gray-400 mb-1">
+                          {character.faction === 'wraith' ? 'Oboli' : 'Silvers'} Purchased
+                        </div>
+                        <div className="text-2xl font-bold">{character.inventory?.coin?.silvers || 0}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-400 mb-1">
+                          {character.faction === 'wraith' ? 'Bits' : 'Copper'} Purchased
+                        </div>
+                        <div className="text-2xl font-bold">{character.inventory?.coin?.coppers || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Items tab ── */}
+              {freebieWizardTab === 'items' && (() => {
+                const isWraith = character.faction === 'wraith';
+                const S = isWraith ? 'Obulus' : 'Silver';
+                const C = isWraith ? 'Bit' : 'Copper';
+                const coinBalance = (character.inventory?.coin?.silvers || 0) * 12 + (character.inventory?.coin?.coppers || 0);
+                const copperToStr = (c) => {
+                  if (c === 0) return 'Free';
+                  const s = Math.floor(c / 12);
+                  const cu = c % 12;
+                  if (s === 0) return `${cu} ${C}`;
+                  if (cu === 0) return `${s} ${S}`;
+                  return `${s} ${S} ${cu} ${C}`;
+                };
+                const buyItem = async (name, copperCost) => {
+                  if (coinBalance < copperCost) { alert(`Not enough coin (need ${copperToStr(copperCost)})`); return; }
+                  const remaining = coinBalance - copperCost;
+                  const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                  await updateCurrentCharacter({
+                    ...character,
+                    inventory: {
+                      ...inv,
+                      coin: { silvers: Math.floor(remaining / 12), coppers: remaining % 12 },
+                      items: [...(inv.items || []), name],
+                    },
+                    lastModified: new Date().toISOString(),
+                  });
+                };
+                const removeItem = async (name, copperCost) => {
+                  const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                  const idx = (inv.items || []).findIndex(i => i === name);
+                  if (idx === -1) return;
+                  const refunded = coinBalance + copperCost;
+                  const newItems = [...(inv.items || [])];
+                  newItems.splice(idx, 1);
+                  await updateCurrentCharacter({
+                    ...character,
+                    inventory: {
+                      ...inv,
+                      coin: { silvers: Math.floor(refunded / 12), coppers: refunded % 12 },
+                      items: newItems,
+                    },
+                    lastModified: new Date().toISOString(),
+                  });
+                };
+                const MUNDANE = [
+                  ['Light Armor', 8], ['Medium Armor', 12], ['Heavy Armor', 21],
+                  ['Ranged Weapon', 12], ['Martial Weapon', 12], ['Shield', 18],
+                  ['Silver Dagger', 180], ['Key', 2], ['Lock', 12],
+                ];
+                const SUPERNATURAL = [
+                  ['Antidote', 4], ['Healing Potion', 5], ['Simple Ritual', 12],
+                  ['Complex Ritual', 36], ['Expert Ritual', 120], ['Relic (Generic)', 72],
+                  ['Melee \u2013 Iron', 60], ['Melee \u2013 Silver', 180], ['Melee \u2013 Gold', 360],
+                  ...(isWraith ? [['Bit', 6], ['Obulus', 24]] : []),
+                ];
+                const ownedItems = character.inventory?.items || [];
+                return (
+                  <div className="space-y-4">
+                    {/* Balance */}
+                    <div className={`${themeClasses.card} p-3 flex items-center justify-between`}>
+                      <span className="text-sm text-gray-400">Current coin balance</span>
+                      <span className="font-bold text-lg text-yellow-300">
+                        {Math.floor(coinBalance / 12)} {S}, {coinBalance % 12} {C}
+                      </span>
+                    </div>
+
+                    {/* Owned items */}
+                    {ownedItems.length > 0 && (
+                      <div className={`${themeClasses.card} p-3`}>
+                        <h4 className="font-semibold mb-2 text-green-400">Items Purchased</h4>
+                        <div className="space-y-1">
+                          {ownedItems.map((item, idx) => {
+                            const catalogCost = [...MUNDANE, ...SUPERNATURAL].find(([n]) => n === item)?.[1];
+                            return (
+                              <div key={idx} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-0">
+                                <span className="text-sm">{item}</span>
+                                <div className="flex items-center gap-2">
+                                  {catalogCost != null && (
+                                    <span className="text-xs text-gray-400">{copperToStr(catalogCost)}</span>
+                                  )}
+                                  <button
+                                    onClick={() => catalogCost != null ? removeItem(item, catalogCost) : (async () => {
+                                      const inv = character.inventory || { coin: { silvers: 0, coppers: 0 }, items: [] };
+                                      const newItems = [...(inv.items || [])];
+                                      newItems.splice(idx, 1);
+                                      await updateCurrentCharacter({ ...character, inventory: { ...inv, items: newItems }, lastModified: new Date().toISOString() });
+                                    })()}
+                                    className="text-xs text-red-400 hover:text-red-300"
+                                  >
+                                    {catalogCost != null ? 'Refund' : '✕'}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mundane catalog */}
+                    <div className={`${themeClasses.card} p-3`}>
+                      <h4 className="font-semibold mb-3 text-gray-300">Mundane Items</h4>
+                      <div className="space-y-2">
+                        {MUNDANE.map(([name, copper]) => {
+                          const owned = ownedItems.filter(i => i === name).length;
+                          const canAfford = coinBalance >= copper;
+                          return (
+                            <div key={name} className="flex items-center justify-between">
+                              <div>
+                                <span className="text-sm">{name}</span>
+                                {owned > 0 && <span className="ml-2 text-xs text-green-400">(×{owned})</span>}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`text-xs font-medium ${canAfford ? 'text-yellow-300' : 'text-gray-500'}`}>{copperToStr(copper)}</span>
+                                <button
+                                  onClick={() => buyItem(name, copper)}
+                                  disabled={!canAfford}
+                                  className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded font-medium"
+                                >Buy</button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Supernatural catalog */}
+                    <div className={`${themeClasses.card} p-3`}>
+                      <h4 className="font-semibold mb-3 text-gray-300">Supernatural Items</h4>
+                      <div className="space-y-2">
+                        {SUPERNATURAL.map(([name, copper]) => {
+                          const owned = ownedItems.filter(i => i === name).length;
+                          const canAfford = coinBalance >= copper;
+                          return (
+                            <div key={name} className="flex items-center justify-between">
+                              <div>
+                                <span className="text-sm">{name}</span>
+                                {owned > 0 && <span className="ml-2 text-xs text-green-400">(×{owned})</span>}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`text-xs font-medium ${canAfford ? 'text-yellow-300' : 'text-gray-500'}`}>{copperToStr(copper)}</span>
+                                <button
+                                  onClick={() => buyItem(name, copper)}
+                                  disabled={!canAfford}
+                                  className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded font-medium"
+                                >Buy</button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Finalize button */}
+              <div className="flex justify-end pt-2 border-t border-gray-700">
+                <button
+                  onClick={async () => {
+                    if (character.totalXP > 0) {
+                      const confirmed = window.confirm(
+                        `You have ${character.totalXP} XP unspent. This XP will be permanently lost. Continue?`
+                      );
+                      if (!confirmed) return;
+                    }
+                    const now = new Date().toISOString();
+                    await updateCurrentCharacter({
+                      ...character,
+                      freebieWizardComplete: true,
+                      totalXP: 0,
+                      lastModified: now,
+                    });
+                  }}
+                  className="px-6 py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-lg font-bold text-base shadow"
+                >
+                  {character.totalXP === 0
+                    ? '✅ Finalize Character'
+                    : `⚠️ Finalize (${character.totalXP} XP will be lost)`}
+                </button>
+              </div>
+            </div>
+          ) : (<>
+
           {/* Tabs - Scrollable on mobile */}
           <div className="overflow-x-auto mb-5 border-b border-gray-700">
             <div className="flex space-x-1 min-w-max">
@@ -11277,13 +11935,13 @@ Your character is ready to play!`;
                 </div>
               </div>
 
-              {/* Starting Coin — freebie XP only, before first check-in */}
-              {(character.checkInCount || 0) === 0 && (
+              {/* Starting Coin — freebie XP only; now handled by freebie wizard */}
+              {(character.checkInCount || 0) === 0 && !character.freebieWizardComplete && (
                 <div className={`${themeClasses.card} p-3 md:col-span-2 lg:col-span-3`}>
                   <h3 className="text-xl font-bold mb-1">Starting Coin</h3>
                   <p className="text-sm text-gray-400 mb-3">
-                    Spend freebie XP on extra starting coin. All characters also receive{' '}
-                    <strong className="text-yellow-300">5 Silvers free</strong> at first Check-In.
+                    Spend freebie XP on extra starting coin. All characters start with{' '}
+                    <strong className="text-yellow-300">5 Silvers</strong> already allocated.
                     {character.faction === 'wraith' && ' Wraiths receive coin as Oboli (Silvers) and Bits (Coppers).'}
                   </p>
                   <div className="flex flex-wrap gap-3">
@@ -13273,9 +13931,8 @@ Your character is ready to play!`;
                 <div className="p-4 bg-yellow-600 bg-opacity-20 rounded-lg border border-yellow-500">
                   <h4 className="font-bold text-yellow-300 mb-1">Starting Grant</h4>
                   <p className="text-sm text-yellow-200">
-                    New characters receive <strong>5 Silvers</strong> of starting coin/gear at first Check-In.
+                    New characters start with <strong>5 {character.faction === 'wraith' ? 'Oboli' : 'Silvers'}</strong> already allocated.
                     {character.faction === 'wraith' && ' Wraiths receive coin as Oboli (Silvers) and Bits (Coppers).'}
-                    {' '}Use the <strong>Advancement</strong> tab to buy extra coin with freebie XP.
                   </p>
                 </div>
               )}
@@ -13416,6 +14073,7 @@ Your character is ready to play!`;
               </div>
             </div>
           )}
+          </>)}
         </div>
       </div>
     );
