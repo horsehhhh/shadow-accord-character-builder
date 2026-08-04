@@ -1052,7 +1052,7 @@ const ShadowAccordComplete = () => {
     factions: `faction_id,faction_name,energy_type,base_health,base_willpower,base_energy,base_virtue,virtue_type,fundamental_powers
 human,Human,Vitality,10,1,10,7,Humanity,
 vampire,Vampire,Vitae,10,1,15,6,Road,Amaranth|Bestial Frenzy|Blood Buff|Draining|Paralyzing Bite|Regeneration 1|Test Faction|Test Vitae
-shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 1|Step Sideways|War Form
+shifter,Shifter,Gnosis,10,1,10,7,Rage,Bestial Frenzy|Bestial Healing|Regeneration 2|Step Sideways|War Form
 wraith,Wraith,Pathos,10,1,10,4,Angst,Fetter Healing|Portal Walk|Regeneration 1|Sense Emotion|Sense Living|Sense Maximum Health|Temporary Angst|Umbra Sight`,
 
     subfactions: `subfaction_id,subfaction_name,faction_id,type,energy_type,restrictions,dormancy_rules,innate_trees
