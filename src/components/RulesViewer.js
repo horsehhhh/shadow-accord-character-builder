@@ -101,7 +101,8 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const [pdfDoc, setPdfDoc]                   = useState(null);
   const [outline, setOutline]                 = useState([]);
   const [hasOutline, setHasOutline]           = useState(false);
-  const [sidebarOpen, setSidebarOpen]         = useState(true);
+  // Default sidebar closed on mobile (<768px), open on desktop
+  const [sidebarOpen, setSidebarOpen]         = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [visiblePages, setVisiblePages]       = useState(new Set([1, 2, 3]));
 
   // Search state
@@ -112,9 +113,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const [isSearching, setIsSearching]         = useState(false);
   const [searchDone, setSearchDone]           = useState(false);
 
-  const pageRefs    = useRef({});
-  const observerRef = useRef(null);
-  const currentDoc  = DOCUMENTS.find(d => d.id === activeDocId);
+  const pageRefs           = useRef({});
+  const observerRef        = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const currentDoc         = DOCUMENTS.find(d => d.id === activeDocId);
 
   // Set up IntersectionObserver for lazy page rendering
   useEffect(() => {
@@ -145,6 +147,22 @@ const RulesViewer = ({ onBack, themeClasses }) => {
 
     return () => observerRef.current?.disconnect();
   }, [numPages]);
+
+  // Fit PDF width to the scroll container — called on load and window resize
+  const fitWidth = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const available = container.clientWidth - 32; // 16px padding each side
+    setScale(parseFloat(Math.max(0.4, Math.min(3.0, available / 612)).toFixed(2)));
+  }, []);
+
+  // Auto-fit on document load and re-fit on window resize
+  useEffect(() => {
+    if (!numPages) return;
+    fitWidth();
+    window.addEventListener('resize', fitWidth);
+    return () => window.removeEventListener('resize', fitWidth);
+  }, [numPages, fitWidth]);
 
   // Switch document
   const switchDoc = useCallback((docId) => {
@@ -199,8 +217,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   }, []);
 
   // Outline click - pageNum already resolved, instant response
+  // Closes TOC drawer on mobile after navigating
   const handleOutlineClick = useCallback((pageNum) => {
     scrollToPage(pageNum);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) setSidebarOpen(false);
   }, [scrollToPage]);
 
   // Jump to page from input
@@ -284,30 +304,6 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return parts;
   }, [activeHighlight]);
 
-  // Android fallback - open PDFs externally
-  const isAndroid = typeof window !== 'undefined' && window.Capacitor?.getPlatform?.() === 'android';
-
-  if (isAndroid) {
-    return (
-      <div className={`min-h-screen ${themeClasses.base}`}>
-        <div className="max-w-lg mx-auto px-4 py-6">
-          <button onClick={onBack} className="text-gray-400 hover:text-white mb-6 text-sm">Back</button>
-          <h1 className="text-2xl font-bold text-red-400 mb-2">Rules &amp; Rituals</h1>
-          <p className="text-gray-400 text-sm mb-6">Tap a document to open it.</p>
-          <div className="space-y-3">
-            {DOCUMENTS.map(doc => (
-              <a key={doc.id} href={doc.file} target="_blank" rel="noopener noreferrer"
-                className={`${themeClasses.card} p-4 flex items-center justify-between hover:shadow-lg transition-all`}>
-                <span className="font-medium">{doc.label}</span>
-                <span className="text-gray-400 text-sm">Open</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={`${themeClasses.base} flex flex-col`} style={{ height: '100vh' }}>
 
@@ -329,103 +325,107 @@ const RulesViewer = ({ onBack, themeClasses }) => {
         ))}
       </div>
 
-      {/* Controls bar */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-700 flex-shrink-0 flex-wrap">
+      {/* Controls - two rows for mobile friendliness */}
+      <div className="px-3 py-2 border-b border-gray-700 flex-shrink-0 space-y-2">
 
-        {/* TOC toggle */}
-        {hasOutline && (
-          <button onClick={() => setSidebarOpen(o => !o)}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors flex-shrink-0 ${
-              sidebarOpen ? 'bg-red-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}>
-            <Menu className="w-3 h-3" /> TOC
-          </button>
-        )}
-
-        {/* Search */}
-        <div className="flex items-center gap-1 flex-1 min-w-0">
+        {/* Row 1: TOC toggle + search */}
+        <div className="flex items-center gap-2">
+          {hasOutline && (
+            <button onClick={() => setSidebarOpen(o => !o)}
+              className={`flex items-center gap-1 px-3 py-2 rounded text-xs transition-colors flex-shrink-0 ${
+                sidebarOpen ? 'bg-red-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}>
+              <Menu className="w-4 h-4" />
+            </button>
+          )}
           <input
             type="text"
             placeholder="Search and highlight..."
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setSearchDone(false); }}
             onKeyDown={e => e.key === 'Enter' && performSearch()}
-            className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white flex-1 min-w-0"
+            className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white flex-1 min-w-0"
           />
           <button onClick={performSearch} disabled={isSearching || !pdfDoc}
-            className="px-2 py-1 bg-blue-700 text-white rounded text-sm disabled:opacity-40 whitespace-nowrap flex-shrink-0">
+            className="px-3 py-2 bg-blue-700 text-white rounded text-sm disabled:opacity-40 whitespace-nowrap flex-shrink-0">
             {isSearching ? '...' : 'Find'}
           </button>
-          {searchDone && (
+          {searchDone && searchResults.length === 0 && (
+            <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">None</span>
+          )}
+          {searchResults.length > 0 && (
             <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
-              {searchResults.length === 0 ? 'No results' : `${searchIdx + 1}/${searchResults.length}`}
+              {searchIdx + 1}/{searchResults.length}
             </span>
           )}
           {searchResults.length > 1 && <>
-            <button onClick={() => navigateResult(-1)} className="px-2 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Prev</button>
-            <button onClick={() => navigateResult(1)}  className="px-2 py-1 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Next</button>
+            <button onClick={() => navigateResult(-1)} className="px-2 py-2 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Prev</button>
+            <button onClick={() => navigateResult(1)}  className="px-2 py-2 text-gray-300 hover:text-white text-sm flex-shrink-0 bg-gray-700 rounded">Next</button>
           </>}
           {activeHighlight && (
-            <button
-              onClick={() => { setActiveHighlight(''); setSearchResults([]); setSearchDone(false); }}
-              className="flex-shrink-0 text-gray-500 hover:text-white p-1"
-              title="Clear highlights"
-            >
-              <X className="w-3 h-3" />
+            <button onClick={() => { setActiveHighlight(''); setSearchResults([]); setSearchDone(false); }}
+              className="flex-shrink-0 text-gray-500 hover:text-white p-2" title="Clear highlights">
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        {/* Jump to page */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <span className="text-gray-500 text-xs">p.</span>
-          <input
-            type="number"
-            min={1}
-            max={numPages || 1}
-            value={pageInput}
-            onChange={e => setPageInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && jumpToPage()}
-            className="w-14 bg-gray-700 border border-gray-600 rounded px-1 py-1 text-center text-white text-sm"
-          />
-          <button onClick={jumpToPage}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-300">
-            Go
-          </button>
-          <span className="text-gray-500 text-xs">/ {numPages ?? '?'}</span>
-        </div>
-
-        {/* Zoom */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => setScale(s => Math.max(0.4, parseFloat((s - 0.15).toFixed(2))))}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm font-bold">-</button>
-          <span className="text-gray-300 text-xs w-10 text-center">{Math.round(scale * 100)}%</span>
-          <button onClick={() => setScale(s => Math.min(3.0, parseFloat((s + 0.15).toFixed(2))))}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-sm font-bold">+</button>
-          <button onClick={() => setScale(1.0)}
-            className="px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-400">
-            Reset
-          </button>
+        {/* Row 2: Page jump + zoom */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <span className="text-gray-500 text-xs">p.</span>
+            <input
+              type="number"
+              min={1}
+              max={numPages || 1}
+              value={pageInput}
+              onChange={e => setPageInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && jumpToPage()}
+              className="w-14 bg-gray-700 border border-gray-600 rounded px-1 py-2 text-center text-white text-sm"
+            />
+            <button onClick={jumpToPage} className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-300">Go</button>
+            <span className="text-gray-500 text-xs">/ {numPages ?? '?'}</span>
+          </div>
+          <div className="flex-1" />
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button onClick={() => setScale(s => Math.max(0.4, parseFloat((s - 0.15).toFixed(2))))}
+              className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">-</button>
+            <span className="text-gray-300 text-xs w-10 text-center">{Math.round(scale * 100)}%</span>
+            <button onClick={() => setScale(s => Math.min(3.0, parseFloat((s + 0.15).toFixed(2))))}
+              className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">+</button>
+            <button onClick={fitWidth}
+              className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-300">Fit</button>
+          </div>
         </div>
       </div>
 
       {/* Body: sidebar + scrollable PDF */}
       <div className="flex flex-1 min-h-0">
 
-        {/* TOC Sidebar */}
+        {/* TOC - fixed drawer on mobile, sidebar on md+ */}
         {hasOutline && sidebarOpen && (
-          <div className="w-64 flex-shrink-0 border-r border-gray-700 overflow-y-auto bg-gray-900/50">
-            <div className="p-3">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 pb-2 border-b border-gray-700">
-                Contents
-              </p>
-              <OutlineTree items={outline} onNavigate={handleOutlineClick} />
+          <>
+            {/* Mobile backdrop */}
+            <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+            <div className={`
+              fixed inset-y-0 left-0 w-4/5 max-w-xs z-50 border-r border-gray-700 overflow-y-auto bg-gray-900
+              md:relative md:inset-auto md:w-64 md:z-auto md:flex-shrink-0 md:bg-gray-900/50
+            `}>
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-700">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Contents</p>
+                  <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-500 hover:text-white p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <OutlineTree items={outline} onNavigate={handleOutlineClick} />
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Continuous scroll PDF area */}
-        <div className="flex-1 overflow-auto bg-gray-900">
+        <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-gray-900">
           <Document
             file={currentDoc.file}
             onLoadSuccess={onLoadSuccess}
