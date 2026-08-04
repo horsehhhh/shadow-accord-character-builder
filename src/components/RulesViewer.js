@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import { ChevronRight, ChevronDown, Menu, X } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -12,6 +12,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 // Pages to render on each side of the current viewport — smaller on mobile
 // so post-zoom re-rasterization stays fast
 const RENDER_BUFFER = typeof window !== 'undefined' && window.innerWidth < 768 ? 3 : 8;
+
+// Escape HTML so PDF text is safe to inject via customTextRenderer (innerHTML)
+const escapeHtml = (s) => s
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
 
 const DOCUMENTS = [
   { id: 'rulebook',  label: 'Rulebook',          file: '/2026 Shadow Accord Rulebook.pdf' },
@@ -121,6 +127,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const [searchIdx, setSearchIdx]             = useState(0);
   const [isSearching, setIsSearching]         = useState(false);
   const [searchDone, setSearchDone]           = useState(false);
+  const [loadProgress, setLoadProgress]       = useState(0);
 
   const pageRefs              = useRef({});
   const observerRef           = useRef(null);
@@ -132,6 +139,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const pinchStartZoomRef     = useRef(null);
   const pinchingRef           = useRef(false);
   const currentDoc            = DOCUMENTS.find(d => d.id === activeDocId);
+
+  // pdf.js options — disableAutoFetch makes it range-request only the pages you
+  // actually view instead of downloading the whole (large) PDF up front, so the
+  // first page appears far sooner. Memoized so <Document> doesn't reload.
+  const pdfOptions = useMemo(() => ({
+    disableAutoFetch: true,
+    disableStream: false,
+  }), []);
 
   // Set up IntersectionObserver for lazy page rendering
   useEffect(() => {
@@ -272,6 +287,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setVisiblePages(new Set([1, 2, 3]));
     pageRefs.current = {};
     currentPageRef.current = 1;
+    setLoadProgress(0);
   }, []);
 
   // Document load - also pre-resolves all outline destinations in parallel
@@ -279,6 +295,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setPdfDoc(doc);
     setNumPages(doc.numPages);
     setPageInput('1');
+    setLoadProgress(100);
     try {
       const rawOutline = await doc.getOutline();
       if (rawOutline?.length) {
@@ -373,31 +390,26 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setTimeout(() => scrollToPage(searchResults[next]), 50);
   }, [searchIdx, searchResults, scrollToPage]);
 
-  // Search term highlight renderer for PDF text layer
+  // Search term highlight renderer. react-pdf sets the return value as innerHTML
+  // (via a sanitizing template), so this MUST return an HTML string — not JSX.
+  // A translucent <mark> background lets the underlying canvas text show through.
   const customTextRenderer = useCallback(({ str }) => {
-    if (!activeHighlight || !str) return str;
+    if (!activeHighlight || !str) return str ? escapeHtml(str) : str;
     const query    = activeHighlight.toLowerCase();
     const lowerStr = str.toLowerCase();
-    if (!lowerStr.includes(query)) return str;
+    if (!lowerStr.includes(query)) return escapeHtml(str);
 
-    const parts = [];
+    let out = '';
     let lastIdx = 0;
     let idx = lowerStr.indexOf(query, 0);
     while (idx !== -1) {
-      if (idx > lastIdx) parts.push(str.slice(lastIdx, idx));
-      parts.push(
-        <mark
-          key={idx}
-          style={{ backgroundColor: '#fbbf24', color: '#111', borderRadius: '2px', padding: '0 1px' }}
-        >
-          {str.slice(idx, idx + query.length)}
-        </mark>
-      );
+      out += escapeHtml(str.slice(lastIdx, idx));
+      out += `<mark style="background-color:rgba(250,204,21,0.5);color:inherit;border-radius:2px;">${escapeHtml(str.slice(idx, idx + query.length))}</mark>`;
       lastIdx = idx + query.length;
       idx = lowerStr.indexOf(query, lastIdx);
     }
-    if (lastIdx < str.length) parts.push(str.slice(lastIdx));
-    return parts;
+    out += escapeHtml(str.slice(lastIdx));
+    return out;
   }, [activeHighlight]);
 
   // Internal PDF hyperlink navigation (annotation layer + outline clicks)
@@ -530,11 +542,19 @@ const RulesViewer = ({ onBack, themeClasses }) => {
         <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-gray-900" style={{ touchAction: 'pan-x pan-y' }}>
           <Document
             file={currentDoc.file}
+            options={pdfOptions}
             onLoadSuccess={onLoadSuccess}
+            onLoadProgress={({ loaded, total }) => {
+              if (total) setLoadProgress(Math.min(99, Math.round((loaded / total) * 100)));
+            }}
             onItemClick={handleItemClick}
             loading={
               <div className="text-gray-400 mt-20 text-center">
                 <div className="text-lg mb-2">Loading PDF...</div>
+                <div className="w-48 h-2 mx-auto bg-gray-700 rounded overflow-hidden">
+                  <div className="h-full bg-red-600 transition-all" style={{ width: `${loadProgress}%` }} />
+                </div>
+                <div className="text-xs mt-1">{loadProgress}%</div>
               </div>
             }
             error={

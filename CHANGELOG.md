@@ -19,6 +19,20 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [Unreleased]
+
+### 📖 Rules & Rituals Viewer
+
+#### Fixed
+- **Search highlighting**: Highlights now actually appear — react-pdf requires the text renderer to return an HTML string, not JSX
+- **Zoom flashing/jumping**: Zoom now uses the CSS `zoom` property so canvases never re-rasterize during zoom; no more white flash or page jumping
+
+#### Added
+- **Faster first load**: PDFs now fetch pages on demand (range requests) instead of downloading the entire file up front
+- **Load progress bar**: Shows download percentage while a PDF loads
+
+---
+
 ## [v0.5.3] - 2026-05-12
 
 ### 📖 Rulebook Sync
