@@ -21,12 +21,16 @@ const escapeHtml = (s) => s
 
 const DOCUMENTS = [
   { id: 'rulebook',  label: 'Rulebook',          file: '/2026 Shadow Accord Rulebook.pdf' },
+  { id: 'st',        label: 'ST Rulebook',        file: '/2025 Shadow Accord ST Rulebook v1.1.pdf', locked: true },
   { id: 'vampire',   label: 'Vampire Rituals',    file: '/Shadow Accord Vampire Blood Rituals List (2025).pdf' },
   { id: 'shifter',   label: 'Shifter Rituals',    file: '/Shadow Accord Shifter Glyph Rituals List (2025).pdf' },
   { id: 'sorcerer',  label: 'Sorcerer Rituals',   file: '/Shadow Accord Sorcerer Mystic Rituals List (2025).pdf' },
   { id: 'wraith',    label: 'Wraith Rituals',     file: '/Shadow Accord Wraith Arcanos Rituals List (2025).pdf' },
   { id: 'other',     label: 'Other Rituals',      file: '/Shadow Accord Other Rituals List (2025).pdf' },
 ];
+
+// Session-only password for the ST Rulebook (not persisted)
+const ST_PASSWORD = '1234!';
 
 // Pre-resolve all outline item destinations to page numbers up front
 const resolveOutlineItems = async (doc, items) => {
@@ -105,6 +109,10 @@ const OutlineTree = ({ items, onNavigate, depth = 0 }) => {
 // Main viewer
 const RulesViewer = ({ onBack, themeClasses }) => {
   const [activeDocId, setActiveDocId]         = useState('rulebook');
+  const [stUnlocked, setStUnlocked]           = useState(false);
+  const [showLockModal, setShowLockModal]     = useState(false);
+  const [lockInput, setLockInput]             = useState('');
+  const [lockError, setLockError]             = useState(false);
   const [numPages, setNumPages]               = useState(null);
   const [pageInput, setPageInput]             = useState('1');
   // baseScale = scale the canvases are actually rasterized at (fit-to-width).
@@ -420,6 +428,43 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   return (
     <div className={`${themeClasses.base} flex flex-col`} style={{ height: '100vh' }}>
 
+      {/* ST Rulebook lock modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 w-80 shadow-xl">
+            <h2 className="text-white font-bold text-lg mb-1">ST Rulebook</h2>
+            <p className="text-gray-400 text-sm mb-4">This document is restricted. Enter the ST password to unlock for this session.</p>
+            <input
+              type="password"
+              autoFocus
+              placeholder="Password"
+              value={lockInput}
+              onChange={e => { setLockInput(e.target.value); setLockError(false); }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  if (lockInput === ST_PASSWORD) { setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
+                  else setLockError(true);
+                }
+                if (e.key === 'Escape') setShowLockModal(false);
+              }}
+              className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            {lockError && <p className="text-red-400 text-xs mb-2">Incorrect password.</p>}
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setShowLockModal(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button
+                onClick={() => {
+                  if (lockInput === ST_PASSWORD) { setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
+                  else setLockError(true);
+                }}
+                className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white text-sm rounded">
+                Unlock
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-700 flex-shrink-0">
         <button onClick={onBack} className="text-gray-400 hover:text-white text-sm mr-2">Back</button>
@@ -428,14 +473,24 @@ const RulesViewer = ({ onBack, themeClasses }) => {
 
       {/* Document tab bar */}
       <div className="flex gap-1 px-3 py-2 border-b border-gray-700 overflow-x-auto flex-shrink-0">
-        {DOCUMENTS.map(doc => (
-          <button key={doc.id} onClick={() => switchDoc(doc.id)}
-            className={`px-3 py-1 rounded text-sm whitespace-nowrap transition-colors ${
-              activeDocId === doc.id ? 'bg-red-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}>
-            {doc.label}
-          </button>
-        ))}
+        {DOCUMENTS.map(doc => {
+          const isLocked = doc.locked && !stUnlocked;
+          return (
+            <button key={doc.id}
+              onClick={() => {
+                if (isLocked) { setLockInput(''); setLockError(false); setShowLockModal(true); }
+                else switchDoc(doc.id);
+              }}
+              className={`px-3 py-1 rounded text-sm whitespace-nowrap transition-colors flex items-center gap-1 ${
+                activeDocId === doc.id ? 'bg-red-700 text-white'
+                : isLocked ? 'bg-gray-800 text-gray-500 cursor-pointer'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}>
+              {isLocked && <span>🔒</span>}
+              {doc.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Controls - two rows for mobile friendliness */}
