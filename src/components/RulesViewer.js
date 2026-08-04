@@ -100,6 +100,9 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const [numPages, setNumPages]               = useState(null);
   const [pageInput, setPageInput]             = useState('1');
   const [scale, setScale]                     = useState(1.0);
+  // Scale actually passed to <Page> — lags behind `scale` by a debounce so
+  // rapid zooming scales the existing canvases via CSS instead of re-rasterizing
+  const [renderScale, setRenderScale]         = useState(1.0);
   const [pdfDoc, setPdfDoc]                   = useState(null);
   const [outline, setOutline]                 = useState([]);
   const [hasOutline, setHasOutline]           = useState(false);
@@ -181,6 +184,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
 
   // Keep scaleRef current so touch handlers (added once via [] dep) can read it
   useEffect(() => { scaleRef.current = scale; }, [scale]);
+
+  // Commit renderScale after zooming settles (debounced). Until then the pages
+  // are visually scaled with a CSS transform — no re-rasterization, no flash.
+  useEffect(() => {
+    if (scale === renderScale) return;
+    const t = setTimeout(() => setRenderScale(scale), 300);
+    return () => clearTimeout(t);
+  }, [scale, renderScale]);
 
   // Pinch-to-zoom — must use non-passive touchmove to call preventDefault,
   // preventing the browser's native page zoom from fighting our handler
@@ -504,35 +515,51 @@ const RulesViewer = ({ onBack, themeClasses }) => {
               </div>
             }
           >
-            {numPages && Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
-              <div
-                key={pageNum}
-                data-page={pageNum}
-                ref={el => {
-                  pageRefs.current[pageNum] = el;
-                  if (el && observerRef.current) observerRef.current.observe(el);
-                }}
-                className="flex justify-center py-3 border-b border-gray-800/60"
-              >
-                {visiblePages.has(pageNum) ? (
-                  <Page
-                    pageNumber={pageNum}
-                    scale={scale}
-                    renderTextLayer
-                    renderAnnotationLayer
-                    customTextRenderer={activeHighlight ? customTextRenderer : undefined}
-                    className="shadow-2xl"
-                  />
-                ) : (
-                  <div
-                    style={{ width: Math.round(612 * scale), height: Math.round(792 * scale) }}
-                    className="bg-gray-800 rounded flex items-center justify-center text-gray-600 text-sm select-none"
-                  >
-                    {pageNum}
-                  </div>
-                )}
-              </div>
-            ))}
+            {/* While zooming, scale existing canvases with CSS (instant, no flash).
+                Once renderScale catches up (debounced), transform becomes 1 and
+                pages re-rasterize crisply at the new scale. */}
+            <div
+              style={scale !== renderScale ? {
+                transform: `scale(${scale / renderScale})`,
+                transformOrigin: 'top center',
+              } : undefined}
+            >
+              {numPages && Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
+                <div
+                  key={pageNum}
+                  data-page={pageNum}
+                  ref={el => {
+                    pageRefs.current[pageNum] = el;
+                    if (el && observerRef.current) observerRef.current.observe(el);
+                  }}
+                  className="flex justify-center py-3 border-b border-gray-800/60"
+                >
+                  {visiblePages.has(pageNum) ? (
+                    <Page
+                      pageNumber={pageNum}
+                      scale={renderScale}
+                      renderTextLayer
+                      renderAnnotationLayer
+                      customTextRenderer={activeHighlight ? customTextRenderer : undefined}
+                      className="shadow-2xl"
+                      loading={
+                        <div
+                          style={{ width: Math.round(612 * renderScale), height: Math.round(792 * renderScale) }}
+                          className="bg-gray-800 rounded select-none"
+                        />
+                      }
+                    />
+                  ) : (
+                    <div
+                      style={{ width: Math.round(612 * renderScale), height: Math.round(792 * renderScale) }}
+                      className="bg-gray-800 rounded flex items-center justify-center text-gray-600 text-sm select-none"
+                    >
+                      {pageNum}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </Document>
         </div>
       </div>
