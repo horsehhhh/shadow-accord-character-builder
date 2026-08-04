@@ -10503,7 +10503,7 @@ Your character is ready to play!`;
                 })()}
               </div>
 
-              {/* Statistics */
+              {/* Statistics */}
               <div className={`${themeClasses.card} p-3`}>
                 <h3 className="text-xl font-bold mb-2">Statistics</h3>
                 <div className="space-y-3">
