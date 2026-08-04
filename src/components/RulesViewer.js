@@ -184,9 +184,17 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     }
   }, []);
 
-  // Scroll to page - synchronous, no async work
+  // Scroll to page - instant jump, and pre-adds the target to visiblePages so
+  // rendering starts immediately rather than waiting for IntersectionObserver.
+  // Using 'auto' (not 'smooth') avoids triggering the observer for every page
+  // between current position and target, which caused cascading render queues.
   const scrollToPage = useCallback((pageNum) => {
-    pageRefs.current[pageNum]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setVisiblePages(prev => {
+      const next = new Set(prev);
+      for (let p = Math.max(1, pageNum - 1); p <= pageNum + 1; p++) next.add(p);
+      return next;
+    });
+    pageRefs.current[pageNum]?.scrollIntoView({ behavior: 'auto', block: 'start' });
     setPageInput(String(pageNum));
   }, []);
 
