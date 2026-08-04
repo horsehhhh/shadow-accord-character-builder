@@ -115,11 +115,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const [isSearching, setIsSearching]         = useState(false);
   const [searchDone, setSearchDone]           = useState(false);
 
-  const pageRefs           = useRef({});
-  const observerRef        = useRef(null);
-  const scrollContainerRef = useRef(null);
-  const currentPageRef     = useRef(1);
-  const currentDoc         = DOCUMENTS.find(d => d.id === activeDocId);
+  const pageRefs              = useRef({});
+  const observerRef           = useRef(null);
+  const scrollContainerRef    = useRef(null);
+  const currentPageRef        = useRef(1);
+  const scaleRef              = useRef(1.0);
+  const pinchStartDistRef     = useRef(null);
+  const pinchStartScaleRef    = useRef(null);
+  const currentDoc            = DOCUMENTS.find(d => d.id === activeDocId);
 
   // Set up IntersectionObserver for lazy page rendering
   useEffect(() => {
@@ -176,20 +179,44 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return () => window.removeEventListener('resize', fitWidth);
   }, [numPages, fitWidth]);
 
-  // When scale changes, trim visiblePages to the current window.
-  // Without this, every page visited during a long reading session would
-  // re-render simultaneously on any zoom change.
+  // Keep scaleRef current so touch handlers (added once via [] dep) can read it
+  useEffect(() => { scaleRef.current = scale; }, [scale]);
+
+  // Pinch-to-zoom — must use non-passive touchmove to call preventDefault,
+  // preventing the browser's native page zoom from fighting our handler
   useEffect(() => {
-    if (!numPages) return;
-    setVisiblePages(() => {
-      const next = new Set();
-      const anchor = currentPageRef.current;
-      for (let p = Math.max(1, anchor - RENDER_BUFFER); p <= Math.min(numPages, anchor + RENDER_BUFFER); p++) {
-        next.add(p);
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const dist = (t) => {
+      const dx = t[0].clientX - t[1].clientX;
+      const dy = t[0].clientY - t[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+    const onStart = (e) => {
+      if (e.touches.length === 2) {
+        pinchStartDistRef.current  = dist(e.touches);
+        pinchStartScaleRef.current = scaleRef.current;
       }
-      return next;
-    });
-  }, [scale, numPages]);
+    };
+    const onMove = (e) => {
+      if (e.touches.length !== 2 || pinchStartDistRef.current === null) return;
+      e.preventDefault();
+      const ratio    = dist(e.touches) / pinchStartDistRef.current;
+      const newScale = Math.max(0.4, Math.min(3.0,
+        parseFloat((pinchStartScaleRef.current * ratio).toFixed(2))
+      ));
+      setScale(newScale);
+    };
+    const onEnd = () => { pinchStartDistRef.current = null; };
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove',  onMove,  { passive: false });
+    el.addEventListener('touchend',   onEnd,   { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove',  onMove);
+      el.removeEventListener('touchend',   onEnd);
+    };
+  }, []);  // runs once — scale accessed via ref, setScale is stable
 
   // Switch document
   const switchDoc = useCallback((docId) => {
@@ -335,6 +362,11 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return parts;
   }, [activeHighlight]);
 
+  // Internal PDF hyperlink navigation (annotation layer + outline clicks)
+  const handleItemClick = useCallback(({ pageNumber }) => {
+    if (pageNumber) scrollToPage(pageNumber);
+  }, [scrollToPage]);
+
   return (
     <div className={`${themeClasses.base} flex flex-col`} style={{ height: '100vh' }}>
 
@@ -460,6 +492,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           <Document
             file={currentDoc.file}
             onLoadSuccess={onLoadSuccess}
+            onItemClick={handleItemClick}
             loading={
               <div className="text-gray-400 mt-20 text-center">
                 <div className="text-lg mb-2">Loading PDF...</div>
