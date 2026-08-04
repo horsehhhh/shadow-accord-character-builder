@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { ChevronRight, ChevronDown, Menu, X } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -9,7 +9,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-const RENDER_BUFFER = 8; // pages to render on each side of the current viewport
+// Pages to render on each side of the current viewport — smaller on mobile
+// so post-zoom re-rasterization stays fast
+const RENDER_BUFFER = typeof window !== 'undefined' && window.innerWidth < 768 ? 3 : 8;
 
 const DOCUMENTS = [
   { id: 'rulebook',  label: 'Rulebook',          file: '/2026 Shadow Accord Rulebook.pdf' },
@@ -123,8 +125,12 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const scrollContainerRef    = useRef(null);
   const currentPageRef        = useRef(1);
   const scaleRef              = useRef(1.0);
+  const renderScaleRef        = useRef(1.0);
+  const prevRenderScaleRef    = useRef(1.0);
   const pinchStartDistRef     = useRef(null);
   const pinchStartScaleRef    = useRef(null);
+  // Y coordinate (in content space) that should stay fixed while zooming
+  const [zoomOriginY, setZoomOriginY] = useState(0);
   const currentDoc            = DOCUMENTS.find(d => d.id === activeDocId);
 
   // Set up IntersectionObserver for lazy page rendering
@@ -134,6 +140,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     observerRef.current?.disconnect();
     observerRef.current = new IntersectionObserver(
       (entries) => {
+        // Ignore observer noise while a zoom is in flight: the CSS transform
+        // shifts page positions around, which would re-anchor to random pages
+        if (pinchStartDistRef.current !== null) return;
+        if (scaleRef.current !== renderScaleRef.current) return;
         // Collect all intersecting page numbers from this batch
         const intersecting = entries
           .filter(e => e.isIntersecting)
@@ -184,6 +194,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
 
   // Keep scaleRef current so touch handlers (added once via [] dep) can read it
   useEffect(() => { scaleRef.current = scale; }, [scale]);
+  useEffect(() => { renderScaleRef.current = renderScale; }, [renderScale]);
+
+  // Capture the zoom anchor (viewport center in content space) before changing scale.
+  // Used as the CSS transform-origin so the content you're looking at stays put.
+  const beginZoom = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) setZoomOriginY(el.scrollTop + el.clientHeight / 2);
+  }, []);
 
   // Commit renderScale after zooming settles (debounced). Until then the pages
   // are visually scaled with a CSS transform — no re-rasterization, no flash.
@@ -192,6 +210,19 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     const t = setTimeout(() => setRenderScale(scale), 300);
     return () => clearTimeout(t);
   }, [scale, renderScale]);
+
+  // When renderScale commits, the layout height changes by scale ratio.
+  // Compensate scrollTop before paint so the viewport stays on the same content.
+  useLayoutEffect(() => {
+    const prev = prevRenderScaleRef.current;
+    prevRenderScaleRef.current = renderScale;
+    if (prev === renderScale) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const ratio  = renderScale / prev;
+    const center = el.scrollTop + el.clientHeight / 2;
+    el.scrollTop = Math.max(0, center * ratio - el.clientHeight / 2);
+  }, [renderScale]);
 
   // Pinch-to-zoom — must use non-passive touchmove to call preventDefault,
   // preventing the browser's native page zoom from fighting our handler
@@ -207,6 +238,8 @@ const RulesViewer = ({ onBack, themeClasses }) => {
       if (e.touches.length === 2) {
         pinchStartDistRef.current  = dist(e.touches);
         pinchStartScaleRef.current = scaleRef.current;
+        const c = scrollContainerRef.current;
+        if (c) setZoomOriginY(c.scrollTop + c.clientHeight / 2);
       }
     };
     const onMove = (e) => {
@@ -462,12 +495,12 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-1 flex-shrink-0">
-            <button onClick={() => setScale(s => Math.max(0.4, parseFloat((s - 0.15).toFixed(2))))}
+            <button onClick={() => { beginZoom(); setScale(s => Math.max(0.4, parseFloat((s - 0.15).toFixed(2)))); }}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">-</button>
             <span className="text-gray-300 text-xs w-10 text-center">{Math.round(scale * 100)}%</span>
-            <button onClick={() => setScale(s => Math.min(3.0, parseFloat((s + 0.15).toFixed(2))))}
+            <button onClick={() => { beginZoom(); setScale(s => Math.min(3.0, parseFloat((s + 0.15).toFixed(2)))); }}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">+</button>
-            <button onClick={fitWidth}
+            <button onClick={() => { beginZoom(); fitWidth(); }}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-300">Fit</button>
           </div>
         </div>
@@ -498,8 +531,9 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           </>
         )}
 
-        {/* Continuous scroll PDF area */}
-        <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-gray-900">
+        {/* Continuous scroll PDF area — touch-action allows panning but disables
+            the browser's native pinch zoom (we handle pinch ourselves) */}
+        <div ref={scrollContainerRef} className="flex-1 overflow-auto bg-gray-900" style={{ touchAction: 'pan-x pan-y' }}>
           <Document
             file={currentDoc.file}
             onLoadSuccess={onLoadSuccess}
@@ -516,12 +550,14 @@ const RulesViewer = ({ onBack, themeClasses }) => {
             }
           >
             {/* While zooming, scale existing canvases with CSS (instant, no flash).
-                Once renderScale catches up (debounced), transform becomes 1 and
+                Origin is anchored to the viewport center captured at zoom start so
+                the content you're reading stays put instead of drifting away.
+                Once renderScale catches up (debounced), transform resets and
                 pages re-rasterize crisply at the new scale. */}
             <div
               style={scale !== renderScale ? {
                 transform: `scale(${scale / renderScale})`,
-                transformOrigin: 'top center',
+                transformOrigin: `50% ${zoomOriginY}px`,
               } : undefined}
             >
               {numPages && Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
