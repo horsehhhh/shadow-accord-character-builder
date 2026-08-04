@@ -9,6 +9,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+const RENDER_BUFFER = 8; // pages to render on each side of the current viewport
+
 const DOCUMENTS = [
   { id: 'rulebook',  label: 'Rulebook',          file: '/2026 Shadow Accord Rulebook.pdf' },
   { id: 'vampire',   label: 'Vampire Rituals',    file: '/Shadow Accord Vampire Blood Rituals List (2025).pdf' },
@@ -116,6 +118,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const pageRefs           = useRef({});
   const observerRef        = useRef(null);
   const scrollContainerRef = useRef(null);
+  const currentPageRef     = useRef(1);
   const currentDoc         = DOCUMENTS.find(d => d.id === activeDocId);
 
   // Set up IntersectionObserver for lazy page rendering
@@ -125,20 +128,29 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     observerRef.current?.disconnect();
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          const pageNum = parseInt(entry.target.dataset.page, 10);
-          if (isNaN(pageNum)) return;
-          setVisiblePages(prev => {
-            const next = new Set(prev);
-            for (let p = Math.max(1, pageNum - 1); p <= Math.min(numPages, pageNum + 1); p++) {
-              next.add(p);
-            }
-            return next;
-          });
+        // Collect all intersecting page numbers from this batch
+        const intersecting = entries
+          .filter(e => e.isIntersecting)
+          .map(e => parseInt(e.target.dataset.page, 10))
+          .filter(n => !isNaN(n));
+        if (!intersecting.length) return;
+        // Use the median page in the batch as the anchor (handles fast scrolling:
+        // intermediate pages batch together; final position becomes the anchor)
+        intersecting.sort((a, b) => a - b);
+        const anchor = intersecting[Math.floor(intersecting.length / 2)];
+        currentPageRef.current = anchor;
+        // Replace (not accumulate) with a window around the anchor so:
+        // 1. Zoom only re-renders current window, not every visited page
+        // 2. Fast scroll evicts intermediate pages; destination renders first
+        setVisiblePages(() => {
+          const next = new Set();
+          for (let p = Math.max(1, anchor - RENDER_BUFFER); p <= Math.min(numPages, anchor + RENDER_BUFFER); p++) {
+            next.add(p);
+          }
+          return next;
         });
       },
-      { rootMargin: '100px', threshold: 0 }
+      { rootMargin: '200px', threshold: 0 }
     );
 
     Object.values(pageRefs.current).forEach(el => {
@@ -164,6 +176,21 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     return () => window.removeEventListener('resize', fitWidth);
   }, [numPages, fitWidth]);
 
+  // When scale changes, trim visiblePages to the current window.
+  // Without this, every page visited during a long reading session would
+  // re-render simultaneously on any zoom change.
+  useEffect(() => {
+    if (!numPages) return;
+    setVisiblePages(() => {
+      const next = new Set();
+      const anchor = currentPageRef.current;
+      for (let p = Math.max(1, anchor - RENDER_BUFFER); p <= Math.min(numPages, anchor + RENDER_BUFFER); p++) {
+        next.add(p);
+      }
+      return next;
+    });
+  }, [scale, numPages]);
+
   // Switch document
   const switchDoc = useCallback((docId) => {
     setActiveDocId(docId);
@@ -179,6 +206,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setSearchDone(false);
     setVisiblePages(new Set([1, 2, 3]));
     pageRefs.current = {};
+    currentPageRef.current = 1;
   }, []);
 
   // Document load - also pre-resolves all outline destinations in parallel
@@ -207,14 +235,17 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   // Using 'auto' (not 'smooth') avoids triggering the observer for every page
   // between current position and target, which caused cascading render queues.
   const scrollToPage = useCallback((pageNum) => {
-    setVisiblePages(prev => {
-      const next = new Set(prev);
-      for (let p = Math.max(1, pageNum - 1); p <= pageNum + 1; p++) next.add(p);
+    currentPageRef.current = pageNum;
+    setVisiblePages(() => {
+      const next = new Set();
+      for (let p = Math.max(1, pageNum - RENDER_BUFFER); p <= Math.min(numPages || 9999, pageNum + RENDER_BUFFER); p++) {
+        next.add(p);
+      }
       return next;
     });
     pageRefs.current[pageNum]?.scrollIntoView({ behavior: 'auto', block: 'start' });
     setPageInput(String(pageNum));
-  }, []);
+  }, [numPages]);
 
   // Outline click - pageNum already resolved, instant response
   // Closes TOC drawer on mobile after navigating
