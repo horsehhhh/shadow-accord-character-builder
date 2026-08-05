@@ -13385,7 +13385,6 @@ Your character is ready to play!`;
                     if (stTrees.length === 0) return (
                       <div className={`${themeClasses.card} p-4 text-center text-gray-400 text-sm`}>No ST power trees available for this character's faction.</div>
                     );
-                    const innateTreeIds = character.innateTreeIds || [];
                     return (
                       <div className={`${themeClasses.card} p-4`}>
                         <h4 className="font-bold text-purple-300 mb-1">ST-Only Power Trees</h4>
