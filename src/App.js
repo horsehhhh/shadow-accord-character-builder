@@ -13395,7 +13395,6 @@ Your character is ready to play!`;
                             const currentLevels = character.powers?.[tree.tree_id] || {};
                             const allLearned = currentLevels[1] && currentLevels[2] && currentLevels[3];
                             const note = ST_TREE_NOTES[tree.tree_id];
-                            const isInnate = innateTreeIds.includes(tree.tree_id);
                             return (
                               <div key={tree.tree_id} className={`p-3 rounded-lg border ${note?.color === 'red' ? 'border-red-700 bg-red-900 bg-opacity-20' : note?.color === 'yellow' ? 'border-yellow-700 bg-yellow-900 bg-opacity-10' : themeClasses.card}`}>
                                 <div className="font-bold mb-1 flex items-center gap-2">
