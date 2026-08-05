@@ -23,7 +23,43 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
-## [v0.6.1] - 2026-08-04
+## [v0.6.4] - 2026-08-05
+
+### 🏠 Main Menu
+
+#### Changed
+- **Rules & Rituals moved up**: Swapped position with Settings so the rulebook is visible without scrolling on mobile (Android APK)
+- **Character delete fix**: Deleting a character now correctly persists to localStorage so it doesn't reappear after reload when offline/unauthenticated
+
+---
+
+## [v0.6.3] - 2026-08-04
+
+### 🗂️ NPC Bank
+
+#### Added
+- **NPC Bank tab**: Save NPCs to a persistent bank (local storage + cloud sync when logged in)
+- **Saved NPCs grid**: Browse saved NPCs with Load, Print, and Delete actions per entry
+- **Save to Bank button**: Appears in header when on the Create tab; validates name before saving
+- **Load NPC**: Populates the full form from a saved entry; faction reactive effects suppressed during load to prevent overwriting
+- **Print from bank**: Print a saved NPC's sheet directly without loading it into the form first
+- **Cloud sync**: When authenticated, bank syncs to `/api/npcs` backend endpoint; falls back to localStorage
+
+---
+
+## [v0.6.2] - 2026-08-04
+
+### ✨ Features
+
+#### Added
+- **Character Clone**: Clone button (copy icon) in character management grid creates a deep copy with " (Copy)" suffix, synced to cloud or local depending on auth state
+- **NPC Print Sheet**: Black-and-white print-optimised sheet for NPCs (opens in browser print dialog); includes all stats, trees, special abilities, skills, merits, and notes
+- **NPC Power System Redesign**: Power picker replaced with tree+level model matching character creation — pick tree name (with faction-keyed autocomplete datalist), level 1–5, and Innate/Learned category; separate Special Abilities freeform list
+- **NPC Bank Backend**: `/api/npcs` endpoints (GET/POST/DELETE) with MongoDB model, ownership validation, and `npcBankAPI` client helper in `api.js`
+
+---
+
+
 
 ### 🃏 NPC Creator
 
