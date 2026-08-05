@@ -1,3 +1,4 @@
+/* eslint-disable unicode-bom */
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Lock } from 'lucide-react';
 import { powersData } from '../data/powersData';
