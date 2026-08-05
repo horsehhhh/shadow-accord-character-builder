@@ -146,6 +146,8 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   const pinchStartDistRef     = useRef(null);
   const pinchStartZoomRef     = useRef(null);
   const pinchingRef           = useRef(false);
+  const fitScaleRef           = useRef(1.0); // baseScale at fit-to-width, for accurate % label
+  const skipScrollAdjRef      = useRef(false); // prevent scroll jump when baking zoom into baseScale
   const currentDoc            = DOCUMENTS.find(d => d.id === activeDocId);
 
   // pdf.js options — disableAutoFetch makes it range-request only the pages you
@@ -198,13 +200,15 @@ const RulesViewer = ({ onBack, themeClasses }) => {
   }, [numPages]);
 
   // Fit PDF width to the scroll container — sets the rasterization scale and
-  // resets live zoom to 1. Called on load, resize, and the Fit button.
+  // defaults zoom by orientation: 0.5 landscape (wide screens), 1.0 portrait.
   const fitWidth = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
     const available = container.clientWidth - 32; // 16px padding each side
-    setBaseScale(parseFloat(Math.max(0.4, Math.min(3.0, available / 612)).toFixed(2)));
-    setZoom(1.0);
+    const newScale = parseFloat(Math.max(0.4, Math.min(3.0, available / 612)).toFixed(2));
+    fitScaleRef.current = newScale;
+    setBaseScale(newScale);
+    setZoom(window.innerWidth > window.innerHeight ? 0.5 : 1.0);
   }, []);
 
   // Auto-fit on document load and re-fit on window resize
@@ -225,11 +229,24 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     const prev = prevZoomRef.current;
     prevZoomRef.current = zoom;
     if (prev === zoom) return;
+    // Skip when baking zoom into baseScale — visual size unchanged, scroll is already correct
+    if (skipScrollAdjRef.current) { skipScrollAdjRef.current = false; return; }
     const el = scrollContainerRef.current;
     if (!el) return;
     const ratio  = zoom / prev;
     const center = el.scrollTop + el.clientHeight / 2;
     el.scrollTop = Math.max(0, center * ratio - el.clientHeight / 2);
+  }, [zoom]);
+
+  // Re-rasterize at full quality after zoom settles above 1.0 (CSS upscaling blurs canvas)
+  useEffect(() => {
+    if (zoom <= 1.0) return;
+    const id = setTimeout(() => {
+      skipScrollAdjRef.current = true;
+      setBaseScale(bs => parseFloat(Math.max(0.4, Math.min(3.0, bs * zoom)).toFixed(2)));
+      setZoom(1.0);
+    }, 400);
+    return () => clearTimeout(id);
   }, [zoom]);
 
   const changeZoom = useCallback((delta) => {
@@ -556,10 +573,10 @@ const RulesViewer = ({ onBack, themeClasses }) => {
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-1 flex-shrink-0">
-            <button onClick={() => changeZoom(-0.2)}
+            <button onClick={() => changeZoom(-0.1)}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">-</button>
-            <span className="text-gray-300 text-xs w-10 text-center">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => changeZoom(0.2)}
+            <span className="text-gray-300 text-xs w-12 text-center">{Math.round(baseScale * zoom / fitScaleRef.current * 100)}%</span>
+            <button onClick={() => changeZoom(0.1)}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 font-bold text-sm">+</button>
             <button onClick={fitWidth}
               className="px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-xs text-gray-300">Fit</button>

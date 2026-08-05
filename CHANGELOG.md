@@ -23,6 +23,30 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.6.1] - 2026-08-04
+
+### 🃏 NPC Creator
+
+#### Added
+- **Monster faction**: Full Monster support in NPC Creator — Fright/Horror/Terror/Legend types with stat reference table (health, energy, WP, power, immunity, augment ranges), Health field, Augment field, Realmbound/Umbrabound radio, Spend Health as Energy checkbox, Sense Faction response field, Scorch type picker (add/remove tags), Immunities list with optional "unless" condition, Weaknesses list with optional "when" condition
+- **Legend auto-Legendary**: Selecting Legend type auto-sets the LEGENDARY badge; Umbrabound auto-adds Umbra Sight to fundamentals
+
+#### Changed
+- **NPC card redesign**: Replaced stat boxes with a structured two-column stat table (Faction, Sub-Faction, Energy, Willpower, Virtue, Regen Rate, Health/Augment for Monsters); faction-specific details now displayed as a **Faction Specifics** section with generated descriptive text (e.g. "Umbrabound. Goes to Dead if forced into the Realm."); power sections use cleaner divider-separated layout; header shows name prominently with italic title and right-aligned badges (⚑ LEGENDARY, ☠ PERMATAINTED)
+- **Monster card**: Scorch, Immunities, Weaknesses shown as a dedicated stat table below the core stats
+
+### 🧿 Magic Item Wizards
+
+#### Changed
+- **Item card redesign (both wizards)**: Dark amber gradient background with gold accent border lines; item name in large uppercase bold; Type · Energy subtitle; Klaive/Relic/Artifact/Tainted shown as colored badge chips (not list bullets); properties listed with ◆ bullets; attunement displayed as a large color-coded number (green < 6, amber 6–9, red 10+) in a footer bar
+
+### 📖 Rulebook Viewer
+
+#### Changed
+- **Orientation-based default zoom**: PDF opens at 50% zoom on landscape screens (desktop / phone landscape), 100% on portrait screens; Fit button respects the same logic on click
+
+---
+
 ## [v0.6.0] - 2026-08-04
 
 ### 🔒 Storyteller Suite
