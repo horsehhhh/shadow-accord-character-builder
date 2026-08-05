@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, BookOpen, Zap, Users, DollarSign, Volume2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { powersData } from './data/powersData';
 
@@ -15,7 +15,7 @@ function PowerIndex({ onBack, embedded = false }) {
   useEffect(() => {
     setPowers(powersData);
     setIsLoading(false);
-  }, [powersData]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Get unique sources and types for filters
   const uniqueSources = useMemo(() => {

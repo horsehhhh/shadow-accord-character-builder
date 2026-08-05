@@ -1,4 +1,4 @@
-﻿export const powersData = [
+export const powersData = [
     {
       name: "AGGRAVATED 1",
       type: "DAMAGE",
