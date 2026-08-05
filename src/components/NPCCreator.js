@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Lock, Users } from 'lucide-react';
+import { npcBankAPI } from '../services/api';
 
 const ST_PASSWORD = '1234!';
 
@@ -467,10 +468,18 @@ const NPCCreator = ({ onBack }) => {
   const [notes, setNotes]     = useState('');
   const [isPermatainted, setIsPermatainted] = useState(false);
 
-  const nextPowerId = useRef(1);
+  const nextPowerId  = useRef(1);
+  // Suppresses reactive faction/subfaction effects when bulk-loading a saved NPC
+  const loadingRef   = useRef(false);
+
+  // NPC bank
+  const [activeTab, setActiveTab]     = useState('create');
+  const [savedNPCs, setSavedNPCs]     = useState([]);
+  const [bankLoading, setBankLoading] = useState(false);
 
   // Apply faction template when faction changes
   useEffect(() => {
+    if (loadingRef.current) return;
     const tmpl = FACTIONS[faction];
     if (!tmpl) return;
     setEnergyType(tmpl.energyType);
@@ -486,6 +495,7 @@ const NPCCreator = ({ onBack }) => {
 
   // Apply human subfaction overrides
   useEffect(() => {
+    if (loadingRef.current) return;
     if (faction !== 'human') return;
     const tmpl = FACTIONS.human;
     const override = HUMAN_SUBFACTION_OVERRIDES[subfaction] || {};
@@ -500,6 +510,7 @@ const NPCCreator = ({ onBack }) => {
 
   // Auto-set energy from vampire generation
   useEffect(() => {
+    if (loadingRef.current) return;
     if (faction !== 'vampire') return;
     const row = GENERATION_TABLE.find(g => g.gen === Number(generation));
     if (row) setEnergy(row.energy);
@@ -507,6 +518,7 @@ const NPCCreator = ({ onBack }) => {
 
   // Auto-set Legendary + Umbra Sight fundamentals for monster type/realm changes
   useEffect(() => {
+    if (loadingRef.current) return;
     if (faction !== 'monster') return;
     if (MONSTER_TYPES[subfaction]?.isLegendary) setIsLegendary(true);
     setFundamentals(prev => {
@@ -514,6 +526,150 @@ const NPCCreator = ({ onBack }) => {
       return isRealmbound ? base : [...base, 'Umbra Sight'];
     });
   }, [subfaction, isRealmbound, faction]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resolvedFaction = FACTIONS[faction];
+
+  // ── NPC Bank ─────────────────────────────────────────────────────────────
+  const loadBank = useCallback(async () => {
+    setBankLoading(true);
+    const local = JSON.parse(localStorage.getItem('shadowAccordNPCBank') || '[]');
+    setSavedNPCs(local);
+    try {
+      if (localStorage.getItem('auth_token')) {
+        const cloud = await npcBankAPI.getAll();
+        setSavedNPCs(cloud);
+        localStorage.setItem('shadowAccordNPCBank', JSON.stringify(cloud));
+      }
+    } catch (e) { /* stay with local */ }
+    setBankLoading(false);
+  }, []);
+
+  useEffect(() => { if (unlocked) loadBank(); }, [unlocked, loadBank]);
+
+  const saveToBank = useCallback(async () => {
+    if (!name.trim()) { alert('Give the NPC a name before saving.'); return; }
+    try {
+      let entry;
+      if (localStorage.getItem('auth_token')) {
+        entry = await npcBankAPI.create(name, faction, npcData);
+      } else {
+        entry = { id: `local_${Date.now()}`, name, faction, data: npcData, createdAt: new Date().toISOString() };
+      }
+      setSavedNPCs(prev => {
+        const updated = [entry, ...prev];
+        localStorage.setItem('shadowAccordNPCBank', JSON.stringify(updated));
+        return updated;
+      });
+      alert(`"${name}" saved to bank.`);
+    } catch (e) {
+      alert('Save failed: ' + (e.message || 'Unknown error'));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, faction, npcData]);
+
+  const deleteFromBank = useCallback(async (entry) => {
+    if (!window.confirm(`Delete "${entry.name}" from the bank?`)) return;
+    try {
+      if (localStorage.getItem('auth_token') && entry._id) {
+        await npcBankAPI.delete(entry._id);
+      }
+    } catch (e) { /* ignore, still remove locally */ }
+    setSavedNPCs(prev => {
+      const updated = prev.filter(n => (n._id || n.id) !== (entry._id || entry.id));
+      localStorage.setItem('shadowAccordNPCBank', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const loadNPC = useCallback((entry) => {
+    const d = entry.data || entry;
+    loadingRef.current = true;
+    setName(d.name || '');
+    setTitle(d.title || '');
+    setFaction(d.faction || 'vampire');
+    setSubfaction(d.subfaction || '');
+    setIsLegendary(!!d.isLegendary);
+    setIsPermatainted(!!d.isPermatainted);
+    setEnergy(d.energy ?? 15);
+    setEnergyType(d.energyType || '');
+    setWillpower(d.willpower ?? 6);
+    setVirtue(d.virtue || '');
+    setVirtueValue(d.virtueValue ?? 6);
+    setRegenRate(d.regenRate ?? 0);
+    setGeneration(d.generation ?? 10);
+    setRoad(d.road || '');
+    setAmaranth(d.amaranth ?? 0);
+    setBreed(d.breed || 'Homid');
+    setAuspice(d.auspice || 'Ahroun');
+    setRank(d.rank ?? 1);
+    setLegion(d.legion || 'No Legion');
+    setGuild(d.guild || 'No Guild');
+    setPassions(d.passions || '');
+    setShadowArchetype(d.shadowArchetype || '');
+    setThorn(d.thorn || '');
+    setLineage(d.lineage || '');
+    setCourt(d.court || '');
+    setEchoes(d.echoes || '');
+    setTrueName(d.trueName || '');
+    setCelestialName(d.celestialName || '');
+    setAppellation(d.appellation || '');
+    setDemonicVice(d.demonicVice || '');
+    setExtraField1(d.extraField1 || '');
+    setExtraField2(d.extraField2 || '');
+    setMonsterHealth(d.monsterHealth ?? 10);
+    setIsRealmbound(d.isRealmbound !== false);
+    setIsHealthAsEnergy(!!d.isHealthAsEnergy);
+    setMonsterAugment(d.monsterAugment ?? 1);
+    setScorchTypes(d.scorchTypes || ['Fire']);
+    setImmunities(d.immunities || [{ text: '', condition: '' }]);
+    setWeaknesses(d.weaknesses || [{ text: '', condition: '' }]);
+    setSenseFaction(d.senseFaction || 'Monster');
+    setPowerTrees(d.powerTrees || []);
+    setSpecialAbilities(d.specialAbilities || []);
+    setFundamentals(d.fundamentals || []);
+    setSkills(d.skills || [{ name: '', dots: 1 }]);
+    setMerits(d.merits || ['']);
+    setNotes(d.notes || '');
+    setTimeout(() => { loadingRef.current = false; }, 0);
+    setActiveTab('create');
+  }, []);
+
+  const printBankedNPC = useCallback((entry) => {
+    // Temporarily inject saved data into printNPC — clone data into current npcData shape
+    const saved = entry.data || entry;
+    const rf = FACTIONS[saved.faction];
+    const d = saved;
+    const dotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 5 - n));
+    const row = (label, value) => (value != null && value !== '' && value !== false)
+      ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
+    const section = (title, content) => content
+      ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
+    const fLabel = rf?.label || saved.faction;
+    const specs = [];
+    if (d.faction === 'vampire') {
+      const genRow = GENERATION_TABLE.find(g => g.gen === Number(d.generation));
+      if (genRow) specs.push(`Generation: ${genRow.label}`);
+      if (d.road) specs.push(`Road: ${d.road}`);
+      if (d.amaranth > 0) specs.push(`Amaranth: ${d.amaranth}`);
+    } else if (d.faction === 'shifter') {
+      if (d.breed) specs.push(`Breed: ${d.breed}`);
+      if (d.auspice) specs.push(`Auspice: ${d.auspice}`);
+      if (d.rank) specs.push(`Rank: ${d.rank}`);
+    } else if (d.faction === 'monster') {
+      specs.push(d.isRealmbound ? 'Realmbound.' : 'Umbrabound.');
+    }
+    const innate  = (d.powerTrees || []).filter(p => p.cat === 'innate');
+    const learned = (d.powerTrees || []).filter(p => p.cat === 'learned');
+    const powerLine = p => `<div class="item"><span class="dots">${dotsStr(p.level)}</span> ${p.tree}</div>`;
+    const monsterExtra = d.faction === 'monster' && d.scorchTypes?.length
+      ? `<table class="stats-table">${row('Scorch', d.scorchTypes.join(', '))}</table>` : '';
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => `<div class="item">${s.name} ${dotsStr(s.dots)}</div>`).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => `<div class="item">${m}</div>`).join('')) : ''}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
+    const win = window.open('', '_blank', 'width=750,height=950');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
+  }, []);
 
   const resolvedFaction = FACTIONS[faction];
 
@@ -685,15 +841,83 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
         <button onClick={onBack} className="text-gray-400 hover:text-white text-sm">← Back</button>
         <Users className="w-5 h-5 text-purple-400" />
         <h1 className="text-lg font-bold text-purple-400 mr-auto">NPC Creator</h1>
-        <button
-          onClick={printNPC}
-          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded border border-gray-600"
-        >
-          Print Sheet
-        </button>
+        {activeTab === 'create' && (
+          <>
+            <button onClick={saveToBank} className="text-xs bg-purple-800 hover:bg-purple-700 text-purple-200 px-3 py-1.5 rounded border border-purple-600">
+              Save to Bank
+            </button>
+            <button onClick={printNPC} className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded border border-gray-600">
+              Print Sheet
+            </button>
+          </>
+        )}
         <span className="text-xs text-gray-500">🔓 ST Mode</span>
       </div>
 
+      {/* Tab bar */}
+      <div className="flex border-b border-gray-700 bg-gray-850 px-4">
+        {[['create','Create NPC'],['bank',`Saved NPCs${savedNPCs.length > 0 ? ` (${savedNPCs.length})` : ''}`]].map(([id, label]) => (
+          <button key={id} onClick={() => setActiveTab(id)}
+            className={`px-4 py-2 text-sm border-b-2 transition-colors ${
+              activeTab === id ? 'border-purple-400 text-purple-300' : 'border-transparent text-gray-400 hover:text-gray-200'
+            }`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Bank tab ───────────────────────────────────────────────────────── */}
+      {activeTab === 'bank' && (
+        <div className="max-w-6xl mx-auto p-4">
+          {bankLoading ? (
+            <p className="text-gray-400 text-sm">Loading…</p>
+          ) : savedNPCs.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              <p className="text-lg mb-2">No saved NPCs yet.</p>
+              <p className="text-sm">Build an NPC in the Create tab and click "Save to Bank".</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {savedNPCs.map((entry) => {
+                const d = entry.data || entry;
+                const rf = FACTIONS[entry.faction || d.faction];
+                return (
+                  <div key={entry._id || entry.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-bold text-white truncate">{entry.name || d.name || 'Unnamed'}</div>
+                        <div className="text-xs text-gray-400">{rf?.label || entry.faction || d.faction}</div>
+                        {entry.createdAt && (
+                          <div className="text-xs text-gray-600 mt-0.5">{new Date(entry.createdAt).toLocaleDateString()}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => loadNPC(entry)}
+                        className="flex-1 text-xs bg-blue-700 hover:bg-blue-600 text-white py-1.5 rounded">
+                        Load
+                      </button>
+                      <button
+                        onClick={() => printBankedNPC(entry)}
+                        className="flex-1 text-xs bg-gray-600 hover:bg-gray-500 text-white py-1.5 rounded">
+                        Print
+                      </button>
+                      <button
+                        onClick={() => deleteFromBank(entry)}
+                        className="text-xs text-red-400 hover:text-red-300 px-2 py-1.5">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'create' && (
       <div className="max-w-6xl mx-auto p-4 grid grid-cols-1 xl:grid-cols-2 gap-6">
 
         {/* ── LEFT: Form ─────────────────────────────────────────────────────── */}
@@ -1156,6 +1380,7 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
           <p className="text-xs text-gray-600 mt-2 text-center">Use browser print (Ctrl+P) to print this card</p>
         </div>
       </div>
+      )}
     </div>
   );
 };
