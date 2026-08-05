@@ -13316,24 +13316,6 @@ Your character is ready to play!`;
                       }}
                       className="w-full px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded font-medium"
                     >Unlock ST Tools</button>
-                    {(() => {
-                      try {
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        if (!user?.email) return null;
-                        const trusted = localStorage.getItem('stEmail');
-                        return (
-                          <div className="pt-2 border-t border-gray-600 text-center">
-                            {trusted === user.email
-                              ? <p className="text-green-400 text-xs">✅ {user.email} — auto-unlocks on login</p>
-                              : <button
-                                  onClick={() => { localStorage.setItem('stEmail', user.email); setStModeUnlocked(true); localStorage.setItem('stModeUnlocked', 'true'); }}
-                                  className="text-amber-400 hover:underline text-xs"
-                                >Trust my account ({user.email})</button>
-                            }
-                          </div>
-                        );
-                      } catch { return null; }
-                    })()}
                   </div>
                 </div>
               ) : (
@@ -13341,13 +13323,22 @@ Your character is ready to play!`;
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold flex items-center gap-2">🔓 ST Tools <span className="text-sm font-normal text-purple-400">— Storyteller Mode Active</span></h3>
                     <div className="flex items-center gap-2">
-                      {localStorage.getItem('stEmail') && (
-                        <button
-                          onClick={() => localStorage.removeItem('stEmail')}
-                          className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded text-gray-400"
-                          title="Stop auto-unlocking for this account"
-                        >Untrust account</button>
-                      )}
+                      {(() => {
+                        try {
+                          const user = JSON.parse(localStorage.getItem('user'));
+                          if (!user?.email) return null;
+                          const trusted = localStorage.getItem('stEmail');
+                          return trusted === user.email
+                            ? <button onClick={() => localStorage.removeItem('stEmail')}
+                                className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded text-gray-400"
+                                title="Stop auto-unlocking for this account"
+                              >Untrust account</button>
+                            : <button onClick={() => { localStorage.setItem('stEmail', user.email); }}
+                                className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded text-amber-400"
+                                title="Auto-unlock ST tools when this account is logged in"
+                              >Trust my account</button>;
+                        } catch { return null; }
+                      })()}
                       <button
                         onClick={() => { setStModeUnlocked(false); localStorage.removeItem('stModeUnlocked'); }}
                         className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded"
