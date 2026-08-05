@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Lock, Users } from 'lucide-react';
-import { powersData } from '../data/powersData';
 
 const ST_PASSWORD = '1234!';
 
@@ -123,49 +122,42 @@ const WRAITH_GUILDS  = ['Artificers','Masquers','Pardoners','Usurers','Chanteurs
 const SHIFTER_BREEDS  = ['Homid','Lupus','Metis','Other'];
 const SHIFTER_AUSPICES = ['Ragabash','Theurge','Philodox','Galliard','Ahroun','Other'];
 
-// ── Power search ──────────────────────────────────────────────────────────────
-function PowerSearch({ onSelect }) {
-  const [query, setQuery] = useState('');
-  const [open, setOpen]   = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, []);
-
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return powersData.filter(p => p.searchableText.includes(q)).slice(0, 40);
-  }, [query]);
-
-  return (
-    <div ref={ref} className="relative">
-      <input
-        className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-400 focus:outline-none text-sm"
-        placeholder="Search powers (including NPC-Only)…"
-        value={query}
-        onChange={e => { setQuery(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-      />
-      {open && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded max-h-52 overflow-y-auto shadow-xl">
-          {results.map(p => (
-            <button key={p.name}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-700 text-white"
-              onClick={() => { onSelect(p); setQuery(''); setOpen(false); }}>
-              <span className="font-medium">{p.name}</span>
-              <span className="text-gray-400 ml-2 text-xs">{p.sources}</span>
-              {/NPC Only/i.test(p.description) && <span className="ml-2 text-xs text-yellow-400">[NPC]</span>}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+// ── Faction tree suggestions for ST autocomplete ────────────────────────────
+const FACTION_TREES = {
+  vampire: [
+    'Animalism','Auspex','Celerity','Dominate','Fortitude','Obfuscate','Potence','Presence',
+    'Daimoinon','Deimos','Dementation','Mortis','Necromancy','Obtenebration','Protean',
+    'Quietus','Valeren Healer','Valeren Warrior','Vicissitude','Visceratika',
+    'Thaumaturgy: Creo Ignem','Thaumaturgy: Rego Aquam','Thaumaturgy: Rego Vitae',
+    'Path of the Defiler','Rego Dolor (Path of Pain)','Rego Manes (Path of Spirit)',
+    'Rego Pestis (Path of Pestilence)','Rego Phobos (Path of Fear)',
+  ],
+  shifter: [
+    'Ahroun','Galliard','Philodox','Ragabash','Theurge','Homid','Lupus','Natus',
+    'Black Fury Gift','Bone Gnawer Gift','Child of Gaia Gift','Fenrir Gift','Fianna Gift',
+    'Red Talon Gift','Shadow Lord Gift','Silent Strider Gift','Silver Fang Gift','Warder of Man Gift',
+    'Ananasi Gift','Bagheera Gift','Bubasti Gift','Ceilican Gift','Corax Gift','Ratkin Gift','Swara Gift',
+    'Corruption (Wyrm)','Cunning (Wyrm)','Defiling (Wyrm)','Fear (Wyrm)','Madness (Wyrm)',
+  ],
+  wraith: [
+    'Argos','Castigate','Embody','Fatalism','Flux','Inhabit','Intimation','Keening',
+    'Lifeweb','Mnemosynis','Moliate','Outrage','Pandemonium','Phantasm','Puppetry','Usury',
+    'Contaminate','Hive Mind','Larceny','Maleficence','Tempest Weaving',
+  ],
+  human: [
+    'Animal','Body','Curse','Healer','Mind','Patterns','Perception','Protection','Spirit','Warrior',
+    'Death','Demonology','Madness','Ruin',
+    'Ahl-i-batin','Craftmason','Messianic Voices','Old Faith','Order of Hermes',
+    'Spirit Talkers','Valdaermen','Veneficti',
+    'Affinity','Champion','Discernment','Purity','Solace','Spiritual',
+    'Brash','Brawny','Inquisitive','Sturdy',
+    'Stasis','Weaver','Onesong',
+    'Enticer','Ferectori','Gorehound','Toad','Gorgon',
+  ],
+  fae:     ['Chicanery','Legerdemain','Metamorphosis','Naming','Primal','Soothsay','Sovereign','Wayfare'],
+  demon:   ['Lore of the Fundament','Lore of Humanity','Lore of the Winds','Lore of Storms','Lore of the Earth','Lore of the Forge','Lore of the Flame','Lore of the Celestials'],
+  monster: [],
+};
 
 // ── Dot rating display ─────────────────────────────────────────────────────────
 function Dots({ n }) {
@@ -197,8 +189,7 @@ function PowerRow({ power }) {
   return (
     <div className="text-xs text-gray-200 flex items-baseline gap-2">
       <Dots n={power.level} />
-      <span>{power.name}</span>
-      {power.sources && <span className="text-gray-500">[{power.sources}]</span>}
+      <span>{power.tree}</span>
     </div>
   );
 }
@@ -208,7 +199,8 @@ function NPCCard({ npc, resolvedFaction }) {
   const {
     name, title, faction, subfaction, isLegendary, isPermatainted,
     energy, energyType, willpower, virtue, virtueValue, regenRate,
-    powers, fundamentals, skills, merits, notes,
+    powerTrees = [], fundamentals, skills, merits, notes,
+    specialAbilities = [],
     generation, road, amaranth,
     breed, auspice, rank,
     legion, guild, passions, shadowArchetype, thorn,
@@ -219,9 +211,8 @@ function NPCCard({ npc, resolvedFaction }) {
     scorchTypes, immunities, weaknesses, senseFaction,
   } = npc;
 
-  const innate     = powers.filter(p => p.cat === 'innate');
-  const learned    = powers.filter(p => p.cat === 'learned');
-  const additional = powers.filter(p => p.cat === 'additional');
+  const innate     = powerTrees.filter(p => p.cat === 'innate');
+  const learned    = powerTrees.filter(p => p.cat === 'learned');
 
   const fLabel = resolvedFaction?.label || faction;
 
@@ -352,20 +343,22 @@ function NPCCard({ npc, resolvedFaction }) {
         )}
 
         {innate.length > 0 && (
-          <CardSection title="Innate Tree Powers" color="text-green-400">
+          <CardSection title="Innate Trees" color="text-green-400">
             <div className="space-y-0.5">{innate.map((p, i) => <PowerRow key={i} power={p} />)}</div>
           </CardSection>
         )}
 
         {learned.length > 0 && (
-          <CardSection title="Learned Powers" color="text-blue-400">
+          <CardSection title="Learned Trees" color="text-blue-400">
             <div className="space-y-0.5">{learned.map((p, i) => <PowerRow key={i} power={p} />)}</div>
           </CardSection>
         )}
 
-        {additional.length > 0 && (
-          <CardSection title="Additional Powers" color="text-amber-400">
-            <div className="space-y-0.5">{additional.map((p, i) => <PowerRow key={i} power={p} />)}</div>
+        {specialAbilities.filter(Boolean).length > 0 && (
+          <CardSection title="Special Abilities" color="text-amber-400">
+            <div className="space-y-0.5">
+              {specialAbilities.filter(Boolean).map((s, i) => <div key={i} className="text-xs text-gray-200">{s}</div>)}
+            </div>
           </CardSection>
         )}
 
@@ -462,11 +455,9 @@ const NPCCreator = ({ onBack }) => {
   const [senseFaction, setSenseFaction]         = useState('Monster');
 
   // Powers
-  const [powers, setPowers]         = useState([]);
-  const [fundamentals, setFundamentals] = useState([]);
-  const [newPowerCat, setNewPowerCat] = useState('innate');
-  const [newPowerLevel, setNewPowerLevel] = useState(1);
-  const [freeformPower, setFreeformPower] = useState('');
+  const [powerTrees, setPowerTrees]             = useState([]);
+  const [specialAbilities, setSpecialAbilities] = useState([]);
+  const [fundamentals, setFundamentals]         = useState([]);
 
   // Skills
   const [skills, setSkills] = useState([{ name: '', dots: 1 }]);
@@ -529,7 +520,7 @@ const NPCCreator = ({ onBack }) => {
   const npcData = {
     name, title, faction, subfaction, isLegendary, isPermatainted,
     energy, energyType, willpower, virtue, virtueValue, regenRate,
-    powers, fundamentals,
+    powerTrees, fundamentals, specialAbilities,
     skills, merits, notes,
     generation, road, amaranth,
     breed, auspice, rank,
@@ -539,6 +530,120 @@ const NPCCreator = ({ onBack }) => {
     extraField1, extraField2,
     monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
     scorchTypes, immunities, weaknesses, senseFaction,
+  };
+
+  const printNPC = () => {
+    const d = npcData;
+    const fLabel = resolvedFaction?.label || faction;
+    const dotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 5 - n));
+    const row = (label, value) => (value != null && value !== '' && value !== false)
+      ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
+    const section = (title, content) => content
+      ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
+    const powerLine = p =>
+      `<div class="item">${p.level ? `<span class="dots">${dotsStr(p.level)}</span> ` : ''}${p.tree}</div>`;
+
+    const specs = [];
+    if (d.faction === 'vampire') {
+      const genRow = GENERATION_TABLE.find(g => g.gen === Number(d.generation));
+      if (genRow) specs.push(`Generation: ${genRow.label}`);
+      if (d.road) specs.push(`Road: ${d.road}`);
+      if (d.amaranth > 0) specs.push(`Amaranth: ${d.amaranth}`);
+    } else if (d.faction === 'shifter') {
+      if (d.breed) specs.push(`Breed: ${d.breed}`);
+      if (d.auspice) specs.push(`Auspice: ${d.auspice}`);
+      if (d.rank) specs.push(`Rank: ${d.rank}`);
+    } else if (d.faction === 'wraith') {
+      if (d.legion && d.legion !== 'No Legion') specs.push(`Legion: ${d.legion}`);
+      if (d.guild && d.guild !== 'No Guild') specs.push(`Guild: ${d.guild}`);
+      if (d.passions) specs.push(`Passions: ${d.passions}`);
+      if (d.shadowArchetype) specs.push(`Shadow: ${d.shadowArchetype}${d.thorn ? ` \u2014 Thorn: ${d.thorn}` : ''}`);
+    } else if (d.faction === 'fae') {
+      if (d.lineage) specs.push(`Lineage: ${d.lineage}`);
+      if (d.court) specs.push(`Court: ${d.court}`);
+      if (d.echoes) specs.push(`Echoes: ${d.echoes}`);
+    } else if (d.faction === 'demon') {
+      if (d.trueName) specs.push(`True Name: ${d.trueName}`);
+      if (d.celestialName) specs.push(`Celestial Name: ${d.celestialName}`);
+      if (d.appellation) specs.push(`Appellation: ${d.appellation}`);
+      if (d.demonicVice) specs.push(`Vice: ${d.demonicVice}`);
+    } else if (d.faction === 'plasmic' || d.faction === 'spirit') {
+      if (d.extraField1) specs.push(`Type: ${d.extraField1}`);
+      if (d.extraField2) specs.push(d.extraField2);
+    } else if (d.faction === 'monster') {
+      specs.push(d.isRealmbound ? 'Realmbound. Goes to Dead if forced into the Umbra.' : 'Umbrabound. Goes to Dead if forced into the Realm.');
+      if (d.isHealthAsEnergy) specs.push('Spend Health as Energy.');
+      if (d.senseFaction) specs.push(`Call "no effect" to ${d.senseFaction} Sense Health or any healing powers/skills.`);
+    }
+
+    const innate     = (d.powerTrees || []).filter(p => p.cat === 'innate');
+    const learned    = (d.powerTrees || []).filter(p => p.cat === 'learned');
+
+    const monsterExtra = d.faction === 'monster' && (d.scorchTypes?.length > 0 || d.immunities?.some(im => im.text) || d.weaknesses?.some(w => w.text))
+      ? `<table class="stats-table">
+          ${d.scorchTypes?.length > 0 ? row('Scorch', d.scorchTypes.join(', ')) : ''}
+          ${d.immunities?.some(im => im.text) ? row('Immunities', d.immunities.filter(im => im.text).map(im => im.text + (im.condition ? ` (unless: ${im.condition})` : '')).join('<br>')) : ''}
+          ${d.weaknesses?.some(w => w.text) ? row('Weaknesses', d.weaknesses.filter(w => w.text).map(w => w.text + (w.condition ? ` (when: ${w.condition})` : '')).join('<br>')) : ''}
+        </table>` : '';
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>NPC: ${d.name || 'Unnamed'}</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; font-size: 13px; color: #000; background: #fff; padding: 28px 32px; max-width: 680px; }
+.header { overflow: hidden; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px; }
+.badges { float: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; margin-left: 12px; }
+.badge { border: 1px solid #000; padding: 1px 7px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
+.name { font-size: 24px; font-weight: bold; letter-spacing: 0.3px; line-height: 1.2; }
+.npc-title { font-style: italic; color: #333; margin-top: 3px; font-size: 13px; }
+.stats-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.stats-table td { padding: 3px 8px; border-bottom: 1px solid #ddd; vertical-align: top; font-size: 12px; }
+.stats-table td.lbl { font-weight: bold; width: 130px; color: #444; white-space: nowrap; }
+.sec { margin-top: 9px; }
+.sec-title { font-weight: bold; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 5px; }
+.item { font-size: 12px; margin: 2px 0; line-height: 1.5; }
+.dots { font-family: monospace; letter-spacing: 1px; }
+.src { color: #555; font-size: 11px; }
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 0 28px; }
+.notes-text { font-style: italic; white-space: pre-wrap; color: #333; line-height: 1.6; }
+@media print { body { padding: 0; } @page { margin: 1.2cm 1.5cm; } }
+</style></head><body>
+<div class="header">
+  <div class="badges">
+    ${d.isLegendary ? '<span class="badge">\u2691 LEGENDARY</span>' : ''}
+    ${d.isPermatainted ? '<span class="badge">\u2620 PERMATAINTED</span>' : ''}
+    <span class="badge">NPC</span>
+  </div>
+  <div class="name">${d.name || '[ NPC Name ]'}</div>
+  ${d.title ? `<div class="npc-title">${d.title}</div>` : ''}
+</div>
+<table class="stats-table">
+  ${row('Faction', fLabel)}
+  ${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}
+  ${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}
+  ${row('Willpower', d.willpower)}
+  ${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}
+  ${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}
+  ${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}
+  ${d.faction === 'monster' && d.monsterAugment > 0 ? row('Augment', d.monsterAugment) : ''}
+  ${d.faction === 'vampire' && d.generation ? row('Generation', GENERATION_TABLE.find(g => g.gen === Number(d.generation))?.label || d.generation) : ''}
+</table>
+${monsterExtra}
+${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}
+${d.fundamentals.filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}
+${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}
+${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}
+${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}
+${d.skills.some(s => s.name) ? section('Skills', `<div class="skills-wrap">${d.skills.filter(s => s.name).map(s => `<div class="item"><span class="dots">${dotsStr(s.dots)}</span> ${s.name}</div>`).join('')}</div>`) : ''}
+${d.merits.some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => `<div class="item">${m}</div>`).join('')) : ''}
+${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
+</body></html>`;
+
+    const win = window.open('', '_blank', 'width=750,height=950');
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
   };
 
   if (!unlocked) {
@@ -568,32 +673,11 @@ const NPCCreator = ({ onBack }) => {
   const lbl = "block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1";
   const sec = "bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-3";
 
-  const addPower = (p) => {
-    setPowers(prev => [...prev, {
-      id: nextPowerId.current++,
-      name: p.name,
-      sources: p.sources || '',
-      cat: newPowerCat,
-      level: newPowerLevel,
-      isNpcOnly: /NPC Only/i.test(p.description || ''),
-    }]);
-  };
-
-  const addFreeformPower = () => {
-    if (!freeformPower.trim()) return;
-    setPowers(prev => [...prev, {
-      id: nextPowerId.current++,
-      name: freeformPower.trim(),
-      sources: '',
-      cat: newPowerCat,
-      level: newPowerLevel,
-      isNpcOnly: false,
-    }]);
-    setFreeformPower('');
-  };
-
   const removeSkillRow = idx => setSkills(s => s.filter((_, i) => i !== idx));
   const removeMeritRow = idx => setMerits(m => m.filter((_, i) => i !== idx));
+
+  const treeListId = `trees-${faction}`;
+  const treeSuggestions = FACTION_TREES[faction] || [];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -601,6 +685,12 @@ const NPCCreator = ({ onBack }) => {
         <button onClick={onBack} className="text-gray-400 hover:text-white text-sm">← Back</button>
         <Users className="w-5 h-5 text-purple-400" />
         <h1 className="text-lg font-bold text-purple-400 mr-auto">NPC Creator</h1>
+        <button
+          onClick={printNPC}
+          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded border border-gray-600"
+        >
+          Print Sheet
+        </button>
         <span className="text-xs text-gray-500">🔓 ST Mode</span>
       </div>
 
@@ -943,59 +1033,69 @@ const NPCCreator = ({ onBack }) => {
             </button>
           </div>
 
-          {/* Powers */}
+          {/* Power Trees */}
           <div className={sec}>
-            <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Powers</h2>
-            <p className="text-xs text-gray-500">NPCs may use NPC-Only powers. Search the database or enter freeform.</p>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className={lbl}>Category</label>
-                <select className={inp} value={newPowerCat} onChange={e => setNewPowerCat(e.target.value)}>
-                  <option value="innate">Innate Tree</option>
-                  <option value="learned">Learned</option>
-                  <option value="additional">Additional / Other</option>
-                </select>
-              </div>
-              <div>
-                <label className={lbl}>Level</label>
-                <select className={inp} value={newPowerLevel} onChange={e => setNewPowerLevel(Number(e.target.value))}>
-                  <option value={1}>● Level 1</option>
-                  <option value={2}>●● Level 2</option>
-                  <option value={3}>●●● Level 3</option>
-                </select>
-              </div>
-            </div>
-            <PowerSearch onSelect={addPower} />
-            <div className="flex gap-2">
-              <input className={`${inp} flex-1`} placeholder="Freeform / NPC-Only power name…"
-                value={freeformPower} onChange={e => setFreeformPower(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') addFreeformPower(); }}
-              />
-              <button onClick={addFreeformPower} className="bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded text-sm shrink-0">Add</button>
-            </div>
-
-            {powers.length > 0 && (
-              <div className="space-y-1 mt-1 max-h-52 overflow-y-auto">
-                {powers.map(p => (
-                  <div key={p.id} className="flex items-center gap-2 bg-gray-900 rounded px-2 py-1.5 text-sm">
-                    <span className={`text-xs shrink-0 px-1.5 py-0.5 rounded ${p.cat === 'innate' ? 'bg-green-900 text-green-300' : p.cat === 'learned' ? 'bg-blue-900 text-blue-300' : 'bg-amber-900 text-amber-300'}`}>
-                      {p.cat === 'innate' ? 'Inn' : p.cat === 'learned' ? 'Lrn' : 'Adl'}
-                    </span>
-                    <Dots n={p.level} />
-                    <span className="flex-1 truncate text-gray-200">{p.name}</span>
-                    {p.isNpcOnly && <span className="text-xs text-yellow-400 shrink-0">[NPC]</span>}
-                    <select value={p.cat} onChange={e => setPowers(prev => prev.map(x => x.id === p.id ? { ...x, cat: e.target.value } : x))}
-                      className="bg-gray-700 text-white text-xs rounded px-1 py-0.5 border border-gray-600 shrink-0">
+            <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Power Trees</h2>
+            <p className="text-xs text-gray-500">Pick tree + level. Innate = clan/tribe/etc., Learned = bought with XP.</p>
+            <datalist id={treeListId}>
+              {treeSuggestions.map(t => <option key={t} value={t} />)}
+            </datalist>
+            {powerTrees.length > 0 && (
+              <div className="space-y-1.5">
+                {powerTrees.map((pt, i) => (
+                  <div key={pt.id} className="flex gap-2 items-center">
+                    <input
+                      list={treeListId}
+                      className={`${inp} flex-1`}
+                      placeholder="Tree name (e.g. Celerity)"
+                      value={pt.tree}
+                      onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, tree: e.target.value } : x))}
+                    />
+                    <select
+                      value={pt.level}
+                      onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, level: Number(e.target.value) } : x))}
+                      className="bg-gray-700 text-white text-sm rounded px-2 py-2 border border-gray-600 shrink-0">
+                      {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                    <select
+                      value={pt.cat}
+                      onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, cat: e.target.value } : x))}
+                      className="bg-gray-700 text-white text-xs rounded px-1.5 py-2 border border-gray-600 shrink-0">
                       <option value="innate">Innate</option>
                       <option value="learned">Learned</option>
-                      <option value="additional">Additional</option>
                     </select>
-                    <button onClick={() => setPowers(prev => prev.filter(x => x.id !== p.id))} className="text-red-400 hover:text-red-300 text-xs shrink-0">✕</button>
+                    <button onClick={() => setPowerTrees(prev => prev.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300 text-sm">✕</button>
                   </div>
                 ))}
               </div>
             )}
+            <button
+              onClick={() => setPowerTrees(prev => [...prev, { id: nextPowerId.current++, tree: '', level: 1, cat: 'innate' }])}
+              className="text-xs text-green-400 hover:text-green-300 border border-green-800 rounded px-2 py-1">
+              + Add Tree
+            </button>
+          </div>
+
+          {/* Special Abilities */}
+          <div className={sec}>
+            <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Special Abilities</h2>
+            <p className="text-xs text-gray-500">Anything beyond normal PC rules — magic items, Bestow Power, NPC-only effects, etc.</p>
+            {specialAbilities.map((s, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input
+                  className={`${inp} flex-1`}
+                  placeholder="e.g. Magic Item: Sword of X, Bestow Power: Celerity"
+                  value={s}
+                  onChange={e => setSpecialAbilities(prev => prev.map((x, j) => j === i ? e.target.value : x))}
+                />
+                <button onClick={() => setSpecialAbilities(prev => prev.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300 text-sm">✕</button>
+              </div>
+            ))}
+            <button
+              onClick={() => setSpecialAbilities(prev => [...prev, ''])}
+              className="text-xs text-amber-400 hover:text-amber-300 border border-amber-800 rounded px-2 py-1">
+              + Add Special Ability
+            </button>
           </div>
 
           {/* Skills */}

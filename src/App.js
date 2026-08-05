@@ -6,7 +6,8 @@ import {
   TrendingUp, Archive,
   Minus,
   Home,
-  ArrowLeft
+  ArrowLeft,
+  Copy
 } from 'lucide-react';
 import { PDFDocument, PDFTextField, PDFCheckBox } from 'pdf-lib';
 import { Capacitor } from '@capacitor/core';
@@ -2783,6 +2784,22 @@ pleasure,Pleasure,Joy|excitement|comfort`
       }
     }
   }, [characters, currentCharacterIndex, setCharacters]);
+
+  const handleCloneCharacter = useCallback(async (character) => {
+    const clone = JSON.parse(JSON.stringify(character));
+    delete clone._id;
+    clone.id = `local_${Date.now()}`;
+    clone.name = `${clone.name || 'Character'} (Copy)`;
+    clone.createdAt = new Date().toISOString();
+    clone.updatedAt = new Date().toISOString();
+    try {
+      await cloudCreateCharacter(clone);
+      console.log('✅ Character cloned:', clone.name);
+    } catch (error) {
+      console.error('❌ Clone failed, saving locally:', error);
+      setCharacters(prev => [...prev, clone]);
+    }
+  }, [cloudCreateCharacter, setCharacters]);
 
 
   const advanceCharacter = useCallback((character, advancement) => {
@@ -9967,6 +9984,13 @@ Your character is ready to play!`;
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded font-medium text-sm"
                   >
                     Edit
+                  </button>
+                  <button
+                    onClick={() => handleCloneCharacter(character)}
+                    title="Duplicate character"
+                    className="text-gray-400 hover:text-gray-200 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  >
+                    <Copy className="w-4 h-4" />
                   </button>
                   <button
                     onClick={createMobileOptimizedHandler(() => exportCharacter(character, 'pdf'))}

@@ -561,6 +561,13 @@ export const usersAPI = {
   getPublicProfile: (id) => api.get(`/users/${id}/public`).then(res => res.data.user),
 };
 
+// NPC Bank API — save/load/delete NPCs for the ST NPC Creator
+export const npcBankAPI = {
+  getAll: () => api.get('/npcs').then(res => res.data.npcs),
+  create: (name, faction, data) => api.post('/npcs', { name, faction, data }).then(res => res.data.npc),
+  delete: (id) => api.delete(`/npcs/${id}`),
+};
+
 // Utility functions for migration from localStorage
 export const migrationUtils = {
   // Import characters from localStorage to backend
