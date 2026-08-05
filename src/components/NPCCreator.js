@@ -77,7 +77,25 @@ const FACTIONS = {
     regenRate: 0,
     fundamentals: ['Toughness'],
   },
+  monster: {
+    label: 'Monster', energyType: 'Unknown',
+    energyDefault: 0, energyMin: 0, energyMax: 170,
+    virtue: 'None', virtueDefault: 0,
+    regenRate: 0,
+    subfactionLabel: 'Monster Type',
+    subfactions: ['Fright', 'Horror', 'Terror', 'Legend'],
+    fundamentals: [],
+  },
 };
+
+const MONSTER_TYPES = {
+  Fright: { health: '10',    energy: '0–15 (or 20–30)',   wpRange: '1–3',  powers: '0–4',      immunities: '0–2', augmentRange: '0–2' },
+  Horror: { health: '10–20', energy: '0–20 (or 20–40)',   wpRange: '2–5',  powers: '1–8',      immunities: '0–3', augmentRange: '0–4' },
+  Terror: { health: '10–40', energy: '0–40 (or 40–80)',   wpRange: '3–8',  powers: '1–16',     immunities: '0–4', augmentRange: '0–6' },
+  Legend: { health: '10–80', energy: '0–80 (or 100–170)', wpRange: '4–10', powers: 'No limit', immunities: 'No limit', augmentRange: '0–9', isLegendary: true },
+};
+
+const SCORCH_DAMAGE_TYPES = ['Agg','Fire','Blood','Dark','Light','Silver','Wolfsbane','Gold','Holy','Iron','Water','Other'];
 
 const HUMAN_SUBFACTION_OVERRIDES = {
   'Ghoul':          { energyType: 'Vitae',  regenRate: 1, extraFundamentals: ['Test Vitae'] },
@@ -156,203 +174,223 @@ function Dots({ n }) {
   ))}</span>;
 }
 
+// ── NPC Card helpers ──────────────────────────────────────────────────────────
+function StatRow({ label, value, accent }) {
+  return (
+    <tr className="border-b border-gray-800 last:border-0">
+      <td className="px-3 py-1.5 text-gray-400 text-xs font-semibold uppercase tracking-wide w-28 align-top">{label}</td>
+      <td className={`px-3 py-1.5 text-xs ${accent ? 'text-amber-300 font-bold' : 'text-white'}`}>{value}</td>
+    </tr>
+  );
+}
+
+function CardSection({ title, color = 'text-purple-400', children }) {
+  return (
+    <div className="px-3 py-2.5 border-b border-gray-800 last:border-0">
+      <div className={`text-xs font-bold uppercase tracking-wider mb-1.5 ${color}`}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function PowerRow({ power }) {
+  return (
+    <div className="text-xs text-gray-200 flex items-baseline gap-2">
+      <Dots n={power.level} />
+      <span>{power.name}</span>
+      {power.sources && <span className="text-gray-500">[{power.sources}]</span>}
+    </div>
+  );
+}
+
 // ── NPC Card preview ──────────────────────────────────────────────────────────
 function NPCCard({ npc, resolvedFaction }) {
-  const { name, title, faction, subfaction, isLegendary, isPermatainted,
+  const {
+    name, title, faction, subfaction, isLegendary, isPermatainted,
     energy, energyType, willpower, virtue, virtueValue, regenRate,
     powers, fundamentals, skills, merits, notes,
-    generation, clan, road, amaranth,
+    generation, road, amaranth,
     breed, auspice, rank,
     legion, guild, passions, shadowArchetype, thorn,
     lineage, court, echoes,
     trueName, celestialName, appellation, demonicVice,
     extraField1, extraField2,
+    monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
+    scorchTypes, immunities, weaknesses, senseFaction,
   } = npc;
 
-  const innate   = powers.filter(p => p.cat === 'innate');
-  const learned  = powers.filter(p => p.cat === 'learned');
+  const innate     = powers.filter(p => p.cat === 'innate');
+  const learned    = powers.filter(p => p.cat === 'learned');
   const additional = powers.filter(p => p.cat === 'additional');
 
   const fLabel = resolvedFaction?.label || faction;
-  const subfactionDisplay = subfaction || (clan ? `Clan: ${clan}` : '');
+
+  const factionSpecifics = [];
+  if (faction === 'vampire') {
+    const genRow = GENERATION_TABLE.find(g => g.gen === Number(generation));
+    if (genRow) factionSpecifics.push(`Generation: ${genRow.label}`);
+    if (road) factionSpecifics.push(`Road: ${road}`);
+    if (amaranth > 0) factionSpecifics.push(`Amaranth: ${amaranth}`);
+  } else if (faction === 'shifter') {
+    if (breed) factionSpecifics.push(`Breed: ${breed}`);
+    if (auspice) factionSpecifics.push(`Auspice: ${auspice}`);
+    if (rank) factionSpecifics.push(`Rank: ${rank}`);
+  } else if (faction === 'wraith') {
+    if (legion && legion !== 'No Legion') factionSpecifics.push(`Legion: ${legion}`);
+    if (guild && guild !== 'No Guild') factionSpecifics.push(`Guild: ${guild}`);
+    if (passions) factionSpecifics.push(`Passions: ${passions}`);
+    if (shadowArchetype) factionSpecifics.push(`Shadow: ${shadowArchetype}${thorn ? ` — Thorn: ${thorn}` : ''}`);
+  } else if (faction === 'fae') {
+    if (lineage) factionSpecifics.push(`Lineage: ${lineage}`);
+    if (court) factionSpecifics.push(`Court: ${court}`);
+    if (echoes) factionSpecifics.push(`Echoes: ${echoes}`);
+  } else if (faction === 'demon') {
+    if (trueName) factionSpecifics.push(`True Name: ${trueName}`);
+    if (celestialName) factionSpecifics.push(`Celestial Name: ${celestialName}`);
+    if (appellation) factionSpecifics.push(`Appellation: ${appellation}`);
+    if (demonicVice) factionSpecifics.push(`Vice: ${demonicVice}`);
+  } else if (faction === 'plasmic' || faction === 'spirit') {
+    if (extraField1) factionSpecifics.push(`Type: ${extraField1}`);
+    if (extraField2) factionSpecifics.push(extraField2);
+  } else if (faction === 'monster') {
+    factionSpecifics.push(isRealmbound
+      ? 'Realmbound. Goes to Dead if forced into the Umbra.'
+      : 'Umbrabound. Goes to Dead if forced into the Realm.');
+    if (isHealthAsEnergy) factionSpecifics.push('Spend Health as Energy.');
+    if (senseFaction) factionSpecifics.push(`Call "no effect" to ${senseFaction} Sense Health or any healing powers/skills.`);
+  }
 
   return (
-    <div className="border-2 border-purple-700 rounded-lg bg-gray-950 font-mono text-sm shadow-xl overflow-hidden print:shadow-none">
-      {/* Header */}
-      <div className="bg-purple-900 px-4 py-3 border-b border-purple-700">
-        <div className="text-white font-bold text-lg">{name || '[ NPC Name ]'}</div>
-        {title && <div className="text-purple-300 text-xs mt-0.5">{title}</div>}
-        <div className="flex flex-wrap gap-2 mt-2">
-          <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
-            {fLabel}{subfactionDisplay ? ` — ${subfactionDisplay}` : ''}
-          </span>
-          {isLegendary && <span className="text-xs bg-yellow-900 text-yellow-300 px-2 py-0.5 rounded font-bold">LEGENDARY</span>}
-          {isPermatainted && <span className="text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded">PERMATAINTED</span>}
-          <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded">NPC</span>
+    <div className="border-2 border-purple-700 rounded-lg bg-gray-950 shadow-xl overflow-hidden print:shadow-none text-sm">
+
+      {/* ── Header ── */}
+      <div className="bg-purple-950 border-b-2 border-purple-800 px-4 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-white font-black text-xl tracking-tight leading-none">{name || '[ NPC Name ]'}</div>
+            {title && <div className="text-purple-300 text-sm italic mt-1">{title}</div>}
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {isLegendary && <span className="text-xs bg-yellow-900 border border-yellow-700 text-yellow-300 px-2 py-0.5 rounded font-bold whitespace-nowrap">⚑ LEGENDARY</span>}
+            {isPermatainted && <span className="text-xs bg-red-900 border border-red-700 text-red-300 px-2 py-0.5 rounded whitespace-nowrap">☠ PERMATAINTED</span>}
+            <span className="text-xs bg-gray-800 border border-gray-700 text-gray-400 px-2 py-0.5 rounded">NPC</span>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        {/* Core stats */}
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          {energyType !== 'None' && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">Energy</span>
-              <span className="float-right font-bold text-white">{energy} {energyType}</span>
-            </div>
-          )}
-          {willpower > 0 && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">Willpower</span>
-              <span className="float-right font-bold text-white">{willpower}</span>
-            </div>
-          )}
-          {virtue !== 'None' && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">{virtue || 'Virtue'}</span>
-              <span className="float-right font-bold text-white">{virtueValue}</span>
-            </div>
-          )}
-          {regenRate > 0 && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">Regen Rate</span>
-              <span className="float-right font-bold text-white">{regenRate}</span>
-            </div>
-          )}
+      {/* ── Stats table ── */}
+      <table className="w-full border-b border-gray-800">
+        <tbody>
+          <StatRow label="Faction" value={fLabel} />
+          {subfaction && <StatRow label="Sub-Faction" value={subfaction} />}
+          {energyType !== 'None' && <StatRow label="Energy" value={`${energy} (${energyType})`} />}
+          <StatRow label="Willpower" value={willpower} />
+          <StatRow label="Virtue" value={virtue !== 'None' ? `${virtueValue} (${virtue})` : 'N/A'} />
+          {regenRate > 0 && <StatRow label="Regen Rate" value={regenRate} />}
+          {faction === 'monster' && <StatRow label="Health" value={monsterHealth} accent />}
+          {faction === 'monster' && monsterAugment > 0 && <StatRow label="Augment" value={monsterAugment} />}
           {faction === 'vampire' && generation && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">Generation</span>
-              <span className="float-right font-bold text-white">{GENERATION_TABLE.find(g => g.gen === Number(generation))?.label || generation}</span>
-            </div>
+            <StatRow label="Generation" value={GENERATION_TABLE.find(g => g.gen === Number(generation))?.label || generation} />
           )}
-          {faction === 'vampire' && road && (
-            <div className="bg-gray-800 rounded p-2 col-span-2">
-              <span className="text-gray-400">Road</span>
-              <span className="float-right font-bold text-white">{road}</span>
-            </div>
-          )}
-          {faction === 'shifter' && rank > 0 && (
-            <div className="bg-gray-800 rounded p-2">
-              <span className="text-gray-400">Rank</span>
-              <span className="float-right font-bold text-white">{rank}</span>
-            </div>
-          )}
-        </div>
+        </tbody>
+      </table>
 
-        {/* Faction-specific extras */}
-        {faction === 'shifter' && (breed || auspice) && (
-          <div className="text-xs text-gray-400">
-            {breed && <span className="mr-3">Breed: <span className="text-white">{breed}</span></span>}
-            {auspice && <span>Auspice: <span className="text-white">{auspice}</span></span>}
-          </div>
-        )}
-        {faction === 'wraith' && (
-          <div className="text-xs text-gray-400 space-y-0.5">
-            {(legion || guild) && <div>{legion && <span className="mr-3">Legion: <span className="text-white">{legion}</span></span>}{guild && <span>Guild: <span className="text-white">{guild}</span></span>}</div>}
-            {passions && <div>Passions: <span className="text-white">{passions}</span></div>}
-            {shadowArchetype && <div>Shadow: <span className="text-white">{shadowArchetype}{thorn ? ` — Thorn: ${thorn}` : ''}</span></div>}
-          </div>
-        )}
-        {faction === 'fae' && (lineage || court) && (
-          <div className="text-xs text-gray-400">
-            {lineage && <span className="mr-3">Lineage: <span className="text-white">{lineage}</span></span>}
-            {court && <span>Court: <span className="text-white">{court}</span></span>}
-            {echoes && <div className="mt-0.5">Echoes: <span className="text-white">{echoes}</span></div>}
-          </div>
-        )}
-        {faction === 'demon' && trueName && (
-          <div className="text-xs text-gray-400 space-y-0.5">
-            <div>True Name: <span className="text-yellow-300">{trueName}</span></div>
-            {celestialName && <div>Celestial Name: <span className="text-white">{celestialName}</span></div>}
-            {appellation && <div>Appellation: <span className="text-white">{appellation}</span></div>}
-            {demonicVice && <div>Vice: <span className="text-white">{demonicVice}</span></div>}
-          </div>
+      {/* ── Monster: Scorch / Immunities / Weaknesses ── */}
+      {faction === 'monster' && (scorchTypes?.length > 0 || immunities?.some(im => im.text) || weaknesses?.some(w => w.text)) && (
+        <table className="w-full border-b border-gray-800">
+          <tbody>
+            {scorchTypes?.length > 0 && (
+              <tr className="border-b border-gray-800 last:border-0">
+                <td className="px-3 py-1.5 text-gray-400 text-xs font-semibold uppercase tracking-wide w-28 align-top">Scorch</td>
+                <td className="px-3 py-1.5 text-xs text-orange-300">{scorchTypes.join(', ')}</td>
+              </tr>
+            )}
+            {immunities?.some(im => im.text) && (
+              <tr className="border-b border-gray-800 last:border-0">
+                <td className="px-3 py-1.5 text-gray-400 text-xs font-semibold uppercase tracking-wide align-top">Immunities</td>
+                <td className="px-3 py-1.5 text-xs text-cyan-300">
+                  <div className="space-y-0.5">
+                    {immunities.filter(im => im.text).map((im, i) => (
+                      <div key={i}>{im.text}{im.condition ? <span className="text-gray-400"> (unless: {im.condition})</span> : ''}</div>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            )}
+            {weaknesses?.some(w => w.text) && (
+              <tr className="border-b border-gray-800 last:border-0">
+                <td className="px-3 py-1.5 text-gray-400 text-xs font-semibold uppercase tracking-wide align-top">Weaknesses</td>
+                <td className="px-3 py-1.5 text-xs text-red-300">
+                  <div className="space-y-0.5">
+                    {weaknesses.filter(w => w.text).map((w, i) => (
+                      <div key={i}>{w.text}{w.condition ? <span className="text-gray-400"> (when: {w.condition})</span> : ''}</div>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
+
+      {/* ── Content sections ── */}
+      <div>
+        {factionSpecifics.length > 0 && (
+          <CardSection title="Faction Specifics">
+            <div className="space-y-0.5">
+              {factionSpecifics.map((line, i) => <div key={i} className="text-gray-200 text-xs">{line}</div>)}
+            </div>
+          </CardSection>
         )}
 
-        {/* Fundamentals */}
         {fundamentals.filter(Boolean).length > 0 && (
-          <div>
-            <div className="text-xs font-bold text-purple-400 uppercase tracking-wide mb-1">Fundamental Powers</div>
-            <div className="text-xs text-gray-300 flex flex-wrap gap-x-3 gap-y-0.5">
-              {fundamentals.filter(Boolean).map((f, i) => <span key={i}>• {f}</span>)}
+          <CardSection title="Fundamental Powers" color="text-purple-300">
+            <div className="space-y-0.5">
+              {fundamentals.filter(Boolean).map((f, i) => <div key={i} className="text-gray-200 text-xs">{f}</div>)}
             </div>
-          </div>
+          </CardSection>
         )}
 
-        {/* Powers */}
         {innate.length > 0 && (
-          <div>
-            <div className="text-xs font-bold text-green-400 uppercase tracking-wide mb-1">Innate Tree Powers</div>
-            <ul className="space-y-0.5">
-              {innate.map((p, i) => (
-                <li key={i} className="text-xs text-gray-200 flex gap-2 items-baseline">
-                  <Dots n={p.level} />
-                  <span>{p.name}</span>
-                  {p.sources && <span className="text-gray-500">[{p.sources}]</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CardSection title="Innate Tree Powers" color="text-green-400">
+            <div className="space-y-0.5">{innate.map((p, i) => <PowerRow key={i} power={p} />)}</div>
+          </CardSection>
         )}
+
         {learned.length > 0 && (
-          <div>
-            <div className="text-xs font-bold text-blue-400 uppercase tracking-wide mb-1">Learned Powers</div>
-            <ul className="space-y-0.5">
-              {learned.map((p, i) => (
-                <li key={i} className="text-xs text-gray-200 flex gap-2 items-baseline">
-                  <Dots n={p.level} />
-                  <span>{p.name}</span>
-                  {p.sources && <span className="text-gray-500">[{p.sources}]</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CardSection title="Learned Powers" color="text-blue-400">
+            <div className="space-y-0.5">{learned.map((p, i) => <PowerRow key={i} power={p} />)}</div>
+          </CardSection>
         )}
+
         {additional.length > 0 && (
-          <div>
-            <div className="text-xs font-bold text-amber-400 uppercase tracking-wide mb-1">Additional Powers</div>
-            <ul className="space-y-0.5">
-              {additional.map((p, i) => (
-                <li key={i} className="text-xs text-gray-200 flex gap-2 items-baseline">
-                  <Dots n={p.level} />
-                  <span>{p.name}</span>
-                  {p.sources && <span className="text-gray-500">[{p.sources}]</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CardSection title="Additional Powers" color="text-amber-400">
+            <div className="space-y-0.5">{additional.map((p, i) => <PowerRow key={i} power={p} />)}</div>
+          </CardSection>
         )}
 
-        {/* Skills */}
         {skills.some(s => s.name) && (
-          <div>
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Skills</div>
-            <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+          <CardSection title="Skills" color="text-gray-300">
+            <div className="flex flex-wrap gap-x-5 gap-y-0.5">
               {skills.filter(s => s.name).map((s, i) => (
-                <span key={i} className="text-xs text-gray-200">
-                  {s.name} <Dots n={s.dots} />
-                </span>
+                <span key={i} className="text-xs text-gray-200">{s.name} <Dots n={s.dots} /></span>
               ))}
             </div>
-          </div>
+          </CardSection>
         )}
 
-        {/* Merits */}
         {merits.some(m => m.trim()) && (
-          <div>
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Merits</div>
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-              {merits.filter(m => m.trim()).map((m, i) => <span key={i} className="text-xs text-gray-300">• {m}</span>)}
+          <CardSection title="Merits" color="text-gray-300">
+            <div className="space-y-0.5">
+              {merits.filter(m => m.trim()).map((m, i) => <div key={i} className="text-xs text-gray-200">{m}</div>)}
             </div>
-          </div>
+          </CardSection>
         )}
 
-        {/* Notes */}
         {notes && (
-          <div>
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Notes</div>
-            <p className="text-xs text-gray-300 whitespace-pre-wrap">{notes}</p>
-          </div>
+          <CardSection title="Notes" color="text-gray-400">
+            <p className="text-xs text-gray-300 whitespace-pre-wrap italic">{notes}</p>
+          </CardSection>
         )}
       </div>
     </div>
@@ -412,6 +450,17 @@ const NPCCreator = ({ onBack }) => {
   const [extraField1, setExtraField1] = useState('');
   const [extraField2, setExtraField2] = useState('');
 
+  // Monster extras
+  const [monsterHealth, setMonsterHealth]       = useState(10);
+  const [isRealmbound, setIsRealmbound]         = useState(true);
+  const [isHealthAsEnergy, setIsHealthAsEnergy] = useState(false);
+  const [monsterAugment, setMonsterAugment]     = useState(1);
+  const [scorchTypes, setScorchTypes]           = useState(['Fire']);
+  const [newScorchType, setNewScorchType]       = useState('Fire');
+  const [immunities, setImmunities]             = useState([{ text: '', condition: '' }]);
+  const [weaknesses, setWeaknesses]             = useState([{ text: '', condition: '' }]);
+  const [senseFaction, setSenseFaction]         = useState('Monster');
+
   // Powers
   const [powers, setPowers]         = useState([]);
   const [fundamentals, setFundamentals] = useState([]);
@@ -441,7 +490,8 @@ const NPCCreator = ({ onBack }) => {
     setIsLegendary(!!tmpl.isLegendary);
     setSubfaction('');
     setFundamentals([...tmpl.fundamentals]);
-  }, [faction]);
+    if (faction === 'monster') { setScorchTypes(['Fire']); setMonsterHealth(10); setMonsterAugment(1); setSenseFaction('Monster'); setIsRealmbound(true); setIsHealthAsEnergy(false); }
+  }, [faction]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply human subfaction overrides
   useEffect(() => {
@@ -464,6 +514,16 @@ const NPCCreator = ({ onBack }) => {
     if (row) setEnergy(row.energy);
   }, [generation, faction]);
 
+  // Auto-set Legendary + Umbra Sight fundamentals for monster type/realm changes
+  useEffect(() => {
+    if (faction !== 'monster') return;
+    if (MONSTER_TYPES[subfaction]?.isLegendary) setIsLegendary(true);
+    setFundamentals(prev => {
+      const base = prev.filter(f => f !== 'Umbra Sight');
+      return isRealmbound ? base : [...base, 'Umbra Sight'];
+    });
+  }, [subfaction, isRealmbound, faction]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const resolvedFaction = FACTIONS[faction];
 
   const npcData = {
@@ -477,6 +537,8 @@ const NPCCreator = ({ onBack }) => {
     lineage, court, echoes,
     trueName, celestialName, appellation, demonicVice,
     extraField1, extraField2,
+    monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
+    scorchTypes, immunities, weaknesses, senseFaction,
   };
 
   if (!unlocked) {
@@ -760,6 +822,105 @@ const NPCCreator = ({ onBack }) => {
               <div>
                 <label className={lbl}>Additional Notes</label>
                 <input className={inp} value={extraField2} onChange={e => setExtraField2(e.target.value)} />
+              </div>
+            </div>
+          )}
+          {faction === 'monster' && (
+            <div className={sec}>
+              <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Monster Details</h2>
+              {subfaction && MONSTER_TYPES[subfaction] && (
+                <div className="bg-gray-900 rounded border border-gray-700 p-2 text-xs space-y-0.5">
+                  <div className="text-gray-300 font-semibold mb-1">{subfaction} reference ranges:</div>
+                  {Object.entries(MONSTER_TYPES[subfaction]).filter(([k]) => k !== 'isLegendary').map(([k, v]) => (
+                    <div key={k} className="flex gap-2 text-gray-400">
+                      <span className="w-28 capitalize">{k.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                      <span className="text-white">{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className={lbl}>Health</label>
+                  <input type="number" className={inp} min={1} value={monsterHealth} onChange={e => setMonsterHealth(Number(e.target.value))} />
+                </div>
+                <div>
+                  <label className={lbl}>Augment (0–9)</label>
+                  <input type="number" className={inp} min={0} max={9} value={monsterAugment} onChange={e => setMonsterAugment(Number(e.target.value))} />
+                </div>
+              </div>
+              <div>
+                <label className={lbl}>Realm Affinity</label>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                    <input type="radio" className="accent-purple-400" checked={isRealmbound} onChange={() => setIsRealmbound(true)} />
+                    Realmbound (physical world)
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                    <input type="radio" className="accent-purple-400" checked={!isRealmbound} onChange={() => setIsRealmbound(false)} />
+                    Umbrabound (spirit world)
+                  </label>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-purple-400" checked={isHealthAsEnergy} onChange={e => setIsHealthAsEnergy(e.target.checked)} />
+                  Spend Health as Energy
+                </label>
+              </div>
+              <div>
+                <label className={lbl}>Sense Faction Response</label>
+                <input className={inp} placeholder='e.g. Monster (for "no effect" call)' value={senseFaction} onChange={e => setSenseFaction(e.target.value)} />
+              </div>
+              <div>
+                <label className={lbl}>Scorch Types</label>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {scorchTypes.map((t, i) => (
+                    <span key={i} className="flex items-center gap-1 text-xs bg-orange-900 text-orange-200 px-2 py-0.5 rounded">
+                      {t}
+                      <button onClick={() => setScorchTypes(prev => prev.filter((_, j) => j !== i))} className="text-orange-400 hover:text-orange-200 ml-0.5">✕</button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <select className={`${inp} flex-1`} value={newScorchType} onChange={e => setNewScorchType(e.target.value)}>
+                    {SCORCH_DAMAGE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <button onClick={() => { if (!scorchTypes.includes(newScorchType)) setScorchTypes(prev => [...prev, newScorchType]); }}
+                    className="bg-orange-800 hover:bg-orange-700 text-white px-3 py-2 rounded text-sm shrink-0">Add</button>
+                </div>
+              </div>
+              <div>
+                <label className={lbl}>Immunities</label>
+                <div className="space-y-2">
+                  {immunities.map((im, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input className={`${inp} flex-1`} placeholder="Immune to…" value={im.text}
+                        onChange={e => setImmunities(prev => prev.map((x, j) => j === i ? { ...x, text: e.target.value } : x))} />
+                      <input className={`${inp} flex-1`} placeholder="Unless…" value={im.condition}
+                        onChange={e => setImmunities(prev => prev.map((x, j) => j === i ? { ...x, condition: e.target.value } : x))} />
+                      {immunities.length > 1 && <button onClick={() => setImmunities(prev => prev.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setImmunities(prev => [...prev, { text: '', condition: '' }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 border border-purple-700 rounded px-2 py-1 mt-1">+ Add Immunity</button>
+              </div>
+              <div>
+                <label className={lbl}>Weaknesses</label>
+                <div className="space-y-2">
+                  {weaknesses.map((w, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input className={`${inp} flex-1`} placeholder="Weakness…" value={w.text}
+                        onChange={e => setWeaknesses(prev => prev.map((x, j) => j === i ? { ...x, text: e.target.value } : x))} />
+                      <input className={`${inp} flex-1`} placeholder="When…" value={w.condition}
+                        onChange={e => setWeaknesses(prev => prev.map((x, j) => j === i ? { ...x, condition: e.target.value } : x))} />
+                      {weaknesses.length > 1 && <button onClick={() => setWeaknesses(prev => prev.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setWeaknesses(prev => [...prev, { text: '', condition: '' }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 border border-purple-700 rounded px-2 py-1 mt-1">+ Add Weakness</button>
               </div>
             </div>
           )}

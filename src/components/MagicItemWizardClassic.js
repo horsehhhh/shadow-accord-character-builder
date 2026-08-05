@@ -550,27 +550,46 @@ function TagPreview({ itemName, itemType, energyType, attunement, isRelic, isArt
   addLine(b1);
   addLine(b2);
   if (scorchIdx !== null && DAMAGE_TYPES[scorchIdx]) lines.push(`Scorch: ${DAMAGE_TYPES[scorchIdx].label}`);
-  if (isTainted) lines.push('TAINTED');
-  if (isRelic && !isArtifact) lines.push('Relic');
-  if (isArtifact) lines.push('Artifact');
   if (flawIndex >= 0 && FLAWS[flawIndex]) lines.push(`Flaw: ${FLAWS[flawIndex]}`);
 
   return (
-    <div className="mt-6 border-2 border-amber-700 rounded-lg bg-amber-950 p-4 font-mono text-sm shadow-inner">
-      <div className="text-center text-amber-200 font-bold text-base mb-1 border-b border-amber-700 pb-1">
-        {itemName || '[ Item Name ]'}
+    <div className="mt-6 rounded-xl overflow-hidden shadow-2xl font-mono" style={{ border: '2px solid #78350f' }}>
+      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
+      <div className="bg-gradient-to-b from-amber-950 to-stone-950">
+        <div className="px-5 pt-4 pb-2.5 text-center border-b border-amber-900/60">
+          <div className="text-amber-100 font-black text-lg tracking-widest uppercase leading-tight">{itemName || '[ Item Name ]'}</div>
+          <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+            <span className="text-amber-500 text-xs uppercase tracking-widest">{itemType}</span>
+            <span className="text-amber-800 text-xs">·</span>
+            <span className="text-amber-400 text-xs">{energyType}</span>
+          </div>
+          {(isRelic || isArtifact || isTainted) && (
+            <div className="flex justify-center gap-2 mt-2 flex-wrap">
+              {isArtifact && <span className="text-xs bg-purple-950 border border-purple-700 text-purple-300 px-2 py-0.5 rounded font-bold">Artifact</span>}
+              {!isArtifact && isRelic && <span className="text-xs bg-blue-950 border border-blue-700 text-blue-300 px-2 py-0.5 rounded">Relic</span>}
+              {isTainted && <span className="text-xs bg-red-950 border border-red-700 text-red-400 px-2 py-0.5 rounded font-bold">⚠ TAINTED</span>}
+            </div>
+          )}
+        </div>
+        <div className="px-5 py-3 min-h-12">
+          {lines.length === 0
+            ? <div className="text-amber-800 text-xs text-center italic">(no properties selected)</div>
+            : <div className="space-y-1.5">
+                {lines.map((l, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-amber-100">
+                    <span className="text-amber-700 shrink-0 mt-0.5">◆</span>
+                    <span>{l}</span>
+                  </div>
+                ))}
+              </div>
+          }
+        </div>
+        <div className="border-t border-amber-900/60 px-5 py-2.5 flex items-center justify-between bg-black/20">
+          <span className="text-amber-600 text-xs uppercase tracking-widest font-semibold">Attunement</span>
+          <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-400' : attunement >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{attunement}</span>
+        </div>
       </div>
-      <div className="text-center text-amber-300 text-xs mb-3">
-        {itemType.charAt(0).toUpperCase() + itemType.slice(1)} — {energyType}
-      </div>
-      {lines.length === 0
-        ? <div className="text-amber-600 text-center text-xs">(no selections)</div>
-        : <ul className="space-y-1">{lines.map((l, i) => <li key={i} className="text-amber-100">• {l}</li>)}</ul>
-      }
-      <div className="border-t border-amber-700 mt-3 pt-2 text-center">
-        <span className="text-amber-400 font-bold">Attunement: {attunement}</span>
-        {isTainted && <span className="ml-3 text-red-400 font-bold">TAINTED</span>}
-      </div>
+      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
     </div>
   );
 }
