@@ -4,38 +4,50 @@ import { powersData } from '../data/powersData';
 
 const ST_PASSWORD = '1234!';
 
+// Damage type table (voted Damage Type Attunements proposal, 2026)
+const DAMAGE_TYPES = [
+  { label: 'Agg',       weapon: 5, armor: null },
+  { label: 'Fire',      weapon: 4, armor: 4    },
+  { label: 'Blood',     weapon: 3, armor: 3    },
+  { label: 'Dark',      weapon: 3, armor: 3    },
+  { label: 'Light',     weapon: 3, armor: 3    },
+  { label: 'Silver',    weapon: 3, armor: 3    },
+  { label: 'Wolfsbane', weapon: 3, armor: 3    },
+  { label: 'Gold',      weapon: 2, armor: 2    },
+  { label: 'Holy',      weapon: 2, armor: 2    },
+  { label: 'Iron',      weapon: 2, armor: 2    },
+  { label: 'Other',     weapon: 1, armor: 1    },
+];
+
 // ── Shared item calculation constants ─────────────────────────────────────────
 const BENEFIT_COST = {
   power_1: 2, power_2: 4, power_3: 6,
   dmg_1: 4, dmg_2: 6,
-  dmg_type_agg: 3, dmg_type_non: 1,
   arm_2: 2, arm_4: 4,
-  arm_type_agg: 3, arm_type_non: 1,
   hp_1: 1, hp_2: 2,
+  // dmg_type and arm_type costs are looked up from DAMAGE_TYPES by typeIdx
 };
 
 const BENEFIT_GROUP = {
   dmg_1: 'dmg_bonus', dmg_2: 'dmg_bonus',
-  dmg_type_agg: 'dmg_type', dmg_type_non: 'dmg_type',
+  dmg_type: 'dmg_type',
   arm_2: 'arm_bonus', arm_4: 'arm_bonus',
-  arm_type_agg: 'arm_type', arm_type_non: 'arm_type',
+  arm_type: 'arm_type',
   hp_1: 'hp_bonus', hp_2: 'hp_bonus',
 };
 
 const ALL_BENEFITS = [
-  { value: 'power_1',      label: 'Level 1 Power',                                  cost: 2, types: ['weapon','armor','accessory','talisman','custom'] },
-  { value: 'power_2',      label: 'Level 2 Power',                                  cost: 4, types: ['weapon','armor','accessory','talisman','custom'] },
-  { value: 'power_3',      label: 'Level 3 Power',                                  cost: 6, types: ['weapon','armor','accessory','talisman','custom'] },
-  { value: 'dmg_1',        label: '+1 Damage',                                      cost: 4, types: ['weapon'] },
-  { value: 'dmg_2',        label: '+2 Damage',                                      cost: 6, types: ['weapon'] },
-  { value: 'dmg_type_agg', label: 'Damage <Type> (Agg to a PC faction/subfaction)', cost: 3, types: ['weapon'] },
-  { value: 'dmg_type_non', label: 'Damage <Type> (not Agg to any PC faction)',      cost: 1, types: ['weapon'] },
-  { value: 'arm_2',        label: '+2 Armor Points',                                cost: 2, types: ['armor'] },
-  { value: 'arm_4',        label: '+4 Armor Points',                                cost: 4, types: ['armor'] },
-  { value: 'arm_type_agg', label: '<Type> Armor (Agg to an attunable faction)',     cost: 3, types: ['armor'] },
-  { value: 'arm_type_non', label: '<Type> Armor (not Agg to any attunable faction)',cost: 1, types: ['armor'] },
-  { value: 'hp_1',         label: '+1 Maximum Health',                              cost: 1, types: ['accessory'] },
-  { value: 'hp_2',         label: '+2 Maximum Health',                              cost: 2, types: ['accessory'] },
+  { value: 'power_1',  label: 'Level 1 Power',      cost: 2, types: ['weapon','armor','accessory','talisman','custom'] },
+  { value: 'power_2',  label: 'Level 2 Power',      cost: 4, types: ['weapon','armor','accessory','talisman','custom'] },
+  { value: 'power_3',  label: 'Level 3 Power',      cost: 6, types: ['weapon','armor','accessory','talisman','custom'] },
+  { value: 'dmg_1',    label: '+1 Damage',           cost: 4, types: ['weapon'] },
+  { value: 'dmg_2',    label: '+2 Damage',           cost: 6, types: ['weapon'] },
+  { value: 'dmg_type', label: 'Damage <Type>',       cost: null, types: ['weapon'] },
+  { value: 'arm_2',    label: '+2 Armor Points',     cost: 2, types: ['armor'] },
+  { value: 'arm_4',    label: '+4 Armor Points',     cost: 4, types: ['armor'] },
+  { value: 'arm_type', label: '<Type> Armor',        cost: null, types: ['armor'] },
+  { value: 'hp_1',     label: '+1 Maximum Health',   cost: 1, types: ['accessory'] },
+  { value: 'hp_2',     label: '+2 Maximum Health',   cost: 2, types: ['accessory'] },
 ];
 
 const ITEM_TYPES = [
@@ -101,7 +113,13 @@ function calcBaseAttunement(b1, b2, isRelic, isArtifact, isTainted) {
   let t = 0;
   const addBenefit = b => {
     if (!b.type || b.powerRestriction) return;
-    t += BENEFIT_COST[b.type] || 0;
+    if (b.type === 'dmg_type') {
+      t += b.typeIdx !== null && DAMAGE_TYPES[b.typeIdx] ? DAMAGE_TYPES[b.typeIdx].weapon : 0;
+    } else if (b.type === 'arm_type') {
+      t += b.typeIdx !== null && DAMAGE_TYPES[b.typeIdx] ? (DAMAGE_TYPES[b.typeIdx].armor ?? 0) : 0;
+    } else {
+      t += BENEFIT_COST[b.type] || 0;
+    }
     if (b.type.startsWith('power')) {
       if (b.notAvailable) t += 2;
       if (b.rare) t += 1;
@@ -116,8 +134,8 @@ function calcBaseAttunement(b1, b2, isRelic, isArtifact, isTainted) {
 }
 
 const isPower   = t => t && t.startsWith('power');
-const needsType = t => t && (t.includes('dmg_type') || t.includes('arm_type'));
-const blankB    = () => ({ type: '', powerName: '', powerSources: '', powerRestriction: null, typeName: '', notAvailable: false, rare: false, corrupted: false, autoDetected: false });
+const needsType = t => t === 'dmg_type' || t === 'arm_type';
+const blankB    = () => ({ type: '', powerName: '', powerSources: '', powerRestriction: null, typeIdx: null, notAvailable: false, rare: false, corrupted: false, autoDetected: false });
 
 // ── Power search dropdown (same as MagicItemWizard) ───────────────────────────
 function PowerSearch({ value, sources, restriction, onSelect, energyType, inp }) {
@@ -221,7 +239,7 @@ function ItemBuilder({ energyType, inp, lbl, onCalc }) {
       <label className={lbl}>Benefit {idx}</label>
       <select value={b.type} onChange={e => setB({ ...blankB(), type: e.target.value })} className={inp}>
         <option value="">— None —</option>
-        {getOptions(other).map(o => <option key={o.value} value={o.value}>{o.label} ({o.cost})</option>)}
+        {getOptions(other).map(o => <option key={o.value} value={o.value}>{o.label}{o.cost !== null ? ` (${o.cost})` : ' (see type)'}</option>)}
       </select>
       {isPower(b.type) && (
         <>
@@ -249,7 +267,19 @@ function ItemBuilder({ energyType, inp, lbl, onCalc }) {
         </>
       )}
       {needsType(b.type) && (
-        <input type="text" placeholder="Type name (e.g. Silver)" value={b.typeName} onChange={e => updateB(setB, 'typeName', e.target.value)} className={inp} />
+        <div>
+          <select
+            value={b.typeIdx ?? ''}
+            onChange={e => updateB(setB, 'typeIdx', e.target.value === '' ? null : parseInt(e.target.value))}
+            className={inp}
+          >
+            <option value="">— Select Type —</option>
+            {DAMAGE_TYPES.filter(dt => b.type === 'arm_type' ? dt.armor !== null : true).map((dt, i) => {
+              const cost = b.type === 'arm_type' ? dt.armor : dt.weapon;
+              return <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{cost})</option>;
+            })}
+          </select>
+        </div>
       )}
     </div>
   );
@@ -489,7 +519,11 @@ const TokenWizard = ({ onBack }) => {
                 if (!itemCalc) return;
                 const benefitLines = [itemCalc.b1, itemCalc.b2].filter(b => b.type && !b.powerRestriction).map(b => {
                   if (isPower(b.type)) return `${b.powerName || '<Power>'} (Lv${b.type.split('_')[1]})`;
-                  return ALL_BENEFITS.find(x => x.value === b.type)?.label || b.type;
+                  const bDef = ALL_BENEFITS.find(x => x.value === b.type);
+      if ((b.type === 'dmg_type' || b.type === 'arm_type') && b.typeIdx !== null && DAMAGE_TYPES[b.typeIdx]) {
+        return `${bDef?.label || b.type}: ${DAMAGE_TYPES[b.typeIdx].label}`;
+      }
+      return bDef?.label || b.type;
                 });
                 const desc = `${itemCalc.itemName || 'Unnamed Item'} — Att ${itemCalc.finalAtt} (${energyType || 'Energy Type TBD'})`;
                 addToCart({
