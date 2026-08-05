@@ -189,8 +189,16 @@ function blankBenefit() {
   return { type: '', slot: blankSlot(), typeIdx: null };
 }
 
+const isTrustedUser = () => {
+  try {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail) return false;
+    return JSON.parse(localStorage.getItem('user'))?.email === stEmail;
+  } catch { return false; }
+};
+
 export default function MagicItemWizardClassic({ onBack }) {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(isTrustedUser);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState('');
   if (!unlocked) {

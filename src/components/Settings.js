@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, FileText, Database, FileSpreadsheet } from 'lucide-react';
+import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, FileText, Database, FileSpreadsheet, Lock } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
 import { testConnectivity } from '../services/api';
 
@@ -22,6 +22,10 @@ const Settings = ({
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
   const [syncInterval, setSyncInterval] = useState(5); // seconds
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [stTrustedEmail, setStTrustedEmail] = useState(() => localStorage.getItem('stEmail') || '');
+  const [stPwInput, setStPwInput] = useState('');
+  const [stPwError, setStPwError] = useState(false);
+  const [stPwSuccess, setStPwSuccess] = useState('');
 
   // Mobile-optimized handler for export buttons
   const createMobileHandler = (handler) => {
@@ -652,6 +656,72 @@ const Settings = ({
           </div>
         </div>
       )}
+
+      {/* Storyteller Access */}
+      <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <Lock className="w-4 h-4" />
+          Storyteller Access
+        </h3>
+        {stTrustedEmail ? (
+          <div className="space-y-3">
+            <p className="text-sm text-green-600 dark:text-green-400">
+              ✅ <strong>{stTrustedEmail}</strong> — auto-unlocks all ST tools on login
+            </p>
+            <div className="flex gap-2">
+              <input type="password" placeholder="ST password to confirm removal"
+                value={stPwInput} onChange={e => { setStPwInput(e.target.value); setStPwError(false); setStPwSuccess(''); }}
+                className={`flex-1 text-sm px-3 py-1.5 rounded border ${themeClasses.input}`}
+              />
+              <button onClick={() => {
+                const stored = localStorage.getItem('stPassword') || '1234!';
+                if (stPwInput === stored) {
+                  localStorage.removeItem('stEmail');
+                  setStTrustedEmail('');
+                  setStPwInput('');
+                  setStPwSuccess('Trust removed.');
+                } else { setStPwError(true); }
+              }} className="px-3 py-1.5 text-sm bg-red-700 hover:bg-red-600 text-white rounded">Remove trust</button>
+            </div>
+            {stPwError && <p className="text-red-400 text-xs">Incorrect ST password.</p>}
+            {stPwSuccess && <p className="text-green-400 text-xs">{stPwSuccess}</p>}
+          </div>
+        ) : isAuthenticated ? (
+          (() => {
+            try {
+              const user = JSON.parse(localStorage.getItem('user'));
+              if (!user?.email) return <p className="text-sm text-gray-500">Your account profile hasn&apos;t loaded yet — try refreshing.</p>;
+              return (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Enter the ST password to trust <strong>{user.email}</strong> — all ST locks will auto-unlock when this account is logged in.
+                  </p>
+                  <div className="flex gap-2">
+                    <input type="password" placeholder="ST password" autoComplete="off"
+                      value={stPwInput} onChange={e => { setStPwInput(e.target.value); setStPwError(false); setStPwSuccess(''); }}
+                      onKeyDown={e => { if (e.key !== 'Enter') return;
+                        const stored = localStorage.getItem('stPassword') || '1234!';
+                        if (stPwInput === stored) { localStorage.setItem('stEmail', user.email); setStTrustedEmail(user.email); setStPwInput(''); setStPwSuccess('Account trusted!'); }
+                        else setStPwError(true);
+                      }}
+                      className={`flex-1 text-sm px-3 py-1.5 rounded border ${themeClasses.input}`}
+                    />
+                    <button onClick={() => {
+                      const stored = localStorage.getItem('stPassword') || '1234!';
+                      if (stPwInput === stored) { localStorage.setItem('stEmail', user.email); setStTrustedEmail(user.email); setStPwInput(''); setStPwSuccess('Account trusted!'); }
+                      else setStPwError(true);
+                    }} className="px-3 py-1.5 text-sm bg-amber-700 hover:bg-amber-600 text-white rounded">Trust my account</button>
+                  </div>
+                  {stPwError && <p className="text-red-400 text-xs">Incorrect ST password.</p>}
+                  {stPwSuccess && <p className="text-green-400 text-xs">{stPwSuccess}</p>}
+                </div>
+              );
+            } catch { return <p className="text-sm text-gray-500">Could not read account info.</p>; }
+          })()
+        ) : (
+          <p className="text-sm text-gray-500">Log in to your account to enable trusted auto-unlock for ST tools.</p>
+        )}
+      </div>
     </div>
   );
 };

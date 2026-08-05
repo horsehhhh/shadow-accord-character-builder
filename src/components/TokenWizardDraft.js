@@ -4,6 +4,14 @@ import { powersData } from '../data/powersData';
 
 const ST_PASSWORD = '1234!';
 
+const isTrustedUser = () => {
+  try {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail) return false;
+    return JSON.parse(localStorage.getItem('user'))?.email === stEmail;
+  } catch { return false; }
+};
+
 // ── 2026 item rules constants ─────────────────────────────────────────────────
 const ENERGY_TYPES = [
   'Vitae (Vampire)',
@@ -486,7 +494,7 @@ const TEACH_GROUP_ORDER = {
 };
 
 const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(isTrustedUser);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState(false);
 

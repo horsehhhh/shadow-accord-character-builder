@@ -4,6 +4,14 @@ import { npcBankAPI } from '../services/api';
 
 const ST_PASSWORD = '1234!';
 
+const isTrustedUser = () => {
+  try {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail) return false;
+    return JSON.parse(localStorage.getItem('user'))?.email === stEmail;
+  } catch { return false; }
+};
+
 // ── Faction templates ──────────────────────────────────────────────────────────
 const FACTIONS = {
   vampire: {
@@ -393,7 +401,7 @@ function NPCCard({ npc, resolvedFaction }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 const NPCCreator = ({ onBack }) => {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(isTrustedUser);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState(false);
 

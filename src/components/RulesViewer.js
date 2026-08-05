@@ -26,6 +26,14 @@ const DOCUMENTS = [
 // Session-only password for the ST Rulebook (not persisted)
 const ST_PASSWORD = '1234!';
 
+const isTrustedUser = () => {
+  try {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail) return false;
+    return JSON.parse(localStorage.getItem('user'))?.email === stEmail;
+  } catch { return false; }
+};
+
 // Pre-resolve all outline item destinations to page numbers up front
 const resolveOutlineItems = async (doc, items) => {
   if (!items?.length) return [];
@@ -103,7 +111,7 @@ const OutlineTree = ({ items, onNavigate, depth = 0 }) => {
 // Main viewer
 const RulesViewer = ({ onBack, themeClasses }) => {
   const [activeDocId, setActiveDocId]         = useState('rulebook');
-  const [stUnlocked, setStUnlocked]           = useState(false);
+  const [stUnlocked, setStUnlocked]           = useState(isTrustedUser);
   const [showLockModal, setShowLockModal]     = useState(false);
   const [lockInput, setLockInput]             = useState('');
   const [lockError, setLockError]             = useState(false);

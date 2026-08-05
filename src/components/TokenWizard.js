@@ -4,6 +4,14 @@ import { powersData } from '../data/powersData';
 
 const ST_PASSWORD = '1234!';
 
+const isTrustedUser = () => {
+  try {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail) return false;
+    return JSON.parse(localStorage.getItem('user'))?.email === stEmail;
+  } catch { return false; }
+};
+
 // Damage type table (voted Damage Type Attunements proposal, 2026)
 const DAMAGE_TYPES = [
   { label: 'Agg',       weapon: 5, armor: null },
@@ -418,7 +426,7 @@ const TEACH_GROUP_ORDER = {
 };
 
 const TokenWizard = ({ onBack, powerTrees = [], skills = [] }) => {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(isTrustedUser);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState(false);
 
