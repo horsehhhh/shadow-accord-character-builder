@@ -336,19 +336,6 @@ const ShadowAccordComplete = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [freebieWizardTab, setFreebieWizardTab] = useState('merits');
   const [stModeUnlocked, setStModeUnlocked] = useState(() => localStorage.getItem('stModeUnlocked') === 'true');
-
-  // Auto-unlock ST tools when the logged-in user's email matches the stored trusted email
-  useEffect(() => {
-    const stEmail = localStorage.getItem('stEmail');
-    if (!stEmail || !isAuthenticated) return;
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user?.email === stEmail) {
-        setStModeUnlocked(true);
-        localStorage.setItem('stModeUnlocked', 'true');
-      }
-    } catch { /* ignore parse errors */ }
-  }, [isAuthenticated]);
   const [stPasswordInput, setStPasswordInput] = useState('');
   const [stPasswordError, setStPasswordError] = useState(false);
 
@@ -362,6 +349,19 @@ const ShadowAccordComplete = () => {
     refreshFromCloud,
     isAuthenticated
   } = useCharacters();
+
+  // Auto-unlock ST tools when the logged-in user's email matches the stored trusted email
+  useEffect(() => {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail || !isAuthenticated) return;
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user?.email === stEmail) {
+        setStModeUnlocked(true);
+        localStorage.setItem('stModeUnlocked', 'true');
+      }
+    } catch { /* ignore parse errors */ }
+  }, [isAuthenticated]);
 
   // Helper function to update character with cloud sync
   const updateCurrentCharacter = useCallback(async (updatedCharacter) => {
