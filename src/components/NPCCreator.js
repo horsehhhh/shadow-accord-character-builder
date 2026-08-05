@@ -527,8 +527,6 @@ const NPCCreator = ({ onBack }) => {
     });
   }, [subfaction, isRealmbound, faction]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const resolvedFaction = FACTIONS[faction];
-
   // ── NPC Bank ─────────────────────────────────────────────────────────────
   const loadBank = useCallback(async () => {
     setBankLoading(true);
