@@ -229,6 +229,7 @@ function ItemBuilder({ onBack }) {
   const [isTainted, setIsTainted]     = useState(false);
   const [isKlaive, setIsKlaive]       = useState(false);
   const [klaiveGrand, setKlaiveGrand] = useState(false);
+  const [isKlaiveUnfinished, setIsKlaiveUnfinished] = useState(false);
   const [slot1, setSlot1]             = useState(blankSlot());
   const [passiveKey, setPassiveKey]   = useState('none');
   const [passiveDmgType, setPassiveDmgType]     = useState(null);
@@ -382,6 +383,12 @@ function ItemBuilder({ onBack }) {
                   <span className="text-sm">Grand Klaive</span>
                 </label>
               )}
+              {isKlaive && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" className="accent-amber-400" checked={isKlaiveUnfinished} onChange={e => setIsKlaiveUnfinished(e.target.checked)} />
+                  <span className="text-sm">Unfinished <span className="text-gray-400">(requires char attunement)</span></span>
+                </label>
+              )}
             </div>
           </Section>
 
@@ -529,6 +536,7 @@ function ItemBuilder({ onBack }) {
             <TagPreview
               itemName={itemName} itemType={itemType} energyType={energyType}
               attunement={breakdown.finalAtt} isTainted={isTainted}
+              isKlaive={isKlaive} klaiveGrand={klaiveGrand} isKlaiveUnfinished={isKlaiveUnfinished}
               slot1={slot1} slot2={slot2} benefit2Type={benefit2Type}
               passiveKey={passiveKey} passiveDmgType={passiveDmgType} passiveArmorType={passiveArmorType}
               passive2Key={passive2Key} passive2DmgType={passive2DmgType} passive2ArmorType={passive2ArmorType}
@@ -576,7 +584,7 @@ function PowerSlotRow({ slot, label, onSelect, onClear }) {
 }
 
 function DmgTypeSelect({ label, value, onChange, mode }) {
-  const options = DAMAGE_TYPES.filter(dt => mode === 'weapon' ? dt.weapon !== null && dt.label !== 'Agg' : dt.armor !== null);
+  const options = DAMAGE_TYPES.filter(dt => mode === 'weapon' ? dt.weapon !== null : dt.armor !== null);
   return (
     <div>
       <Label>{label}</Label>
@@ -594,8 +602,12 @@ function DmgTypeSelect({ label, value, onChange, mode }) {
   );
 }
 
-function TagPreview({ itemName, itemType, energyType, attunement, isTainted, slot1, slot2, benefit2Type, passiveKey, passiveDmgType, passiveArmorType, passive2Key, passive2DmgType, passive2ArmorType, scorchType, flawIndex, flawXValue, passiveOptions }) {
+function TagPreview({ itemName, itemType, energyType, attunement, isTainted, isKlaive, klaiveGrand, isKlaiveUnfinished, slot1, slot2, benefit2Type, passiveKey, passiveDmgType, passiveArmorType, passive2Key, passive2DmgType, passive2ArmorType, scorchType, flawIndex, flawXValue, passiveOptions }) {
   const lines = [];
+  if (isKlaive) {
+    lines.push(isKlaiveUnfinished ? '⚠ Unfinished Klaive — requires char attunement' : (klaiveGrand ? 'Grand Klaive' : 'Klaive'));
+    lines.push('Agg Damage');
+  }
   if (slot1.power && !slot1.restriction) lines.push(`Power: ${slot1.power.name}`);
   const p1 = passiveOptions.find(o => o.key === passiveKey);
   if (p1 && p1.key !== 'none') {

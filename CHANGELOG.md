@@ -21,15 +21,22 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [Unreleased]
 
-### 📖 Rules & Rituals Viewer
+---
 
-#### Fixed
-- **Search highlighting**: Highlights now actually appear — react-pdf requires the text renderer to return an HTML string, not JSX
-- **Zoom flashing/jumping**: Zoom now uses the CSS `zoom` property so canvases never re-rasterize during zoom; no more white flash or page jumping
+## [v0.6.0] - 2026-08-04
+
+### 🔒 Storyteller Suite
 
 #### Added
-- **Faster first load**: PDFs now fetch pages on demand (range requests) instead of downloading the entire file up front
-- **Load progress bar**: Shows download percentage while a PDF loads
+- **Magic Item Wizard (2026 Draft)**: Step-based ST item calculator implementing 2026 draft rules — power selection with faction-matched cost modifiers (rare/corrupted/not-available), passive trait, 2nd benefit, scorch, full new flaw table with per-flaw attunement reductions, Klaive/Grand Klaive/Unfinished Klaive support (auto-sets Gnosis, shows Agg Damage on tag), ST free modifier, attunement breakdown and amber item tag preview
+- **Magic Item Wizard (2025 Rules)**: ST item calculator for current rules — two benefit slots, specific damage type cost table (voted Damage Type Attunements proposal), relic modifier, scorch with conflict detection, flaw list with ST-adjustable reduction, ST free modifier, item tag preview
+- **Token Reward Calculator (2025 Rules)**: ST compensation calculator — XP/Silver/Teaching/Ritual/Magic Item spend tabs, cart with running balance and over-budget warning, 2025 item builder with attunement adjusters (X/Y sliders), item tag preview
+- **Token Reward Calculator (2026 Draft)**: Same calculator shell using 2026 step-based item builder — Klaive/Grand Klaive/Unfinished Klaive support, item tag preview with Agg Damage line, attunement adjusters
+
+#### Changed
+- **Damage Type Attunements**: All item tools updated to use specific damage type cost table — Agg (+5), Fire (+4), Blood/Dark/Light/Silver/Wolfsbane (+3), Gold/Holy/Iron (+2), Other (+1), replacing old binary Agg/non-Agg system
+- **Agg Damage on weapons**: Agg now correctly appears in weapon damage type dropdown (was incorrectly excluded)
+- **Shared powers data**: Extracted to `src/data/powersData.js` for reuse across Power Index and all four ST tools
 
 ---
 

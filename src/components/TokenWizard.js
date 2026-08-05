@@ -333,6 +333,48 @@ function ItemBuilder({ energyType, inp, lbl, onCalc }) {
         </div>
       </div>
       <p className="text-xs text-amber-400">⚠ No flaws allowed on compensation items. Story required for XO.</p>
+      <TagPreview
+        itemName={itemName} itemType={itemType} energyType={energyType}
+        finalAtt={finalAtt} tokenCost={tokenCost}
+        isRelic={isRelic} isArtifact={isArtifact} isTainted={isTainted}
+        b1={b1} b2={b2}
+      />
+    </div>
+  );
+}
+
+function TagPreview({ itemName, itemType, energyType, finalAtt, tokenCost, isRelic, isArtifact, isTainted, b1, b2 }) {
+  const lines = [];
+  function descBenefit(b) {
+    if (!b.type) return null;
+    if (b.type === 'dmg_type' && b.typeIdx !== null && DAMAGE_TYPES[b.typeIdx]) return `${DAMAGE_TYPES[b.typeIdx].label} Damage`;
+    if (b.type === 'arm_type' && b.typeIdx !== null && DAMAGE_TYPES[b.typeIdx]) return `${DAMAGE_TYPES[b.typeIdx].label} Armor`;
+    if (b.type.startsWith('power') && b.powerName && !b.powerRestriction) return `Power: ${b.powerName}`;
+    const def = ALL_BENEFITS.find(x => x.value === b.type);
+    return def ? def.label : null;
+  }
+  const l1 = descBenefit(b1); if (l1) lines.push(l1);
+  const l2 = descBenefit(b2); if (l2) lines.push(l2);
+  if (isRelic && !isArtifact) lines.push('Relic');
+  if (isArtifact) lines.push('Artifact');
+  if (isTainted) lines.push('TAINTED');
+
+  return (
+    <div className="mt-4 border-2 border-amber-700 rounded-lg bg-amber-950 p-4 font-mono text-sm shadow-inner">
+      <div className="text-center text-amber-200 font-bold text-base mb-1 border-b border-amber-700 pb-1">
+        {itemName || '[ Item Name ]'}
+      </div>
+      <div className="text-center text-amber-300 text-xs mb-3">
+        {ITEM_TYPES.find(t => t.value === itemType)?.label || itemType} — {energyType || '—'}
+      </div>
+      {lines.length === 0
+        ? <div className="text-amber-600 text-center text-xs">(no selections)</div>
+        : <ul className="space-y-1">{lines.map((l, i) => <li key={i} className="text-amber-100">• {l}</li>)}</ul>
+      }
+      <div className="border-t border-amber-700 mt-3 pt-2 flex justify-between items-center">
+        <span className="text-amber-400 font-bold">Attunement: {finalAtt}</span>
+        <span className="text-yellow-300 font-bold">{tokenCost} tokens</span>
+      </div>
     </div>
   );
 }

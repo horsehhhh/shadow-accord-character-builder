@@ -152,12 +152,64 @@ function getPassiveOptions(itemType) {
   }
 }
 
+function TagPreview2026({ itemName, itemType, energyType, finalAtt, tokenCost, isKlaive, klaiveGrand, isKlaiveUnfinished, isTainted, slot1, slot2, benefit2Type, passiveKey, passiveDmgType, passiveArmorType, passive2Key, passive2DmgType, passive2ArmorType, scorchType }) {
+  const passiveOptions = getPassiveOptions(itemType);
+  const lines = [];
+  if (isKlaive) {
+    lines.push(isKlaiveUnfinished ? '⚠ Unfinished Klaive — requires char attunement' : (klaiveGrand ? 'Grand Klaive' : 'Klaive'));
+    lines.push('Agg Damage');
+  }
+  if (slot1.power && !slot1.restriction) lines.push(`Power: ${slot1.power.name}`);
+  const p1 = passiveOptions.find(o => o.key === passiveKey);
+  if (p1 && p1.key !== 'none') {
+    let t = `Trait: ${p1.label}`;
+    if (passiveDmgType !== null && DAMAGE_TYPES[passiveDmgType]) t += ` (${DAMAGE_TYPES[passiveDmgType].label})`;
+    if (passiveArmorType !== null && DAMAGE_TYPES[passiveArmorType]) t += ` ${DAMAGE_TYPES[passiveArmorType].label} Armor`;
+    lines.push(t);
+  }
+  if (benefit2Type === 'power' && slot2.power && !slot2.restriction) lines.push(`Power: ${slot2.power.name}`);
+  if (benefit2Type === 'passive') {
+    const p2 = passiveOptions.find(o => o.key === passive2Key);
+    if (p2 && p2.key !== 'none') {
+      let t = `Trait: ${p2.label}`;
+      if (passive2DmgType !== null && DAMAGE_TYPES[passive2DmgType]) t += ` (${DAMAGE_TYPES[passive2DmgType].label})`;
+      if (passive2ArmorType !== null && DAMAGE_TYPES[passive2ArmorType]) t += ` ${DAMAGE_TYPES[passive2ArmorType].label} Armor`;
+      lines.push(t);
+    }
+  }
+  if (scorchType !== null && DAMAGE_TYPES[scorchType]) lines.push(`Scorch: ${DAMAGE_TYPES[scorchType].label}`);
+  if (isTainted) lines.push('TAINTED');
+
+  return (
+    <div className="mt-4 border-2 border-amber-700 rounded-lg bg-amber-950 p-4 font-mono text-sm shadow-inner">
+      <div className="text-center text-amber-200 font-bold text-base mb-1 border-b border-amber-700 pb-1">
+        {itemName || '[ Item Name ]'}
+      </div>
+      <div className="text-center text-amber-300 text-xs mb-3">
+        {itemType.charAt(0).toUpperCase() + itemType.slice(1)} — {energyType || '—'}
+      </div>
+      {lines.length === 0
+        ? <div className="text-amber-600 text-center text-xs">(no selections)</div>
+        : <ul className="space-y-1">{lines.map((l, i) => <li key={i} className="text-amber-100">• {l}</li>)}</ul>
+      }
+      <div className="border-t border-amber-700 mt-3 pt-2 flex justify-between items-center">
+        <span className="text-amber-400 font-bold">Attunement: {finalAtt}</span>
+        <span className="text-yellow-300 font-bold">{tokenCost} tokens</span>
+      </div>
+      {isTainted && <div className="text-center text-red-400 font-bold text-xs mt-1">TAINTED</div>}
+    </div>
+  );
+}
+
 // ── 2026 Item sub-builder (no flaws for compensation items) ───────────────────
 function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
   const [itemName, setItemName]   = useState('');
   const [itemType, setItemType]   = useState('weapon');
   const [energyType, setEnergyType] = useState(parentEnergy || 'Vitae (Vampire)');
   const [isTainted, setIsTainted] = useState(false);
+  const [isKlaive, setIsKlaive]   = useState(false);
+  const [klaiveGrand, setKlaiveGrand] = useState(false);
+  const [isKlaiveUnfinished, setIsKlaiveUnfinished] = useState(false);
   const [slot1, setSlot1]         = useState(blankSlot());
   const [passiveKey, setPassiveKey]         = useState('none');
   const [passiveDmgType, setPassiveDmgType] = useState(null);
@@ -188,6 +240,7 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
 
   const baseAtt = useMemo(() => {
     let total = 0;
+    if (isKlaive) total += 5;
     function addPower(slot) {
       if (!slot.power || slot.restriction) return;
       const lvl = slot.level ?? 1;
@@ -213,14 +266,14 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
     if (isTainted) total -= 4;
     if (scorchType !== null && DAMAGE_TYPES[scorchType]?.scorch !== null) total += DAMAGE_TYPES[scorchType].scorch;
     return total;
-  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, scorchType, itemType, passiveOptions]);
+  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, isKlaive, scorchType, itemType, passiveOptions]);
 
   const finalAtt  = Math.max(1, baseAtt + adjY - adjX);
   const tokenCost = Math.max(1, (baseAtt - adjY) + adjX);
 
   useEffect(() => {
-    onCalc({ itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, slot1, slot2 });
-  }, [itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, slot1, slot2]); // eslint-disable-line react-hooks/exhaustive-deps
+    onCalc({ itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, isKlaive, klaiveGrand, isKlaiveUnfinished, slot1, slot2 });
+  }, [itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, isKlaive, klaiveGrand, isKlaiveUnfinished, slot1, slot2]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scorchConflict = useMemo(() => {
     if (scorchType === null) return false;
@@ -258,10 +311,29 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
         </select>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-        <input type="checkbox" className="accent-yellow-500" checked={isTainted} onChange={e => setIsTainted(e.target.checked)} />
-        Tainted (-4)
-      </label>
+      <div className="flex flex-wrap gap-4">
+        <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <input type="checkbox" className="accent-yellow-500" checked={isTainted} onChange={e => setIsTainted(e.target.checked)} />
+          Tainted (-4)
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <input type="checkbox" className="accent-amber-400" checked={isKlaive}
+            onChange={e => { setIsKlaive(e.target.checked); if (!e.target.checked) setKlaiveGrand(false); if (e.target.checked) setEnergyType('Gnosis (Shifter)'); }} />
+          Klaive <span className="text-gray-500">(+5 base att, auto-sets Gnosis)</span>
+        </label>
+        {isKlaive && (
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input type="checkbox" className="accent-amber-400" checked={klaiveGrand} onChange={e => setKlaiveGrand(e.target.checked)} />
+            Grand Klaive
+          </label>
+        )}
+        {isKlaive && (
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <input type="checkbox" className="accent-amber-400" checked={isKlaiveUnfinished} onChange={e => setIsKlaiveUnfinished(e.target.checked)} />
+            Unfinished <span className="text-gray-500">(requires char attunement)</span>
+          </label>
+        )}
+      </div>
 
       {/* Step 2 power */}
       <div>
@@ -288,15 +360,7 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
           {itemType === 'weapon' && (
             <select className={inp} value={passiveDmgType ?? ''} onChange={e => setPassiveDmgType(e.target.value === '' ? null : parseInt(e.target.value))}>
               <option value="">No Damage Type</option>
-              {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => (
-                <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>
-              ))}
-            </select>
-          )}
-          {itemType === 'armor' && (
-            <select className={inp} value={passiveArmorType ?? ''} onChange={e => setPassiveArmorType(e.target.value === '' ? null : parseInt(e.target.value))}>
-              <option value="">No Type Armor</option>
-              {DAMAGE_TYPES.filter(dt => dt.armor !== null).map(dt => (
+              {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => (
                 <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.armor})</option>
               ))}
             </select>
@@ -335,7 +399,7 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
             {itemType === 'weapon' && (
               <select className={inp} value={passive2DmgType ?? ''} onChange={e => setPassive2DmgType(e.target.value === '' ? null : parseInt(e.target.value))}>
                 <option value="">No Damage Type</option>
-                {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => (
+                {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => (
                   <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>
                 ))}
               </select>
@@ -392,6 +456,16 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
         </div>
       </div>
       <p className="text-xs text-amber-400">⚠ No flaws on compensation items. Story required for XO.</p>
+      <TagPreview2026
+        itemName={itemName} itemType={itemType} energyType={energyType}
+        finalAtt={finalAtt} tokenCost={tokenCost}
+        isKlaive={isKlaive} klaiveGrand={klaiveGrand} isKlaiveUnfinished={isKlaiveUnfinished}
+        isTainted={isTainted} slot1={slot1} slot2={slot2}
+        benefit2Type={benefit2Type}
+        passiveKey={passiveKey} passiveDmgType={passiveDmgType} passiveArmorType={passiveArmorType}
+        passive2Key={passive2Key} passive2DmgType={passive2DmgType} passive2ArmorType={passive2ArmorType}
+        scorchType={scorchType}
+      />
     </div>
   );
 }
@@ -566,7 +640,8 @@ const TokenWizardDraft = ({ onBack }) => {
               onClick={() => {
                 if (!itemCalc) return;
                 const et = itemCalc.energyType || energyType || 'Energy Type TBD';
-                const desc = `${itemCalc.itemName || 'Unnamed Item'} — Att ${itemCalc.finalAtt} (${et})`;
+                const klaivePart = itemCalc.isKlaive ? (itemCalc.isKlaiveUnfinished ? ' [Unfinished Klaive]' : itemCalc.klaiveGrand ? ' [Grand Klaive]' : ' [Klaive]') : '';
+                const desc = `${itemCalc.itemName || 'Unnamed Item'}${klaivePart} — Att ${itemCalc.finalAtt} (${et})`;
                 const powerLines = [itemCalc.slot1, itemCalc.slot2]
                   .filter(s => s?.power && !s.restriction)
                   .map(s => s.power.name);

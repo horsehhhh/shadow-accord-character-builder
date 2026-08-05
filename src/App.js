@@ -472,6 +472,20 @@ const ShadowAccordComplete = () => {
   const currentVersion = APP_VERSION;
   const changelog = [
     {
+      version: '0.6.0',
+      date: '2026-08-04',
+      changes: [
+        '🔒 ST Power Index: added 85 ST/Charm powers (C/C1/C2/C3 sources) with labeled filter options in the source dropdown',
+        '📄 ST Rulebook PDF: added locked ST Rulebook tab to the PDF viewer (password protected)',
+        '⚔️ Magic Item Wizard (2025 Rules): full ST item calculator — two benefit slots, relic modifier, specific damage type costs (voted Damage Type Attunements proposal), scorch, flaw list with ST-adjustable reduction, ST free modifier, attunement breakdown and tag preview',
+        '⚔️ Magic Item Wizard (2026 Draft): step-based wizard implementing 2026 draft magic item rework — power (faction-matched modifiers), passive trait, 2nd benefit, scorch, full new flaw table with per-flaw attunement reductions, Klaive/Grand Klaive support',
+        '🪙 Token Reward Calculator (2025 Rules): ST compensation calculator — XP/Silver/Teaching/Ritual/Magic Item spend tabs, cart with running balance, over-budget warning, 2025 item builder with attunement adjusters',
+        '🪙 Token Reward Calculator (2026 Draft): same calculator using 2026 step-based item builder',
+        '📦 Shared powers data module: extracted powersData to src/data/powersData.js for reuse across Power Index and all item wizards',
+        '💥 Damage Type Attunements: updated all item tools to use new specific damage type cost table (Agg +5, Fire +4, Blood/Dark/Light/Silver/Wolfsbane +3, Gold/Holy/Iron +2, Other +1) replacing old binary Agg/non-Agg system'
+      ]
+    },
+    {
       version: '0.5.3',
       date: '2026-05-12',
       changes: [
