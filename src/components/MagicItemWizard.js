@@ -227,9 +227,6 @@ function ItemBuilder({ onBack }) {
   const [itemType, setItemType]       = useState('weapon');
   const [energyType, setEnergyType]   = useState('Vitae (Vampire)');
   const [isTainted, setIsTainted]     = useState(false);
-  const [isKlaive, setIsKlaive]       = useState(false);
-  const [klaiveGrand, setKlaiveGrand] = useState(false);
-  const [isKlaiveUnfinished, setIsKlaiveUnfinished] = useState(false);
   const [slot1, setSlot1]             = useState(blankSlot());
   const [passiveKey, setPassiveKey]   = useState('none');
   const [passiveDmgType, setPassiveDmgType]     = useState(null);
@@ -244,6 +241,19 @@ function ItemBuilder({ onBack }) {
   const [flawXValue, setFlawXValue] = useState(1);
   const [flawVGChoice, setFlawVGChoice] = useState('Vitae (Vampire)');
   const [stMod, setStMod]           = useState(0);
+  const [klaiveMode, setKlaiveMode]               = useState(false);
+  const [klaiveSubMode, setKlaiveSubMode]           = useState('unfinished');
+  const [klaiveName, setKlaiveName]                 = useState('');
+  const [klaiveSpiritName, setKlaiveSpiritName]     = useState('');
+  const [klaiveSpiritName2, setKlaiveSpiritName2]   = useState('');
+  const [klaivePower1, setKlaivePower1]             = useState(blankSlot());
+  const [klaivePower2, setKlaivePower2]             = useState(blankSlot());
+  const [klaiveBanFlaw, setKlaiveBanFlaw]           = useState('');
+  const [klaiveBanAtt, setKlaiveBanAtt]             = useState(1);
+  const [klaiveBan2Flaw, setKlaiveBan2Flaw]         = useState('');
+  const [klaiveBan2Att, setKlaiveBan2Att]           = useState(1);
+  const [klaiveOptFlaw, setKlaiveOptFlaw]           = useState('');
+  const [klaiveOptAtt, setKlaiveOptAtt]             = useState(0);
 
   useEffect(() => {
     if (slot1.power) { const d = detectModifiers(slot1.power, energyType); setSlot1(s => ({ ...s, ...d })); }
@@ -254,6 +264,32 @@ function ItemBuilder({ onBack }) {
     const s = { power, restriction: getPowerRestriction(power), ...detectModifiers(power, energyType) };
     if (n === 1) setSlot1(s); else setSlot2(s);
   }
+
+  const KLAIVE_ENERGY = 'Gnosis (Shifter)';
+  function selectKlaivePower(setter, power) {
+    setter({ power, restriction: getPowerRestriction(power), ...detectModifiers(power, KLAIVE_ENERGY) });
+  }
+  function pCost(slot) {
+    if (!slot?.power || slot.restriction) return 0;
+    const lvl = slot.level ?? 1;
+    let c = lvl === 1 ? 2 : lvl === 2 ? 4 : 6;
+    if (!slot.notAvailable) { if (slot.corrupted) c += 2; else if (slot.rare) c += 1; }
+    else c += 2;
+    return c;
+  }
+  const isGrand       = klaiveSubMode.includes('grand');
+  const isKlaiveUnfin = klaiveSubMode.includes('unfinished');
+  const klaiveModeLabelMap = {
+    unfinished:       'Unfinished Klaive',
+    finished:         'Klaive',
+    grand_unfinished: 'Unfinished Grand Klaive',
+    grand:            'Grand Klaive',
+  };
+  const klaiveFinalAtt = isKlaiveUnfin ? 3 : Math.max(1,
+    5 + pCost(klaivePower1) + (isGrand ? pCost(klaivePower2) : 0)
+    - klaiveBanAtt - (isGrand ? klaiveBan2Att : 0) - klaiveOptAtt
+  );
+  const klaiveTagCount = isKlaiveUnfin ? 1 : isGrand ? 3 : 2;
 
   const passiveOptions = getPassiveOptions(itemType);
 
@@ -268,11 +304,6 @@ function ItemBuilder({ onBack }) {
   const breakdown = useMemo(() => {
     const lines = [];
     let total = 0;
-
-    if (isKlaive) {
-      lines.push({ label: `${klaiveGrand ? 'Grand Klaive' : 'Klaive'} base attunement`, value: 5 });
-      total += 5;
-    }
 
     function addPower(slot, label) {
       if (!slot.power) return;
@@ -335,16 +366,163 @@ function ItemBuilder({ onBack }) {
     if (stMod !== 0) { lines.push({ label: 'ST Free Modifier', value: stMod }); total += stMod; }
 
     return { lines, total, finalAtt: Math.max(1, total) };
-  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, scorchType, flawIndex, flawXValue, flawVGChoice, stMod, itemType, isKlaive, klaiveGrand, passiveOptions]);
+  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, scorchType, flawIndex, flawXValue, flawVGChoice, stMod, itemType, passiveOptions]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <button className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" onClick={onBack}>← Back</button>
           <h1 className="text-2xl font-bold text-amber-400">⚔️ Magic Item Wizard</h1>
           <span className="text-xs bg-amber-900 text-amber-200 px-2 py-1 rounded">2026 Draft Rules</span>
         </div>
+        <div className="flex gap-2 mb-4">
+          <button onClick={() => setKlaiveMode(false)}
+            className={`px-4 py-1.5 rounded text-sm font-semibold ${!klaiveMode ? 'bg-amber-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+          >Magic Item</button>
+          <button onClick={() => setKlaiveMode(true)}
+            className={`px-4 py-1.5 rounded text-sm font-semibold ${klaiveMode ? 'bg-amber-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+          >⚔ Klaive</button>
+        </div>
+        {klaiveMode && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(klaiveModeLabelMap).map(([id, label]) => (
+                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); }}
+                  className={`py-2 text-sm rounded font-medium ${klaiveSubMode === id ? 'bg-amber-700 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-white'}`}
+                >{label}</button>
+              ))}
+            </div>
+            <Section title="Klaive Info">
+              <Label>Klaive Name</Label>
+              <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                placeholder="e.g. Moonbane" value={klaiveName} onChange={e => setKlaiveName(e.target.value)} />
+            </Section>
+            {isKlaiveUnfin ? (
+              <Section title="Unfinished Klaive — Fixed Stats">
+                <div className="space-y-1.5 text-sm">
+                  <div className="text-gray-300">Weapon: <span className="text-white">Silver {isGrand ? '2H' : '1H'}</span></div>
+                  <div className="text-gray-300">Energy: <span className="text-white">Gnosis</span></div>
+                  <div className="text-gray-300">Att: <span className="text-white font-bold">3</span></div>
+                  <div className="text-gray-300">Properties: <span className="text-white">Relic</span></div>
+                  <div className="text-gray-300">Tags: <span className="text-white">1 tag (Klaive Tag)</span></div>
+                  <p className="text-xs text-amber-400 pt-1">Requires ST approval and character attunement before becoming a finished Klaive.</p>
+                </div>
+              </Section>
+            ) : (
+              <>
+                <Section title="Bound Spirit(s)">
+                  <div className="space-y-3">
+                    <div>
+                      <Label>{isGrand ? 'Spirit 1 Name (Greater Jaggling)' : 'Spirit Name'}</Label>
+                      <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="Spirit name" value={klaiveSpiritName} onChange={e => setKlaiveSpiritName(e.target.value)} />
+                    </div>
+                    {isGrand && (
+                      <div>
+                        <Label>Spirit 2 Name <span className="text-amber-400">(Greater Jaggling — War Spirit)</span></Label>
+                        <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                          placeholder="2nd spirit name" value={klaiveSpiritName2} onChange={e => setKlaiveSpiritName2(e.target.value)} />
+                      </div>
+                    )}
+                  </div>
+                </Section>
+                <Section title={isGrand ? 'Spirit Powers' : 'Spirit Power'}>
+                  <div className="space-y-3">
+                    <div>
+                      {isGrand && <Label>Spirit 1</Label>}
+                      <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower1, p)} />
+                      {klaivePower1.power && (
+                        <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower1.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                          <span>{klaivePower1.power.name} (Lv{klaivePower1.level ?? 1}) +{pCost(klaivePower1)} att{klaivePower1.restriction ? ` — ${RESTRICTION_MSG[klaivePower1.restriction] || klaivePower1.restriction}` : ''}</span>
+                          <button onClick={() => setKlaivePower1(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                        </div>
+                      )}
+                    </div>
+                    {isGrand && (
+                      <div>
+                        <Label>Spirit 2</Label>
+                        <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower2, p)} />
+                        {klaivePower2.power && (
+                          <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower2.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                            <span>{klaivePower2.power.name} (Lv{klaivePower2.level ?? 1}) +{pCost(klaivePower2)} att{klaivePower2.restriction ? ` — ${RESTRICTION_MSG[klaivePower2.restriction] || klaivePower2.restriction}` : ''}</span>
+                            <button onClick={() => setKlaivePower2(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Section>
+                <Section title="Mandatory Flaws">
+                  <p className="text-xs text-gray-400 mb-3">Both flaws are required. Gnosis −2 while attuned is a feature, not a flaw.</p>
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Ban Flaw — Spirit 1 <span className="text-red-400">*</span></Label>
+                      <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="Describe the ban condition" value={klaiveBanFlaw} onChange={e => setKlaiveBanFlaw(e.target.value)} />
+                      <Label>Att Reduction</Label>
+                      <div className="flex gap-1 mt-1">
+                        {[0,1,2,3,4].map(n => (
+                          <button key={n} onClick={() => setKlaiveBanAtt(n)}
+                            className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveBanAtt === n ? 'bg-orange-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                          >−{n}</button>
+                        ))}
+                      </div>
+                    </div>
+                    {isGrand && (
+                      <div className="pt-2 border-t border-gray-700">
+                        <Label>Ban Flaw — Spirit 2 <span className="text-red-400">*</span></Label>
+                        <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                          placeholder="Describe the ban condition" value={klaiveBan2Flaw} onChange={e => setKlaiveBan2Flaw(e.target.value)} />
+                        <Label>Att Reduction</Label>
+                        <div className="flex gap-1 mt-1">
+                          {[0,1,2,3,4].map(n => (
+                            <button key={n} onClick={() => setKlaiveBan2Att(n)}
+                              className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveBan2Att === n ? 'bg-orange-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                            >−{n}</button>
+                          ))}
+                        </div>
+                        <p className="text-xs text-amber-400 mt-1">Breaking either ban causes both spirits to reject the character.</p>
+                      </div>
+                    )}
+                  </div>
+                </Section>
+                <Section title="Optional 3rd Flaw (non-Ban)">
+                  <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                    placeholder="Leave blank for none" value={klaiveOptFlaw} onChange={e => setKlaiveOptFlaw(e.target.value)} />
+                  {klaiveOptFlaw && (
+                    <>
+                      <Label>Att Reduction</Label>
+                      <div className="flex gap-1 mt-1">
+                        {[0,1,2,3,4].map(n => (
+                          <button key={n} onClick={() => setKlaiveOptAtt(n)}
+                            className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveOptAtt === n ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                          >−{n}</button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </Section>
+                <Section title="Total Attunement">
+                  <div className="space-y-1 mb-4">
+                    <div className="flex justify-between text-sm"><span>Base (Klaive)</span><span className="font-mono text-amber-300">+5</span></div>
+                    {klaivePower1.power && <div className="flex justify-between text-sm"><span>+ {klaivePower1.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower1)}</span></div>}
+                    {isGrand && klaivePower2.power && <div className="flex justify-between text-sm"><span>+ {klaivePower2.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower2)}</span></div>}
+                    {klaiveBanAtt > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 1)</span><span className="font-mono text-green-400">−{klaiveBanAtt}</span></div>}
+                    {isGrand && klaiveBan2Att > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 2)</span><span className="font-mono text-green-400">−{klaiveBan2Att}</span></div>}
+                    {klaiveOptFlaw && klaiveOptAtt > 0 && <div className="flex justify-between text-sm"><span>− Optional flaw</span><span className="font-mono text-green-400">−{klaiveOptAtt}</span></div>}
+                  </div>
+                  <div className="border-t border-gray-600 pt-3 flex justify-between items-center">
+                    <span className="text-lg font-bold">Final Attunement Cost</span>
+                    <span className={`text-3xl font-black ${klaiveFinalAtt >= 10 ? 'text-red-400' : klaiveFinalAtt >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{klaiveFinalAtt}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">Tags: {klaiveTagCount} {klaiveTagCount === 1 ? '(Klaive Tag)' : isGrand ? '(Grand Klaive Tag + 2× Klaive Spirit Tag)' : '(Klaive Tag + Klaive Spirit Tag)'}</p>
+                </Section>
+              </>
+            )}
+          </div>
+        )}
+        {!klaiveMode && (
         <div className="space-y-4">
 
           <Section title="Item Info">
@@ -372,23 +550,6 @@ function ItemBuilder({ onBack }) {
                 <input type="checkbox" className="accent-amber-400" checked={isTainted} onChange={e => setIsTainted(e.target.checked)} />
                 <span className="text-sm">Tainted <span className="text-gray-400">(-4)</span></span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="accent-amber-400" checked={isKlaive}
-                  onChange={e => { setIsKlaive(e.target.checked); if (!e.target.checked) setKlaiveGrand(false); if (e.target.checked) setEnergyType('Gnosis (Shifter)'); }} />
-                <span className="text-sm">Klaive (base att 5)</span>
-              </label>
-              {isKlaive && (
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="accent-amber-400" checked={klaiveGrand} onChange={e => setKlaiveGrand(e.target.checked)} />
-                  <span className="text-sm">Grand Klaive</span>
-                </label>
-              )}
-              {isKlaive && (
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="accent-amber-400" checked={isKlaiveUnfinished} onChange={e => setIsKlaiveUnfinished(e.target.checked)} />
-                  <span className="text-sm">Unfinished <span className="text-gray-400">(requires char attunement)</span></span>
-                </label>
-              )}
             </div>
           </Section>
 
@@ -536,7 +697,7 @@ function ItemBuilder({ onBack }) {
             <TagPreview
               itemName={itemName} itemType={itemType} energyType={energyType}
               attunement={breakdown.finalAtt} isTainted={isTainted}
-              isKlaive={isKlaive} klaiveGrand={klaiveGrand} isKlaiveUnfinished={isKlaiveUnfinished}
+              isKlaive={false} klaiveGrand={false} isKlaiveUnfinished={false}
               slot1={slot1} slot2={slot2} benefit2Type={benefit2Type}
               passiveKey={passiveKey} passiveDmgType={passiveDmgType} passiveArmorType={passiveArmorType}
               passive2Key={passive2Key} passive2DmgType={passive2DmgType} passive2ArmorType={passive2ArmorType}
@@ -545,6 +706,7 @@ function ItemBuilder({ onBack }) {
             />
           </Section>
         </div>
+        )}
       </div>
     </div>
   );

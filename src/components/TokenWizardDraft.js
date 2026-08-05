@@ -11,8 +11,6 @@ const ENERGY_TYPES = [
   'Pathos (Wraith)',
   'Essence (Human / Sorcerer)',
   'Vitality',
-  'Mists',
-  'Faith',
 ];
 
 const FACTION_CODE = {
@@ -207,9 +205,6 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
   const [itemType, setItemType]   = useState('weapon');
   const [energyType, setEnergyType] = useState(parentEnergy || 'Vitae (Vampire)');
   const [isTainted, setIsTainted] = useState(false);
-  const [isKlaive, setIsKlaive]   = useState(false);
-  const [klaiveGrand, setKlaiveGrand] = useState(false);
-  const [isKlaiveUnfinished, setIsKlaiveUnfinished] = useState(false);
   const [slot1, setSlot1]         = useState(blankSlot());
   const [passiveKey, setPassiveKey]         = useState('none');
   const [passiveDmgType, setPassiveDmgType] = useState(null);
@@ -240,7 +235,6 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
 
   const baseAtt = useMemo(() => {
     let total = 0;
-    if (isKlaive) total += 5;
     function addPower(slot) {
       if (!slot.power || slot.restriction) return;
       const lvl = slot.level ?? 1;
@@ -266,14 +260,14 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
     if (isTainted) total -= 4;
     if (scorchType !== null && DAMAGE_TYPES[scorchType]?.scorch !== null) total += DAMAGE_TYPES[scorchType].scorch;
     return total;
-  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, isKlaive, scorchType, itemType, passiveOptions]);
+  }, [slot1, slot2, passiveKey, passiveDmgType, passiveArmorType, benefit2Type, passive2Key, passive2DmgType, passive2ArmorType, isTainted, scorchType, itemType, passiveOptions]);
 
   const finalAtt  = Math.max(1, baseAtt + adjY - adjX);
   const tokenCost = Math.max(1, (baseAtt - adjY) + adjX);
 
   useEffect(() => {
-    onCalc({ itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, isKlaive, klaiveGrand, isKlaiveUnfinished, slot1, slot2 });
-  }, [itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, isKlaive, klaiveGrand, isKlaiveUnfinished, slot1, slot2]); // eslint-disable-line react-hooks/exhaustive-deps
+    onCalc({ itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, slot1, slot2 });
+  }, [itemName, itemType, energyType, baseAtt, adjX, adjY, finalAtt, tokenCost, isTainted, slot1, slot2]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scorchConflict = useMemo(() => {
     if (scorchType === null) return false;
@@ -316,23 +310,6 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
           <input type="checkbox" className="accent-yellow-500" checked={isTainted} onChange={e => setIsTainted(e.target.checked)} />
           Tainted (-4)
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-          <input type="checkbox" className="accent-amber-400" checked={isKlaive}
-            onChange={e => { setIsKlaive(e.target.checked); if (!e.target.checked) setKlaiveGrand(false); if (e.target.checked) setEnergyType('Gnosis (Shifter)'); }} />
-          Klaive <span className="text-gray-500">(+5 base att, auto-sets Gnosis)</span>
-        </label>
-        {isKlaive && (
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-            <input type="checkbox" className="accent-amber-400" checked={klaiveGrand} onChange={e => setKlaiveGrand(e.target.checked)} />
-            Grand Klaive
-          </label>
-        )}
-        {isKlaive && (
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-            <input type="checkbox" className="accent-amber-400" checked={isKlaiveUnfinished} onChange={e => setIsKlaiveUnfinished(e.target.checked)} />
-            Unfinished <span className="text-gray-500">(requires char attunement)</span>
-          </label>
-        )}
       </div>
 
       {/* Step 2 power */}
@@ -459,7 +436,7 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
       <TagPreview2026
         itemName={itemName} itemType={itemType} energyType={energyType}
         finalAtt={finalAtt} tokenCost={tokenCost}
-        isKlaive={isKlaive} klaiveGrand={klaiveGrand} isKlaiveUnfinished={isKlaiveUnfinished}
+        isKlaive={false} klaiveGrand={false} isKlaiveUnfinished={false}
         isTainted={isTainted} slot1={slot1} slot2={slot2}
         benefit2Type={benefit2Type}
         passiveKey={passiveKey} passiveDmgType={passiveDmgType} passiveArmorType={passiveArmorType}
@@ -471,7 +448,44 @@ function ItemBuilder2026({ energyType: parentEnergy, inp, lbl, onCalc }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-const TokenWizardDraft = ({ onBack }) => {
+// ST-only and unlearnable tree IDs — mirrored from App.js
+const ST_TEACH_ONLY = new Set(['nephandi','khan_gift','simba_gift','gurahl_gift','umfalla','mokole_gift','rokea_gift','abombwe','ogham','serpentis','spiritus','thaumaturgy_rego_viridi']);
+const TEACH_UNLEARNABLE = new Set(['visceratika','mytherceria','nagah_gift']);
+// per-energy filter: Vitality = commoner/faithful human trees; Essence = sorcerer trees
+const TEACH_ENERGY_FILTER = {
+  Vitae:    t => t.faction === 'vampire',
+  Gnosis:   t => t.faction === 'shifter',
+  Pathos:   t => t.faction === 'wraith',
+  Essence:  t => t.faction === 'human' && ['sorcerer','fellowship','fallen_path'].includes(t.group),
+  Vitality: t => t.faction === 'human' && ['talent','bounty'].includes(t.group),
+};
+const TEACH_GROUP_LABELS = {
+  common:           'Common Disciplines',
+  clan_innate:      'Clan Disciplines',
+  thaumaturgy:      'Thaumaturgy Paths',
+  dark_thaumaturgy: 'Dark Thaumaturgy',
+  auspice:          'Auspice Gifts',
+  breed:            'Breed Gifts',
+  tribe_gift:       'Tribe Gifts',
+  fera_gift:        'Fera Gifts',
+  wyrm_gift:        'Wyrm Gifts',
+  arcanos:          'Arcanoi',
+  dark_arcanos:     'Dark Arcanoi',
+  sorcerer:         'Sorcery',
+  fellowship:       'Fellowships',
+  fallen_path:      'Fallen Paths',
+  talent:           'Talents',
+  bounty:           'Bounties',
+};
+const TEACH_GROUP_ORDER = {
+  Vitae:    ['common', 'clan_innate', 'thaumaturgy', 'dark_thaumaturgy'],
+  Gnosis:   ['auspice', 'breed', 'tribe_gift', 'fera_gift', 'wyrm_gift'],
+  Pathos:   ['arcanos', 'dark_arcanos'],
+  Essence:  ['sorcerer', 'fellowship', 'fallen_path'],
+  Vitality: ['talent', 'bounty'],
+};
+
+const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
   const [unlocked, setUnlocked] = useState(false);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState(false);
@@ -483,12 +497,29 @@ const TokenWizardDraft = ({ onBack }) => {
 
   const [xpTokens, setXpTokens]         = useState(1);
   const [silverTokens, setSilverTokens] = useState(1);
-  const [teachName, setTeachName]       = useState('');
-  const [teachST, setTeachST]           = useState(false);
+  const [teachMode, setTeachMode]            = useState('power');
+  const [teachSkillName, setTeachSkillName]   = useState('');
+  const [teachEnergyType, setTeachEnergyType] = useState('');
+  const [teachTreeId, setTeachTreeId]         = useState('');
+  const [teachLevel, setTeachLevel]           = useState(1);
   const [ritualName, setRitualName]     = useState('');
   const [ritualType, setRitualType]     = useState('simple');
   const [ritualDouble, setRitualDouble] = useState(false);
   const [itemCalc, setItemCalc]         = useState(null);
+
+  // Klaive builder state
+  const [klaiveSubMode, setKlaiveSubMode]       = useState('unfinished');
+  const [klaiveName, setKlaiveName]             = useState('');
+  const [klaiveSpiritName, setKlaiveSpiritName] = useState('');
+  const [klaiveSpiritName2, setKlaiveSpiritName2] = useState('');
+  const [klaivePower1, setKlaivePower1]         = useState(blankSlot());
+  const [klaivePower2, setKlaivePower2]         = useState(blankSlot());
+  const [klaiveBanFlaw, setKlaiveBanFlaw]       = useState('');
+  const [klaiveBanAtt, setKlaiveBanAtt]         = useState(1);
+  const [klaiveBan2Flaw, setKlaiveBan2Flaw]     = useState('');
+  const [klaiveBan2Att, setKlaiveBan2Att]       = useState(1);
+  const [klaiveOptFlaw, setKlaiveOptFlaw]       = useState('');
+  const [klaiveOptAtt, setKlaiveOptAtt]         = useState(0);
 
   const [cart, setCart] = useState([]);
   const nextId = useRef(1);
@@ -536,6 +567,7 @@ const TokenWizardDraft = ({ onBack }) => {
     { id: 'teach',  label: 'Teaching' },
     { id: 'ritual', label: 'Ritual' },
     { id: 'item',   label: 'Magic Item' },
+    { id: 'klaive', label: '⚔ Klaive' },
   ];
 
   const renderTab = () => {
@@ -577,28 +609,132 @@ const TokenWizardDraft = ({ onBack }) => {
           </div>
         );
 
-      case 'teach':
+      case 'teach': {
+        const ENERGY_OPTS = ['Vitae', 'Gnosis', 'Pathos', 'Essence', 'Vitality'];
+        const availableTrees = powerTrees.filter(t =>
+          TEACH_ENERGY_FILTER[teachEnergyType]?.(t) && !TEACH_UNLEARNABLE.has(t.tree_id)
+        ).sort((a, b) => {
+          const aS = ST_TEACH_ONLY.has(a.tree_id) ? 1 : 0;
+          const bS = ST_TEACH_ONLY.has(b.tree_id) ? 1 : 0;
+          if (aS !== bS) return aS - bS;
+          return a.tree_name.localeCompare(b.tree_name);
+        });
+        const selectedTree = availableTrees.find(t => t.tree_id === teachTreeId);
+        const isSTTree = teachMode === 'power' && ST_TEACH_ONLY.has(teachTreeId);
+        const teachTokens = teachMode === 'skill' ? 1 : (isSTTree ? 5 : 1);
+        const previewLabel = teachMode === 'skill'
+          ? (teachSkillName.trim() || '—')
+          : selectedTree
+            ? `${selectedTree.tree_name} Lv${teachLevel} (${selectedTree[`level${teachLevel}_powers`] || '—'})`
+            : '—';
+        const canAdd = teachMode === 'skill' ? !!teachSkillName.trim() : !!selectedTree;
         return (
           <div className="space-y-4">
-            <div>
-              <label className={lbl}>Skill or Power Name</label>
-              <input type="text" placeholder="e.g. Dominate, Melee 2" value={teachName} onChange={e => setTeachName(e.target.value)} className={inp} />
+            <div className="flex gap-2">
+              {['power', 'skill'].map(m => (
+                <button key={m} onClick={() => setTeachMode(m)}
+                  className={`flex-1 py-1.5 text-sm rounded font-medium capitalize ${teachMode === m ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                >{m}</button>
+              ))}
             </div>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
-              <input type="checkbox" checked={teachST} onChange={e => setTeachST(e.target.checked)} className="accent-yellow-500" />
-              From ST Rulebook (costs 5 tokens instead of 1)
-            </label>
+            {teachMode === 'skill' ? (
+              <div>
+                <label className={lbl}>Skill</label>
+                <select value={teachSkillName} onChange={e => setTeachSkillName(e.target.value)} className={inp}>
+                  <option value="">Select skill…</option>
+                  {skills.map(s => {
+                    const label = s.skill_id === 'alchemy' ? 'Alchemy (Sorcerer only)'
+                                : s.skill_id === 'holy_water' ? 'Holy Water (Human only)'
+                                : s.skill_name;
+                    return <option key={s.skill_id} value={s.skill_name}>{label}</option>;
+                  })}
+                </select>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className={lbl}>Energy Type</label>
+                  <select value={teachEnergyType}
+                    onChange={e => { setTeachEnergyType(e.target.value); setTeachTreeId(''); }}
+                    className={inp}>
+                    <option value="">Select energy type…</option>
+                    {ENERGY_OPTS.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                </div>
+                {teachEnergyType && (() => {
+                  const normalTrees = availableTrees.filter(t => !ST_TEACH_ONLY.has(t.tree_id));
+                  const stTrees = availableTrees.filter(t => ST_TEACH_ONLY.has(t.tree_id));
+                  const groupOrder = TEACH_GROUP_ORDER[teachEnergyType] || [];
+                  const grouped = {};
+                  normalTrees.forEach(t => { (grouped[t.group] ??= []).push(t); });
+                  const orderedKeys = [
+                    ...groupOrder.filter(g => grouped[g]),
+                    ...Object.keys(grouped).filter(g => !groupOrder.includes(g)),
+                  ];
+                  return (
+                    <div>
+                      <label className={lbl}>Power Tree</label>
+                      <select value={teachTreeId} onChange={e => setTeachTreeId(e.target.value)} className={inp}>
+                        <option value="">Select tree…</option>
+                        {orderedKeys.map(g => (
+                          <optgroup key={g} label={TEACH_GROUP_LABELS[g] || g}>
+                            {grouped[g].sort((a, b) => a.tree_name.localeCompare(b.tree_name)).map(t =>
+                              <option key={t.tree_id} value={t.tree_id}>{t.tree_name}</option>
+                            )}
+                          </optgroup>
+                        ))}
+                        {stTrees.length > 0 && (
+                          <optgroup label="── ST NPC Trees (5 tokens) ──">
+                            {stTrees.sort((a, b) => a.tree_name.localeCompare(b.tree_name)).map(t =>
+                              <option key={t.tree_id} value={t.tree_id}>[ST] {t.tree_name}</option>
+                            )}
+                          </optgroup>
+                        )}
+                      </select>
+                    </div>
+                  );
+                })()}
+                {teachTreeId && (
+                  <div>
+                    <label className={lbl}>Level</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3].map(lvl => (
+                        <button key={lvl} onClick={() => setTeachLevel(lvl)}
+                          className={`flex-1 py-2 text-sm rounded font-bold ${teachLevel === lvl ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                        >{lvl}</button>
+                      ))}
+                    </div>
+                    {selectedTree && (
+                      <div className="text-xs text-gray-400 mt-1">{selectedTree[`level${teachLevel}_powers`]}</div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
             <div className="bg-gray-900 rounded p-3 text-sm flex justify-between border border-gray-600">
-              <span className="text-gray-300">Teaching: {teachName || '—'}</span>
-              <span className="font-bold text-purple-300">{teachST ? 5 : 1} token{teachST ? 's' : ''}</span>
+              <span className="text-gray-300 truncate mr-2">Teaching: {previewLabel}</span>
+              <span className={`font-bold shrink-0 ${isSTTree ? 'text-amber-300' : 'text-purple-300'}`}>
+                {teachTokens} token{teachTokens > 1 ? 's' : ''}
+              </span>
             </div>
-            <p className="text-xs text-amber-400">⚠ Story must be written and provided to XO explaining how training was acquired.</p>
-            <button onClick={() => { if (!teachName.trim()) return; addToCart({ type: 'teach', tokens: teachST ? 5 : 1, label: `Teaching: ${teachName}${teachST ? ' (ST Rulebook)' : ''}`, detail: `${teachST ? 5 : 1} token${teachST ? 's' : ''}` }); setTeachName(''); setTeachST(false); }}
-              className="w-full py-2 bg-purple-700 hover:bg-purple-600 text-white text-sm rounded font-semibold">
-              Add to Cart
-            </button>
+            {isSTTree && <p className="text-xs text-amber-400">⚠ ST NPC Tree — 5 tokens. Story required for XO.</p>}
+            {teachMode === 'skill' && <p className="text-xs text-amber-400">⚠ Story required for XO explaining how training was acquired.</p>}
+            <button
+              disabled={!canAdd}
+              onClick={() => {
+                if (!canAdd) return;
+                const finalLabel = teachMode === 'skill'
+                  ? `Teaching: ${teachSkillName}`
+                  : `Teaching: ${selectedTree.tree_name} Lv${teachLevel}${isSTTree ? ' [ST NPC]' : ''}`;
+                addToCart({ type: 'teach', tokens: teachTokens, label: finalLabel, detail: `${teachTokens} token${teachTokens > 1 ? 's' : ''}`, isST: isSTTree });
+                if (teachMode === 'skill') setTeachSkillName('');
+                else { setTeachTreeId(''); setTeachLevel(1); }
+              }}
+              className="w-full py-2 bg-purple-700 hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm rounded font-semibold"
+            >Add to Cart</button>
           </div>
         );
+      }
 
       case 'ritual':
         return (
@@ -640,8 +776,7 @@ const TokenWizardDraft = ({ onBack }) => {
               onClick={() => {
                 if (!itemCalc) return;
                 const et = itemCalc.energyType || energyType || 'Energy Type TBD';
-                const klaivePart = itemCalc.isKlaive ? (itemCalc.isKlaiveUnfinished ? ' [Unfinished Klaive]' : itemCalc.klaiveGrand ? ' [Grand Klaive]' : ' [Klaive]') : '';
-                const desc = `${itemCalc.itemName || 'Unnamed Item'}${klaivePart} — Att ${itemCalc.finalAtt} (${et})`;
+                const desc = `${itemCalc.itemName || 'Unnamed Item'} — Att ${itemCalc.finalAtt} (${et})`;
                 const powerLines = [itemCalc.slot1, itemCalc.slot2]
                   .filter(s => s?.power && !s.restriction)
                   .map(s => s.power.name);
@@ -657,6 +792,202 @@ const TokenWizardDraft = ({ onBack }) => {
             </button>
           </div>
         );
+
+      case 'klaive': {
+        const isGrand      = klaiveSubMode.includes('grand');
+        const isUnfinished = klaiveSubMode.includes('unfinished');
+        const modeLabelMap = {
+          unfinished:       'Unfinished Klaive',
+          finished:         'Klaive',
+          grand_unfinished: 'Unfinished Grand Klaive',
+          grand:            'Grand Klaive',
+        };
+        const KLAIVE_ENERGY = 'Gnosis (Shifter)';
+        const selectKlaivePower = (setter, power) => {
+          setter({ power, restriction: getPowerRestriction(power), ...detectModifiers(power, KLAIVE_ENERGY) });
+        };
+        const pCost = slot => {
+          if (!slot?.power || slot.restriction) return 0;
+          const lvl = slot.level ?? 1;
+          let c = lvl === 1 ? 2 : lvl === 2 ? 4 : 6;
+          if (!slot.notAvailable) { if (slot.corrupted) c += 2; else if (slot.rare) c += 1; }
+          else c += 2;
+          return c;
+        };
+        const klaiveFinalAtt = isUnfinished ? 3 : Math.max(1,
+          5 + pCost(klaivePower1) + (isGrand ? pCost(klaivePower2) : 0)
+          - klaiveBanAtt - (isGrand ? klaiveBan2Att : 0) - klaiveOptAtt
+        );
+        const klaiveTokenCost = isUnfinished ? 3 : klaiveFinalAtt;
+        const klaiveTagCount  = isUnfinished ? 1 : isGrand ? 3 : 2;
+        const canAddKlaive = !!klaiveName.trim() && (isUnfinished || (
+          !!klaiveSpiritName.trim() && !!klaiveBanFlaw.trim() &&
+          (!isGrand || (!!klaiveSpiritName2.trim() && !!klaiveBan2Flaw.trim()))
+        ));
+        const resetKlaive = () => {
+          setKlaiveName(''); setKlaiveSpiritName(''); setKlaiveSpiritName2('');
+          setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot());
+          setKlaiveBanFlaw(''); setKlaiveBanAtt(1);
+          setKlaiveBan2Flaw(''); setKlaiveBan2Att(1);
+          setKlaiveOptFlaw(''); setKlaiveOptAtt(0);
+        };
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(modeLabelMap).map(([id, label]) => (
+                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); }}
+                  className={`py-2 text-sm rounded font-medium ${klaiveSubMode === id ? 'bg-amber-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                >{label}</button>
+              ))}
+            </div>
+
+            <div>
+              <label className={lbl}>Klaive Name</label>
+              <input type="text" placeholder="e.g. Moonbane" value={klaiveName} onChange={e => setKlaiveName(e.target.value)} className={inp} />
+            </div>
+
+            {isUnfinished ? (
+              <div className="bg-gray-900 border border-amber-800 rounded-lg p-4 space-y-1.5 text-sm">
+                <div className="text-amber-300 font-semibold">{isGrand ? 'Grand Klaive' : 'Klaive'} — Unfinished</div>
+                <div className="text-gray-300">Weapon: <span className="text-white">Silver {isGrand ? '2H' : '1H'}</span></div>
+                <div className="text-gray-300">Energy: <span className="text-white">Gnosis</span></div>
+                <div className="text-gray-300">Att: <span className="text-white font-bold">3</span></div>
+                <div className="text-gray-300">Properties: <span className="text-white">Relic</span></div>
+                <div className="text-gray-300">Tags: <span className="text-white">1 tag (Klaive Tag)</span></div>
+                <p className="text-xs text-amber-400 pt-1">Requires ST approval and character attunement before becoming a finished Klaive.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className={lbl}>Bound Spirit Name {isGrand ? '(Spirit 1 — Greater Jaggling)' : ''}</label>
+                  <input type="text" placeholder="Spirit name" value={klaiveSpiritName} onChange={e => setKlaiveSpiritName(e.target.value)} className={inp} />
+                </div>
+                {isGrand && (
+                  <div>
+                    <label className={lbl}>Spirit 2 Name <span className="text-amber-400">(Greater Jaggling — War Spirit)</span></label>
+                    <input type="text" placeholder="2nd spirit name" value={klaiveSpiritName2} onChange={e => setKlaiveSpiritName2(e.target.value)} className={inp} />
+                  </div>
+                )}
+
+                <div>
+                  <label className={lbl}>Spirit Power{isGrand ? ' (Spirit 1)' : ''}</label>
+                  <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower1, p)} />
+                  {klaivePower1.power && (
+                    <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower1.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                      <span>{klaivePower1.power.name} (Lv{klaivePower1.level ?? 1}) +{pCost(klaivePower1)} att{klaivePower1.restriction ? ` — ${RESTRICTION_MSG[klaivePower1.restriction] || klaivePower1.restriction}` : ''}</span>
+                      <button onClick={() => setKlaivePower1(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                    </div>
+                  )}
+                </div>
+                {isGrand && (
+                  <div>
+                    <label className={lbl}>Spirit Power (Spirit 2)</label>
+                    <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower2, p)} />
+                    {klaivePower2.power && (
+                      <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower2.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                        <span>{klaivePower2.power.name} (Lv{klaivePower2.level ?? 1}) +{pCost(klaivePower2)} att{klaivePower2.restriction ? ` — ${RESTRICTION_MSG[klaivePower2.restriction] || klaivePower2.restriction}` : ''}</span>
+                        <button onClick={() => setKlaivePower2(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="bg-gray-900 border border-orange-800 rounded-lg p-3 space-y-3">
+                  <div className="text-xs text-orange-300 font-semibold uppercase tracking-wide">Mandatory Flaws</div>
+                  <div className="space-y-2">
+                    <label className={lbl}>Ban Flaw — Spirit 1 <span className="text-red-400">*</span></label>
+                    <input type="text" placeholder="Describe the ban condition" value={klaiveBanFlaw} onChange={e => setKlaiveBanFlaw(e.target.value)} className={inp} />
+                    <label className={lbl}>Att Reduction</label>
+                    <div className="flex gap-1">
+                      {[0, 1, 2, 3, 4].map(n => (
+                        <button key={n} onClick={() => setKlaiveBanAtt(n)}
+                          className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveBanAtt === n ? 'bg-orange-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                        >−{n}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {isGrand && (
+                    <div className="space-y-2 pt-2 border-t border-gray-700">
+                      <label className={lbl}>Ban Flaw — Spirit 2 <span className="text-red-400">*</span></label>
+                      <input type="text" placeholder="Describe the ban condition" value={klaiveBan2Flaw} onChange={e => setKlaiveBan2Flaw(e.target.value)} className={inp} />
+                      <label className={lbl}>Att Reduction</label>
+                      <div className="flex gap-1">
+                        {[0, 1, 2, 3, 4].map(n => (
+                          <button key={n} onClick={() => setKlaiveBan2Att(n)}
+                            className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveBan2Att === n ? 'bg-orange-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                          >−{n}</button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-amber-400">Breaking either ban causes both spirits to reject the character.</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400">Gnosis −2 while attuned is a feature, not a flaw — not counted in attunement cost.</p>
+                </div>
+
+                <div>
+                  <label className={lbl}>Optional 3rd Flaw <span className="text-gray-500">(non-Ban)</span></label>
+                  <input type="text" placeholder="Optional flaw (leave blank for none)" value={klaiveOptFlaw} onChange={e => setKlaiveOptFlaw(e.target.value)} className={inp} />
+                  {klaiveOptFlaw && (
+                    <>
+                      <label className={lbl + ' mt-2'}>Att Reduction</label>
+                      <div className="flex gap-1 mt-1">
+                        {[0, 1, 2, 3, 4].map(n => (
+                          <button key={n} onClick={() => setKlaiveOptAtt(n)}
+                            className={`flex-1 py-1.5 text-sm rounded font-bold ${klaiveOptAtt === n ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                          >−{n}</button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="bg-gray-900 rounded-lg p-3 text-sm space-y-1 border border-gray-700">
+                  <div className="text-gray-400 font-semibold text-xs uppercase tracking-wide mb-2">Att Breakdown</div>
+                  <div className="flex justify-between"><span className="text-gray-400">Base (Klaive)</span><span className="text-white">5</span></div>
+                  {klaivePower1.power && <div className="flex justify-between"><span className="text-gray-400">+ {klaivePower1.power.name}</span><span className="text-green-300">+{pCost(klaivePower1)}</span></div>}
+                  {isGrand && klaivePower2.power && <div className="flex justify-between"><span className="text-gray-400">+ {klaivePower2.power.name}</span><span className="text-green-300">+{pCost(klaivePower2)}</span></div>}
+                  {klaiveBanAtt > 0 && <div className="flex justify-between"><span className="text-gray-400">− Ban (Spirit 1)</span><span className="text-red-300">−{klaiveBanAtt}</span></div>}
+                  {isGrand && klaiveBan2Att > 0 && <div className="flex justify-between"><span className="text-gray-400">− Ban (Spirit 2)</span><span className="text-red-300">−{klaiveBan2Att}</span></div>}
+                  {klaiveOptFlaw && klaiveOptAtt > 0 && <div className="flex justify-between"><span className="text-gray-400">− Optional flaw</span><span className="text-red-300">−{klaiveOptAtt}</span></div>}
+                  <div className="flex justify-between border-t border-gray-700 pt-1 mt-1 font-bold">
+                    <span className="text-white">Final Att</span><span className="text-amber-300">{klaiveFinalAtt}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-gray-900 rounded p-3 text-sm flex justify-between border border-gray-600">
+              <span className="text-gray-300 truncate mr-2">{modeLabelMap[klaiveSubMode]}{klaiveName ? `: ${klaiveName}` : ''} — {klaiveTagCount} tag{klaiveTagCount > 1 ? 's' : ''}</span>
+              <span className="font-bold text-amber-300 shrink-0">{klaiveTokenCost} token{klaiveTokenCost !== 1 ? 's' : ''}</span>
+            </div>
+
+            <button
+              disabled={!canAddKlaive}
+              onClick={() => {
+                if (!canAddKlaive) return;
+                const typeLabel = modeLabelMap[klaiveSubMode];
+                const detail = isUnfinished
+                  ? `Silver ${isGrand ? '2H' : '1H'}, Gnosis, Att 3, Relic — 1 tag`
+                  : [
+                      `${isGrand ? '2H' : '1H'} Agg, Gnosis, Att ${klaiveFinalAtt}`,
+                      `Spirit: ${klaiveSpiritName}`,
+                      isGrand && `Spirit 2: ${klaiveSpiritName2}`,
+                      klaivePower1.power && `Power: ${klaivePower1.power.name}`,
+                      isGrand && klaivePower2.power && `Power 2: ${klaivePower2.power.name}`,
+                      `Ban: ${klaiveBanFlaw} (−${klaiveBanAtt})`,
+                      isGrand && `Ban 2: ${klaiveBan2Flaw} (−${klaiveBan2Att})`,
+                      klaiveOptFlaw && `Flaw: ${klaiveOptFlaw} (−${klaiveOptAtt})`,
+                      `Gnosis −2 attuned`,
+                      `${klaiveTagCount} tags`,
+                    ].filter(Boolean).join(' | ');
+                addToCart({ type: 'item', tokens: klaiveTokenCost, label: `${typeLabel}: ${klaiveName}`, detail });
+                resetKlaive();
+              }}
+              className="w-full py-2 bg-amber-700 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm rounded font-semibold"
+            >Add to Cart</button>
+          </div>
+        );
+      }
 
       default: return null;
     }
@@ -748,7 +1079,7 @@ const TokenWizardDraft = ({ onBack }) => {
             )}
             <div className="mt-3 pt-3 border-t border-gray-700 space-y-1 text-xs text-amber-300">
               {cart.some(x => x.type === 'ritual' && x.label.toLowerCase().includes('cryptic')) && <p>⚠ Cryptic ritual — story required for XO.</p>}
-              {cart.some(x => x.type === 'teach' && x.label.includes('ST Rulebook')) && <p>⚠ ST Rulebook teaching — story required for XO.</p>}
+              {cart.some(x => x.type === 'teach' && x.isST) && <p>⚠ ST NPC teaching — story required for XO.</p>}
               {cart.some(x => x.type === 'item') && <p>⚠ Magic item — story required for XO.</p>}
             </div>
           </div>

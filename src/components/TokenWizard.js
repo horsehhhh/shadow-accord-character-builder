@@ -380,7 +380,44 @@ function TagPreview({ itemName, itemType, energyType, finalAtt, tokenCost, isRel
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-const TokenWizard = ({ onBack }) => {
+// ST-only and unlearnable tree IDs — mirrored from App.js
+const ST_TEACH_ONLY = new Set(['nephandi','khan_gift','simba_gift','gurahl_gift','umfalla','mokole_gift','rokea_gift','abombwe','ogham','serpentis','spiritus','thaumaturgy_rego_viridi']);
+const TEACH_UNLEARNABLE = new Set(['visceratika','mytherceria','nagah_gift']);
+// per-energy filter: Vitality = commoner/faithful human trees; Essence = sorcerer trees
+const TEACH_ENERGY_FILTER = {
+  Vitae:    t => t.faction === 'vampire',
+  Gnosis:   t => t.faction === 'shifter',
+  Pathos:   t => t.faction === 'wraith',
+  Essence:  t => t.faction === 'human' && ['sorcerer','fellowship','fallen_path'].includes(t.group),
+  Vitality: t => t.faction === 'human' && ['talent','bounty'].includes(t.group),
+};
+const TEACH_GROUP_LABELS = {
+  common:           'Common Disciplines',
+  clan_innate:      'Clan Disciplines',
+  thaumaturgy:      'Thaumaturgy Paths',
+  dark_thaumaturgy: 'Dark Thaumaturgy',
+  auspice:          'Auspice Gifts',
+  breed:            'Breed Gifts',
+  tribe_gift:       'Tribe Gifts',
+  fera_gift:        'Fera Gifts',
+  wyrm_gift:        'Wyrm Gifts',
+  arcanos:          'Arcanoi',
+  dark_arcanos:     'Dark Arcanoi',
+  sorcerer:         'Sorcery',
+  fellowship:       'Fellowships',
+  fallen_path:      'Fallen Paths',
+  talent:           'Talents',
+  bounty:           'Bounties',
+};
+const TEACH_GROUP_ORDER = {
+  Vitae:    ['common', 'clan_innate', 'thaumaturgy', 'dark_thaumaturgy'],
+  Gnosis:   ['auspice', 'breed', 'tribe_gift', 'fera_gift', 'wyrm_gift'],
+  Pathos:   ['arcanos', 'dark_arcanos'],
+  Essence:  ['sorcerer', 'fellowship', 'fallen_path'],
+  Vitality: ['talent', 'bounty'],
+};
+
+const TokenWizard = ({ onBack, powerTrees = [], skills = [] }) => {
   const [unlocked, setUnlocked] = useState(false);
   const [pwInput, setPwInput]   = useState('');
   const [pwError, setPwError]   = useState(false);
@@ -394,8 +431,11 @@ const TokenWizard = ({ onBack }) => {
   const [xpTokens, setXpTokens]         = useState(1);
   const [silverTokens, setSilverTokens] = useState(1);
 
-  const [teachName, setTeachName]     = useState('');
-  const [teachST, setTeachST]         = useState(false);
+  const [teachMode, setTeachMode]            = useState('power');
+  const [teachSkillName, setTeachSkillName]   = useState('');
+  const [teachEnergyType, setTeachEnergyType] = useState('');
+  const [teachTreeId, setTeachTreeId]         = useState('');
+  const [teachLevel, setTeachLevel]           = useState(1);
 
   const [ritualName, setRitualName]       = useState('');
   const [ritualType, setRitualType]       = useState('simple');
@@ -495,28 +535,132 @@ const TokenWizard = ({ onBack }) => {
           </div>
         );
 
-      case 'teach':
+      case 'teach': {
+        const ENERGY_OPTS = ['Vitae', 'Gnosis', 'Pathos', 'Essence', 'Vitality'];
+        const availableTrees = powerTrees.filter(t =>
+          TEACH_ENERGY_FILTER[teachEnergyType]?.(t) && !TEACH_UNLEARNABLE.has(t.tree_id)
+        ).sort((a, b) => {
+          const aS = ST_TEACH_ONLY.has(a.tree_id) ? 1 : 0;
+          const bS = ST_TEACH_ONLY.has(b.tree_id) ? 1 : 0;
+          if (aS !== bS) return aS - bS;
+          return a.tree_name.localeCompare(b.tree_name);
+        });
+        const selectedTree = availableTrees.find(t => t.tree_id === teachTreeId);
+        const isSTTree = teachMode === 'power' && ST_TEACH_ONLY.has(teachTreeId);
+        const teachTokens = teachMode === 'skill' ? 1 : (isSTTree ? 5 : 1);
+        const previewLabel = teachMode === 'skill'
+          ? (teachSkillName.trim() || '—')
+          : selectedTree
+            ? `${selectedTree.tree_name} Lv${teachLevel} (${selectedTree[`level${teachLevel}_powers`] || '—'})`
+            : '—';
+        const canAdd = teachMode === 'skill' ? !!teachSkillName.trim() : !!selectedTree;
         return (
           <div className="space-y-4">
-            <div>
-              <label className={lbl}>Skill or Power Name</label>
-              <input type="text" placeholder="e.g. Dominate, Melee 2" value={teachName} onChange={e => setTeachName(e.target.value)} className={inp} />
+            <div className="flex gap-2">
+              {['power', 'skill'].map(m => (
+                <button key={m} onClick={() => setTeachMode(m)}
+                  className={`flex-1 py-1.5 text-sm rounded font-medium capitalize ${teachMode === m ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                >{m}</button>
+              ))}
             </div>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
-              <input type="checkbox" checked={teachST} onChange={e => setTeachST(e.target.checked)} className="accent-yellow-500" />
-              From ST Rulebook (costs 5 tokens instead of 1)
-            </label>
+            {teachMode === 'skill' ? (
+              <div>
+                <label className={lbl}>Skill</label>
+                <select value={teachSkillName} onChange={e => setTeachSkillName(e.target.value)} className={inp}>
+                  <option value="">Select skill…</option>
+                  {skills.map(s => {
+                    const label = s.skill_id === 'alchemy' ? 'Alchemy (Sorcerer only)'
+                                : s.skill_id === 'holy_water' ? 'Holy Water (Human only)'
+                                : s.skill_name;
+                    return <option key={s.skill_id} value={s.skill_name}>{label}</option>;
+                  })}
+                </select>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className={lbl}>Energy Type</label>
+                  <select value={teachEnergyType}
+                    onChange={e => { setTeachEnergyType(e.target.value); setTeachTreeId(''); }}
+                    className={inp}>
+                    <option value="">Select energy type…</option>
+                    {ENERGY_OPTS.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                </div>
+                {teachEnergyType && (() => {
+                  const normalTrees = availableTrees.filter(t => !ST_TEACH_ONLY.has(t.tree_id));
+                  const stTrees = availableTrees.filter(t => ST_TEACH_ONLY.has(t.tree_id));
+                  const groupOrder = TEACH_GROUP_ORDER[teachEnergyType] || [];
+                  const grouped = {};
+                  normalTrees.forEach(t => { (grouped[t.group] ??= []).push(t); });
+                  const orderedKeys = [
+                    ...groupOrder.filter(g => grouped[g]),
+                    ...Object.keys(grouped).filter(g => !groupOrder.includes(g)),
+                  ];
+                  return (
+                    <div>
+                      <label className={lbl}>Power Tree</label>
+                      <select value={teachTreeId} onChange={e => setTeachTreeId(e.target.value)} className={inp}>
+                        <option value="">Select tree…</option>
+                        {orderedKeys.map(g => (
+                          <optgroup key={g} label={TEACH_GROUP_LABELS[g] || g}>
+                            {grouped[g].sort((a, b) => a.tree_name.localeCompare(b.tree_name)).map(t =>
+                              <option key={t.tree_id} value={t.tree_id}>{t.tree_name}</option>
+                            )}
+                          </optgroup>
+                        ))}
+                        {stTrees.length > 0 && (
+                          <optgroup label="── ST NPC Trees (5 tokens) ──">
+                            {stTrees.sort((a, b) => a.tree_name.localeCompare(b.tree_name)).map(t =>
+                              <option key={t.tree_id} value={t.tree_id}>[ST] {t.tree_name}</option>
+                            )}
+                          </optgroup>
+                        )}
+                      </select>
+                    </div>
+                  );
+                })()}
+                {teachTreeId && (
+                  <div>
+                    <label className={lbl}>Level</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3].map(lvl => (
+                        <button key={lvl} onClick={() => setTeachLevel(lvl)}
+                          className={`flex-1 py-2 text-sm rounded font-bold ${teachLevel === lvl ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                        >{lvl}</button>
+                      ))}
+                    </div>
+                    {selectedTree && (
+                      <div className="text-xs text-gray-400 mt-1">{selectedTree[`level${teachLevel}_powers`]}</div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
             <div className="bg-gray-900 rounded p-3 text-sm flex justify-between border border-gray-600">
-              <span className="text-gray-300">Teaching: {teachName || '—'}</span>
-              <span className="font-bold text-purple-300">{teachST ? 5 : 1} token{teachST ? 's' : ''}</span>
+              <span className="text-gray-300 truncate mr-2">Teaching: {previewLabel}</span>
+              <span className={`font-bold shrink-0 ${isSTTree ? 'text-amber-300' : 'text-purple-300'}`}>
+                {teachTokens} token{teachTokens > 1 ? 's' : ''}
+              </span>
             </div>
-            <p className="text-xs text-amber-400">⚠ Story must be written and provided to XO explaining how training was acquired.</p>
-            <button onClick={() => { if (!teachName.trim()) return; addToCart({ type: 'teach', tokens: teachST ? 5 : 1, label: `Teaching: ${teachName}${teachST ? ' (ST Rulebook)' : ''}`, detail: `${teachST ? 5 : 1} token${teachST ? 's' : ''}` }); setTeachName(''); setTeachST(false); }}
-              className="w-full py-2 bg-purple-700 hover:bg-purple-600 text-white text-sm rounded font-semibold">
-              Add to Cart
-            </button>
+            {isSTTree && <p className="text-xs text-amber-400">⚠ ST NPC Tree — 5 tokens. Story required for XO.</p>}
+            {teachMode === 'skill' && <p className="text-xs text-amber-400">⚠ Story required for XO explaining how training was acquired.</p>}
+            <button
+              disabled={!canAdd}
+              onClick={() => {
+                if (!canAdd) return;
+                const finalLabel = teachMode === 'skill'
+                  ? `Teaching: ${teachSkillName}`
+                  : `Teaching: ${selectedTree.tree_name} Lv${teachLevel}${isSTTree ? ' [ST NPC]' : ''}`;
+                addToCart({ type: 'teach', tokens: teachTokens, label: finalLabel, detail: `${teachTokens} token${teachTokens > 1 ? 's' : ''}`, isST: isSTTree });
+                if (teachMode === 'skill') setTeachSkillName('');
+                else { setTeachTreeId(''); setTeachLevel(1); }
+              }}
+              className="w-full py-2 bg-purple-700 hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm rounded font-semibold"
+            >Add to Cart</button>
           </div>
         );
+      }
 
       case 'ritual':
         return (
@@ -709,7 +853,7 @@ const TokenWizard = ({ onBack }) => {
                     {rituals.map(r => <div key={r.id} className="text-green-300">✓ {r.label}</div>)}
                     {items.map(i => <div key={i.id} className="text-orange-300">✓ {i.label}</div>)}
                     {(rituals.length > 0 || items.length > 0 || teachings.length > 0) && (
-                      <p className="text-xs text-amber-400 pt-1">⚠ Story required for XO approval on rituals, items, and ST Rulebook teachings.</p>
+                      <p className="text-xs text-amber-400 pt-1">⚠ Story required for XO approval on rituals, items, and ST NPC teachings.</p>
                     )}
                   </div>
                 );

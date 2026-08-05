@@ -314,6 +314,17 @@ const createMobileOptimizedHandler = (handler) => {
 // SHADOW ACCORD CHARACTER BUILDER - PHASE 8
 // ==========================================
 
+// ST-only trees and subfactions — hidden from players, accessible via ST Tools tab
+const ST_ONLY_TREES = new Set([
+  'nephandi', 'khan_gift', 'simba_gift', 'gurahl_gift', 'umfalla',
+  'mokole_gift', 'nagah_gift', 'rokea_gift',
+  'abombwe', 'mytherceria', 'ogham', 'serpentis', 'spiritus', 'thaumaturgy_rego_viridi',
+]);
+const ST_ONLY_SUBFACTIONS = new Set([
+  'ahrimanes', 'kiasyd', 'laibon', 'lhiannan', 'senate',
+  'khan', 'simba', 'gurahl', 'mokole', 'nagah', 'rokea',
+]);
+
 const ShadowAccordComplete = () => {
   // ======================
   // CORE STATE MANAGEMENT (Using cloud sync)
@@ -324,6 +335,9 @@ const ShadowAccordComplete = () => {
   const [creationStep, setCreationStep] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [freebieWizardTab, setFreebieWizardTab] = useState('merits');
+  const [stModeUnlocked, setStModeUnlocked] = useState(() => localStorage.getItem('stModeUnlocked') === 'true');
+  const [stPasswordInput, setStPasswordInput] = useState('');
+  const [stPasswordError, setStPasswordError] = useState(false);
 
   // Cloud features - primary character management with enhanced debugging
   const { 
@@ -1135,6 +1149,17 @@ legion_of_fate,Legion of Fate,wraith,legion,Pathos,,,custom_selection
 no_legion,None,wraith,legion,Pathos,,,custom_selection
 renegades,Renegades,wraith,legion,Pathos,,,custom_selection
 heretics,Heretics,wraith,legion,Pathos,,,custom_selection
+ahrimanes,Ahrimanes,vampire,clan,Vitae,,,animalism|potence|spiritus
+kiasyd,Kiasyd,vampire,clan,Vitae,,,dominate|mytherceria|obtenebration
+laibon,Laibon,vampire,clan,Vitae,,,abombwe|animalism|fortitude
+lhiannan,Lhiannan,vampire,clan,Vitae,,,animalism|ogham|presence
+senate,The Senate,vampire,clan,Vitae,,,obfuscate|presence|serpentis
+khan,Khan,shifter,fera,Gnosis,,,khan_gift
+simba,Simba,shifter,fera,Gnosis,,,simba_gift
+gurahl,Gurahl,shifter,fera,Gnosis,,,gurahl_gift
+mokole,Mokolé,shifter,fera,Gnosis,,,mokole_gift
+nagah,Nagah,shifter,fera,Gnosis,,,nagah_gift
+rokea,Rokea,shifter,fera,Gnosis,,,rokea_gift
 no_guild,None,wraith,guild,Pathos,,,custom_selection
 artificers,Artificers,wraith,guild,Pathos,,,custom_selection
 masquers,Masquers,wraith,guild,Pathos,,,custom_selection
@@ -1254,7 +1279,7 @@ theurge,Theurge,shifter,auspice,Release Spirit|Sense Spirit,Umbra Sight,Umbra St
 usury,Usury,wraith,arcanos,Pathos Exchange|Paralyzing Touch,Devour|Expel Corpus|Health Exchange,Pathos Investment
 valeren_healer,Valeren Healer,vampire,clan_innate,Healing Touch,Serenity,Revive
 valeren_warrior,Valeren Warrior,vampire,clan_innate,Sense Max Health|Sense Mental|Sense Health,Body Wrack,Light Weapon|Vengeance of Samiel
-vicissitude,Vicissitude,vampire,clan_innate,Malleable Visage,Body Wrack,Horrid Form
+vicissitude,Vicissitude,vampire,clan_innate,Weaponry,Imitate,Resilience|Powerful Form: Green and Black Spiked Mask
 visceratika,Visceratika,vampire,clan_innate,Cloak|Clawed Form,Avoidance,Powerful Form|Resilience
 warder_of_man_gift,Warder of Man Gift,shifter,tribe_gift,Pence from Heaven,Fabricate Armor,Cloak Sight
 warrior,Warrior,human,sorcerer,Taunt,Might,Avoidance|Disarm
@@ -1289,7 +1314,21 @@ cunning,Cunning (Wyrm),shifter,wyrm_gift,Smell Fear,Cloak Gathering,Hidden Taint
 defiling,Defiling (Wyrm),shifter,wyrm_gift,Detect Taint|Scion of Evil,Induce Sin,Tainted Induce Frenzy|Terror
 fear,Fear (Wyrm),shifter,wyrm_gift,Sense Confidence,Horrid Reality,Disable
 madness_wyrm,Madness (Wyrm),shifter,wyrm_gift,Tainted Confusion,Tainted Derange,Tainted Decay
-strength,Strength (Wyrm),shifter,wyrm_gift,Hide of the Wyrm,Totemic Form|Resilience,Balefire`,
+strength,Strength (Wyrm),shifter,wyrm_gift,Hide of the Wyrm,Totemic Form|Resilience,Balefire
+nephandi,Nephandi,human,fellowship,Ranged 2 <Void>,Induce Frenzy|Taint,Hidden Taint
+khan_gift,Khan Gift,shifter,fera_gift,Razor Claws,Fabricate Armor,Ranged 4 <Sonic>
+simba_gift,Simba Gift,shifter,fera_gift,Silence,Fire 2,Obedience
+gurahl_gift,Gurahl Gift,shifter,fera_gift,Healing Touch,Disquiet,Revive
+umfalla,Umfalla (Purger),shifter,wyrm_gift,<Tainted> Venom,<Tainted> Derange,<Tainted> Brittle Bones
+mokole_gift,Mokolé Gift,shifter,fera_gift,Disarm,Fire 2,Resilience|Totemic Form
+nagah_gift,Nagah Gift,shifter,fera_gift,Forgetful Mind,Venom,Chameleon
+rokea_gift,Rokea Gift,shifter,fera_gift,Detect Taint,Venom,Resist Taint
+abombwe,Abombwe,vampire,clan_innate,Snarl,Clawed Form|Powerful Form: African Cat,Aggravated Claws
+mytherceria,Mytherceria,vampire,clan_innate,Confusion,Meditate,Gauntlet Walk
+ogham,Ogham,vampire,clan_innate,Drain the Earth,Woadling,Disable
+serpentis,Serpentis,vampire,clan_innate,Fast Healing,Resilience,Paralyze
+spiritus,Spiritus,vampire,clan_innate,Release Spirit|Sense Spirit,Umbra Sight,Clawed Form: Cat Mask|Powerful Form
+thaumaturgy_rego_viridi,Thaumaturgy: Rego Viridi,vampire,thaumaturgy,Poison Immunity|Root,Natural Armor,Hero's Stand`,
 
     merits: `merit_id,merit_name,merit_level,faction_restriction,can_purchase_multiple,description,special_notes
 adept,Adept,1,,false,Additional production item per check-in (except Alchemy),
@@ -2425,11 +2464,13 @@ pleasure,Pleasure,Joy|excitement|comfort`
       const scorches = ['<Fire>', '<Silver>', '<Wolfsbane>'];
       if (subfaction === 'ceilican') scorches.push('<Iron>');
       else if (subfaction === 'corax') scorches.push('<Gold>');
+      else if (subfaction === 'mokole') scorches.push('<Gold>');
       return scorches;
     }
     if (faction === 'vampire') {
       const scorches = ['<Fire>', '<Light>(sunsickness)'];
       if (subfaction === 'baali') scorches.push('<Holy>');
+      if (subfaction === 'kiasyd') scorches.push('<Iron>');
       return scorches;
     }
     if (faction === 'wraith') {
@@ -2449,6 +2490,7 @@ pleasure,Pleasure,Joy|excitement|comfort`
       caitiff:         'Cannot start lower than 10th generation.',
       cappadocian:     'Must wear dead-looking (pale/waxy) makeup on entire face.',
       gangrel:         'Each time you lose Virtue to Frenzy, add a permanent animal feature as a makeup requirement.',
+      gargoyle:        'Cannot embrace. You are Oathed to all Tremere. Must wear gray face paint or a stone mask as makeup.',
       giovanni:        'Must wear dead-looking (pale/waxy) makeup on entire face.',
       lamia:           'Have Venomous Bite as a Fundamental Power.',
       lasombra:        'Each time you see your reflection in a mirror, stare at it for 10 seconds.',
@@ -2461,6 +2503,11 @@ pleasure,Pleasure,Joy|excitement|comfort`
       tremere:         'Drinking blood from a Vampire gives "Craving: Diablerize <Target>" unless you spend 1 Willpower.',
       tzimisce:        'Must have a tagged dirt pouch on your person to activate discipline powers. Gain two new dirt tags each Check-In.',
       ventrue:         'Can only feed from a specific group (gender, hair color, religion, etc.) comprising ~half or less of the population.',
+      ahrimanes:       'Cannot use Vitae to Oath, nor create or sustain Ghouls (explain this OOG when a player consumes your Vitae).',
+      kiasyd:          'You are <Iron> Scorched. Bluish-white skin and pointed ears as makeup requirement. Answer Sense Faction as "Vampire and Fae".',
+      laibon:          'Spending Vitae to Regenerate costs 1 extra Vitae per Health regained. Using a discipline costs 1 extra Vitae. The first point of Vitae from Draining is not gained.',
+      lhiannan:        'Cannot touch a cross. If a cross is presented to hold you at bay, you must remain at least 10 feet away.',
+      senate:          'Suffer Sunsickness in any light except Umbral (blue), firelight (orange), or OOG safety lighting (red).',
     };
     return CLAN_CURSES[subfaction] || null;
   };
@@ -4954,7 +5001,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
 
         case 1: // Subfaction Selection
           const availableSubfactions = gameData.subfactions.filter(
-            sf => sf.faction_id === newCharacter.faction
+            sf => sf.faction_id === newCharacter.faction && !ST_ONLY_SUBFACTIONS.has(sf.subfaction_id)
           );
           
           // For wraiths, separate legions and guilds
@@ -7332,7 +7379,7 @@ Generated by Shadow Accord Character Builder v${currentVersion}
                     
                     {/* Clan options */}
                     {gameData.subfactions
-                      .filter(sub => sub.faction_id === 'vampire' && sub.type === 'clan')
+                      .filter(sub => sub.faction_id === 'vampire' && sub.type === 'clan' && !ST_ONLY_SUBFACTIONS.has(sub.subfaction_id))
                       .map(clan => (
                         <button
                           key={clan.subfaction_id}
@@ -10523,6 +10570,7 @@ Your character is ready to play!`;
                 };
 
                 const factionTrees = gameData.powerTrees.filter(tree => {
+                  if (ST_ONLY_TREES.has(tree.tree_id)) return false;
                   if (character.faction === 'human' && character.subfaction === 'kinfolk') return tree.faction === 'shifter';
                   if (character.faction === 'human' && character.subfaction === 'sorcerer') return tree.group === 'sorcerer' || tree.group === 'fellowship' || tree.group === 'fallen_path';
                   if (character.faction === 'human' && character.subfaction === 'faithful') return innateTreeIds.includes(tree.tree_id);
@@ -10560,6 +10608,11 @@ Your character is ready to play!`;
                   ananasi_gift: 'Ananasi Lore', bagheera_gift: 'Bagheera Lore',
                   bubasti_gift: 'Bubasti Lore', ceilican_gift: 'Ceilican Lore',
                   corax_gift: 'Corax Lore', swara_gift: 'Swara Lore', ratkin_gift: 'Ratkin Lore',
+                  abombwe: 'Laibon Lore', spiritus: 'Ahrimanes Lore', ogham: 'Lhiannan Lore',
+                  serpentis: 'The Senate Lore', mytherceria: 'Kiasyd Lore',
+                  khan_gift: 'Khan Lore', simba_gift: 'Simba Lore', gurahl_gift: 'Gurahl Lore',
+                  mokole_gift: 'Mokolé Lore', nagah_gift: 'Nagah Lore', rokea_gift: 'Rokea Lore',
+                  umfalla: 'Gurahl Lore',
                 };
                 // Per-tree warnings for specific disciplines with side effects
                 const TREE_WARNINGS = {
@@ -10567,9 +10620,10 @@ Your character is ready to play!`;
                   dementation: { color: 'yellow', note: '⚠️ Gives a Derangement — each level learned requires you to take or already have a Derangement.' },
                   valeren_healer: { color: 'yellow', note: '👁️ Requires third-eye makeup — must be visible to use any Valeren Healer power.' },
                   valeren_warrior: { color: 'yellow', note: '👁️ Requires third-eye makeup — must be visible to use any Valeren Warrior power.' },
+                  ogham: { color: 'yellow', note: '⚠️ Gaining any power in this tree applies the Lhiannan bloodline weakness.' },
                 };
-                // Visceratika cannot be learned — Gargoyle innate only
-                const UNLEARNABLE = new Set(['visceratika']);
+                // Visceratika, Mytherceria, Nagah cannot be learned — clan/innate-only or NPC-only
+                const UNLEARNABLE = new Set(['visceratika', 'mytherceria', 'nagah_gift']);
                 const renderTree = (treeId, isInnate) => {
                   const tree = gameData.powerTrees.find(t => t.tree_id === treeId);
                   if (!tree) return null;
@@ -11103,7 +11157,7 @@ Your character is ready to play!`;
           {/* Tabs - Scrollable on mobile */}
           <div className="overflow-x-auto mb-5 border-b border-gray-700">
             <div className="flex space-x-1 min-w-max">
-              {['overview', 'advancement', 'powers', 'power-index', 'lore', 'history', 'xp-tracking', 'notes', 'inventory', 'faction-change', 'self-nerf', 'rank-gen'].map(tab => (
+              {['overview', 'advancement', 'powers', 'power-index', 'lore', 'history', 'xp-tracking', 'notes', 'st-tools', 'inventory', 'faction-change', 'self-nerf', 'rank-gen'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -11117,7 +11171,12 @@ Your character is ready to play!`;
                    tab === 'faction-change' ? 'Faction Change' : 
                    tab === 'self-nerf' ? 'Self Nerf' :
                    tab === 'rank-gen' ? 'Rank/Gen' :
-                   tab === 'power-index' ? 'Power Index' : tab}
+                   tab === 'power-index' ? 'Power Index' :
+                   tab === 'st-tools' ? (
+                     <span className="flex items-center gap-1">
+                       {stModeUnlocked ? '🔓' : '🔒'} ST Tools
+                     </span>
+                   ) : tab}
                 </button>
               ))}
             </div>
@@ -13198,6 +13257,188 @@ Your character is ready to play!`;
             </div>
           )}
 
+          {activeTab === 'st-tools' && (
+            <div className="space-y-4">
+              {!stModeUnlocked ? (
+                <div className={`${themeClasses.card} p-6 max-w-sm mx-auto`}>
+                  <div className="text-center mb-4">
+                    <span className="text-4xl">🔒</span>
+                    <h3 className="text-xl font-bold mt-2">ST Tools — Storyteller Only</h3>
+                    <p className="text-sm text-gray-400 mt-1">Enter the ST password to access NPC factions and restricted power trees.</p>
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="password"
+                      value={stPasswordInput}
+                      onChange={e => { setStPasswordInput(e.target.value); setStPasswordError(false); }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const stored = localStorage.getItem('stPassword') || '1234!';
+                          if (stPasswordInput === stored) {
+                            setStModeUnlocked(true);
+                            localStorage.setItem('stModeUnlocked', 'true');
+                            setStPasswordInput('');
+                            setStPasswordError(false);
+                          } else {
+                            setStPasswordError(true);
+                          }
+                        }
+                      }}
+                      className={`${themeClasses.input} w-full`}
+                      placeholder="ST password"
+                    />
+                    {stPasswordError && <p className="text-red-400 text-sm">Incorrect password.</p>}
+                    <button
+                      onClick={() => {
+                        const stored = localStorage.getItem('stPassword') || '1234!';
+                        if (stPasswordInput === stored) {
+                          setStModeUnlocked(true);
+                          localStorage.setItem('stModeUnlocked', 'true');
+                          setStPasswordInput('');
+                          setStPasswordError(false);
+                        } else {
+                          setStPasswordError(true);
+                        }
+                      }}
+                      className="w-full px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded font-medium"
+                    >Unlock ST Tools</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold flex items-center gap-2">🔓 ST Tools <span className="text-sm font-normal text-purple-400">— Storyteller Mode Active</span></h3>
+                    <button
+                      onClick={() => { setStModeUnlocked(false); localStorage.removeItem('stModeUnlocked'); }}
+                      className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded"
+                    >Lock</button>
+                  </div>
+
+                  {/* NPC Subfaction Assignment */}
+                  {(() => {
+                    const stSubfactions = gameData.subfactions.filter(
+                      sf => ST_ONLY_SUBFACTIONS.has(sf.subfaction_id) && sf.faction_id === character.faction
+                    );
+                    if (stSubfactions.length === 0) return null;
+                    return (
+                      <div className={`${themeClasses.card} p-4`}>
+                        <h4 className="font-bold text-purple-300 mb-1">NPC Faction Assignment</h4>
+                        <p className="text-xs text-gray-400 mb-3">Assign this character to an ST-only clan/tribe. Overwrites current subfaction and innate trees.</p>
+                        <div className="grid md:grid-cols-2 gap-2">
+                          {stSubfactions.map(sf => {
+                            const isActive = character.subfaction === sf.subfaction_id;
+                            return (
+                              <button
+                                key={sf.subfaction_id}
+                                onClick={async () => {
+                                  if (isActive) return;
+                                  const updated = handleSubfactionChange(character, sf.subfaction_id);
+                                  await updateCurrentCharacter(updated);
+                                }}
+                                className={`p-3 rounded-lg border-2 text-left transition-all ${isActive ? 'border-purple-500 bg-purple-500 bg-opacity-20' : 'border-gray-600 hover:border-purple-500'}`}
+                              >
+                                <div className="font-bold">{sf.subfaction_name}</div>
+                                {sf.innate_trees && (
+                                  <div className="text-xs text-gray-400 mt-0.5">Trees: {sf.innate_trees.split('|').join(', ')}</div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* ST-Only Power Trees */}
+                  {(() => {
+                    const ST_TREE_NOTES = {
+                      nephandi: { color: 'red', note: '🩸 Gaining any power causes Permatainted. Level 3 can be taught even if Learned.' },
+                      umfalla: { color: 'red', note: '🩸 Gaining any power causes Permatainted. Must take a Derangement after any power gained.' },
+                      ogham: { color: 'yellow', note: '⚠️ Gaining any power applies the Lhiannan bloodline weakness.' },
+                      mytherceria: { color: 'yellow', note: '⚠️ Cannot be gained through Amaranth or learned — NPC assignment only.' },
+                      nagah_gift: { color: 'yellow', note: '⚠️ Cannot be taught or learned — NPC only. Level 3 (Chameleon) is NPC-only.' },
+                    };
+                    const stTrees = gameData.powerTrees.filter(tree => {
+                      if (!ST_ONLY_TREES.has(tree.tree_id)) return false;
+                      // Show trees matching the character's faction
+                      if (character.faction === 'human' && character.subfaction === 'sorcerer') return tree.faction === 'human';
+                      if (character.faction === 'human' && character.subfaction === 'ghoul') return tree.faction === 'vampire';
+                      if (character.faction === 'human' && character.subfaction === 'kinfolk') return tree.faction === 'shifter';
+                      return tree.faction === character.faction;
+                    });
+                    if (stTrees.length === 0) return (
+                      <div className={`${themeClasses.card} p-4 text-center text-gray-400 text-sm`}>No ST power trees available for this character's faction.</div>
+                    );
+                    const innateTreeIds = character.innateTreeIds || [];
+                    return (
+                      <div className={`${themeClasses.card} p-4`}>
+                        <h4 className="font-bold text-purple-300 mb-1">ST-Only Power Trees</h4>
+                        <p className="text-xs text-gray-400 mb-3">Same XP costs and learning rules apply as regular advancement.</p>
+                        <div className="space-y-3">
+                          {stTrees.map(tree => {
+                            const currentLevels = character.powers?.[tree.tree_id] || {};
+                            const allLearned = currentLevels[1] && currentLevels[2] && currentLevels[3];
+                            const note = ST_TREE_NOTES[tree.tree_id];
+                            const isInnate = innateTreeIds.includes(tree.tree_id);
+                            return (
+                              <div key={tree.tree_id} className={`p-3 rounded-lg border ${note?.color === 'red' ? 'border-red-700 bg-red-900 bg-opacity-20' : note?.color === 'yellow' ? 'border-yellow-700 bg-yellow-900 bg-opacity-10' : themeClasses.card}`}>
+                                <div className="font-bold mb-1 flex items-center gap-2">
+                                  {tree.tree_name}
+                                  {allLearned && <span className="text-xs text-green-400 font-normal">✓ Complete</span>}
+                                </div>
+                                {note && (
+                                  <div className={`text-xs mb-2 ${note.color === 'red' ? 'text-red-400' : 'text-yellow-400'}`}>{note.note}</div>
+                                )}
+                                <div className="space-y-1">
+                                  {[1, 2, 3].map(level => {
+                                    const hasLevel = currentLevels[level];
+                                    const canLearn = canLearnPower(character, tree.tree_id, level);
+                                    const isRedundant = isRedundantPower(character, tree.tree_id, level);
+                                    const cost = isRedundant ? 0 : calculateXPCost(character, 'power', tree.tree_id, level);
+                                    const canAfford = character.totalXP >= cost;
+                                    const powers = tree[`level${level}_powers`]?.split('|') || [];
+                                    if (hasLevel) {
+                                      return (
+                                        <div key={level} className="flex items-start gap-2 p-2 rounded bg-green-500 bg-opacity-10 border border-green-500 border-opacity-40">
+                                          <span className="text-green-400 text-xs mt-0.5">✓</span>
+                                          <div className="text-xs"><span className="font-medium">Lv{level}:</span> {powers.join(', ')}</div>
+                                        </div>
+                                      );
+                                    }
+                                    return (
+                                      <div key={level} className={`flex items-start justify-between gap-2 p-2 rounded border ${canLearn && canAfford ? 'border-purple-500 border-opacity-50 bg-purple-500 bg-opacity-5' : 'border-gray-700 opacity-60'}`}>
+                                        <div className="text-xs flex-1">
+                                          <span className="font-medium text-gray-300">Lv{level}:</span> {powers.join(', ')}
+                                          {!canLearn && <div className="text-yellow-500 mt-0.5">Must learn level {level - 1} first</div>}
+                                        </div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                          <span className={`text-xs font-bold ${cost === 0 ? 'text-green-400' : canAfford ? 'text-purple-300' : 'text-red-400'}`}>{cost === 0 ? 'FREE' : `${cost} XP`}</span>
+                                          <button
+                                            onClick={async () => {
+                                              const updated = advanceCharacter(character, { type: 'power', itemId: tree.tree_id, level, cost });
+                                              await updateCurrentCharacter(updated);
+                                            }}
+                                            disabled={!canLearn || !canAfford}
+                                            className="text-xs px-2 py-1 bg-purple-700 hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed rounded"
+                                          >Assign</button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'xp-tracking' && (
             <div className="space-y-6">
               {/* XP Adjustment Form */}
@@ -14327,8 +14568,8 @@ Your character is ready to play!`;
       case 'rules': return <RulesViewer onBack={() => setCurrentMode('menu')} themeClasses={themeClasses} />;
       case 'item-wizard': return <MagicItemWizard onBack={() => setCurrentMode('menu')} />;
       case 'item-wizard-classic': return <MagicItemWizardClassic onBack={() => setCurrentMode('menu')} />;
-      case 'token-wizard': return <TokenWizard onBack={() => setCurrentMode('menu')} />;
-      case 'token-wizard-draft': return <TokenWizardDraft onBack={() => setCurrentMode('menu')} />;
+      case 'token-wizard': return <TokenWizard onBack={() => setCurrentMode('menu')} powerTrees={gameData.powerTrees} skills={gameData.skills} />;
+      case 'token-wizard-draft': return <TokenWizardDraft onBack={() => setCurrentMode('menu')} powerTrees={gameData.powerTrees} skills={gameData.skills} />;
       case 'npc-creator': return <NPCCreator onBack={() => setCurrentMode('menu')} />;
       case 'settings': return renderSettings();
       case 'changelog': return renderChangelog();
