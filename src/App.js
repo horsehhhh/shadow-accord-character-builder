@@ -2768,9 +2768,16 @@ pleasure,Pleasure,Joy|excitement|comfort`
           console.log('✅ Character deleted from database:', dbId);
         }
         
-        // Remove from local state
-        setCharacters(prev => prev.filter(c => (c.id !== characterId && c._id !== characterId)));
-        
+        // Remove from local state and persist to localStorage for offline users
+        setCharacters(prev => {
+          const filtered = prev.filter(c => (c.id !== characterId && c._id !== characterId));
+          const savedData = localStorage.getItem('shadowAccordPhase8');
+          const data = savedData ? JSON.parse(savedData) : {};
+          data.characters = filtered;
+          localStorage.setItem('shadowAccordPhase8', JSON.stringify(data));
+          return filtered;
+        });
+
         // Navigate away if we deleted the current character
         if (characters[currentCharacterIndex]?.id === characterId || characters[currentCharacterIndex]?._id === characterId) {
           setCurrentCharacterIndex(0);
