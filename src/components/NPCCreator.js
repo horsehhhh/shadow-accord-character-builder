@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Lock, Users } from 'lucide-react';
 import { npcBankAPI } from '../services/api';
 
@@ -546,12 +546,26 @@ const NPCCreator = ({ onBack }) => {
 
   const saveToBank = useCallback(async () => {
     if (!name.trim()) { alert('Give the NPC a name before saving.'); return; }
+    const data = {
+      name, title, faction, subfaction, isLegendary, isPermatainted,
+      energy, energyType, willpower, virtue, virtueValue, regenRate,
+      powerTrees, fundamentals, specialAbilities,
+      skills, merits, notes,
+      generation, road, amaranth,
+      breed, auspice, rank,
+      legion, guild, passions, shadowArchetype, thorn,
+      lineage, court, echoes,
+      trueName, celestialName, appellation, demonicVice,
+      extraField1, extraField2,
+      monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
+      scorchTypes, immunities, weaknesses, senseFaction,
+    };
     try {
       let entry;
       if (localStorage.getItem('auth_token')) {
-        entry = await npcBankAPI.create(name, faction, npcData);
+        entry = await npcBankAPI.create(name, faction, data);
       } else {
-        entry = { id: `local_${Date.now()}`, name, faction, data: npcData, createdAt: new Date().toISOString() };
+        entry = { id: `local_${Date.now()}`, name, faction, data, createdAt: new Date().toISOString() };
       }
       setSavedNPCs(prev => {
         const updated = [entry, ...prev];
@@ -562,8 +576,12 @@ const NPCCreator = ({ onBack }) => {
     } catch (e) {
       alert('Save failed: ' + (e.message || 'Unknown error'));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, faction, npcData]);
+  }, [name, title, faction, subfaction, isLegendary, isPermatainted, energy, energyType, willpower,
+      virtue, virtueValue, regenRate, powerTrees, fundamentals, specialAbilities, skills, merits,
+      notes, generation, road, amaranth, breed, auspice, rank, legion, guild, passions,
+      shadowArchetype, thorn, lineage, court, echoes, trueName, celestialName, appellation,
+      demonicVice, extraField1, extraField2, monsterHealth, isRealmbound, isHealthAsEnergy,
+      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction]);
 
   const deleteFromBank = useCallback(async (entry) => {
     if (!window.confirm(`Delete "${entry.name}" from the bank?`)) return;
