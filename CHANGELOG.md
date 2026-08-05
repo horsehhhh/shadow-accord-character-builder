@@ -23,6 +23,27 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ---
 
+## [v0.6.5] - 2026-08-05
+
+### ⚔️ Magic Item Wizard (2026 Draft)
+
+#### Changed
+- **Klaive builder replaced**: Removed old checkbox-based klaive toggle; replaced with a dedicated full klaive builder accessible via a "Magic Item / ⚔ Klaive" toggle at the top of the wizard
+- **4 klaive modes**: Unfinished Klaive, Klaive (Finished), Unfinished Grand Klaive, Grand Klaive — switchable via mode selector grid
+- **Unfinished klaive** shows fixed stats card (Silver 1H/2H, Gnosis, Att 3, Relic, 1 tag)
+- **Finished klaive**: spirit name input, PowerSearch slot, mandatory ban flaw with att-reduction buttons (\u22120\u2013\u22124), optional 3rd flaw with att reduction, live attunement breakdown
+- **Grand klaive**: two spirit name inputs (second must be a War Spirit), two PowerSearch slots, two mandatory ban flaws, optional 3rd flaw; breaking either ban rejects both spirits
+- **Live attunement breakdown**: shows base 5 + each power cost \u2212 each flaw reduction with final att highlighted in colour
+- **Tag count** shown at bottom of breakdown (1 / 2 / 3 tags depending on mode)
+
+### 🎯 Token Wizards
+
+#### Changed
+- **Teaching dropdowns grouped**: Both TokenWizard (2025) and TokenWizardDraft (2026) now group teaching tree options by type (Auspice, Breed, Tribe, Vampire Clan, Discipline, etc.) with alphabetical ordering within each group
+- **Faith / Mists removed**: Energy type dropdowns in TokenWizardDraft no longer include Faith or Mists
+
+---
+
 ## [v0.6.4] - 2026-08-05
 
 ### 🏠 Main Menu
