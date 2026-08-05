@@ -13,12 +13,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 // so post-zoom re-rasterization stays fast
 const RENDER_BUFFER = typeof window !== 'undefined' && window.innerWidth < 768 ? 3 : 8;
 
-// Escape HTML so PDF text is safe to inject via customTextRenderer (innerHTML)
-const escapeHtml = (s) => s
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;');
-
 const DOCUMENTS = [
   { id: 'rulebook',  label: 'Rulebook',          file: '/2026 Shadow Accord Rulebook.pdf' },
   { id: 'st',        label: 'ST Rulebook',        file: '/2025 Shadow Accord ST Rulebook v1.1.pdf', locked: true },
@@ -415,27 +409,24 @@ const RulesViewer = ({ onBack, themeClasses }) => {
     setTimeout(() => scrollToPage(searchResults[next]), 50);
   }, [searchIdx, searchResults, scrollToPage]);
 
-  // Search term highlight renderer. react-pdf sets the return value as innerHTML
-  // (via a sanitizing template), so this MUST return an HTML string — not JSX.
-  // A translucent <mark> background lets the underlying canvas text show through.
-  const customTextRenderer = useCallback(({ str }) => {
-    if (!activeHighlight || !str) return str ? escapeHtml(str) : str;
-    const query    = activeHighlight.toLowerCase();
-    const lowerStr = str.toLowerCase();
-    if (!lowerStr.includes(query)) return escapeHtml(str);
-
-    let out = '';
-    let lastIdx = 0;
-    let idx = lowerStr.indexOf(query, 0);
-    while (idx !== -1) {
-      out += escapeHtml(str.slice(lastIdx, idx));
-      out += `<mark style="background-color:rgba(250,204,21,0.5);color:inherit;border-radius:2px;">${escapeHtml(str.slice(idx, idx + query.length))}</mark>`;
-      lastIdx = idx + query.length;
-      idx = lowerStr.indexOf(query, lastIdx);
-    }
-    out += escapeHtml(str.slice(lastIdx));
-    return out;
-  }, [activeHighlight]);
+  // Apply highlights directly to text layer spans after they render.
+  // DOM background-color on whole spans avoids the character-offset error that
+  // customTextRenderer inline marks suffer from (pdfjs scaleX stretches the run
+  // as a whole but character widths inside don't match PDF metrics).
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const query = activeHighlight?.toLowerCase() || '';
+    const apply = () => {
+      container.querySelectorAll('.textLayer span').forEach(span => {
+        span.style.backgroundColor = query && span.textContent.toLowerCase().includes(query)
+          ? 'rgba(250,204,21,0.45)' : '';
+      });
+    };
+    apply();
+    const id = setTimeout(apply, 200); // retry for async-rendered text layers
+    return () => clearTimeout(id);
+  }, [activeHighlight, visiblePages]);
 
   // Internal PDF hyperlink navigation (annotation layer + outline clicks)
   const handleItemClick = useCallback(({ pageNumber }) => {
@@ -655,7 +646,6 @@ const RulesViewer = ({ onBack, themeClasses }) => {
                       scale={baseScale}
                       renderTextLayer
                       renderAnnotationLayer
-                      customTextRenderer={activeHighlight ? customTextRenderer : undefined}
                       className="shadow-2xl"
                       loading={
                         <div
