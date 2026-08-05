@@ -336,6 +336,19 @@ const ShadowAccordComplete = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [freebieWizardTab, setFreebieWizardTab] = useState('merits');
   const [stModeUnlocked, setStModeUnlocked] = useState(() => localStorage.getItem('stModeUnlocked') === 'true');
+
+  // Auto-unlock ST tools when the logged-in user's email matches the stored trusted email
+  useEffect(() => {
+    const stEmail = localStorage.getItem('stEmail');
+    if (!stEmail || !isAuthenticated) return;
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user?.email === stEmail) {
+        setStModeUnlocked(true);
+        localStorage.setItem('stModeUnlocked', 'true');
+      }
+    } catch { /* ignore parse errors */ }
+  }, [isAuthenticated]);
   const [stPasswordInput, setStPasswordInput] = useState('');
   const [stPasswordError, setStPasswordError] = useState(false);
 
@@ -346,7 +359,8 @@ const ShadowAccordComplete = () => {
     loading: cloudLoading, 
     createCharacter: cloudCreateCharacter,
     updateCharacter: cloudUpdateCharacter,
-    refreshFromCloud
+    refreshFromCloud,
+    isAuthenticated
   } = useCharacters();
 
   // Helper function to update character with cloud sync
@@ -13302,16 +13316,43 @@ Your character is ready to play!`;
                       }}
                       className="w-full px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded font-medium"
                     >Unlock ST Tools</button>
+                    {(() => {
+                      try {
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        if (!user?.email) return null;
+                        const trusted = localStorage.getItem('stEmail');
+                        return (
+                          <div className="pt-2 border-t border-gray-600 text-center">
+                            {trusted === user.email
+                              ? <p className="text-green-400 text-xs">✅ {user.email} — auto-unlocks on login</p>
+                              : <button
+                                  onClick={() => { localStorage.setItem('stEmail', user.email); setStModeUnlocked(true); localStorage.setItem('stModeUnlocked', 'true'); }}
+                                  className="text-amber-400 hover:underline text-xs"
+                                >Trust my account ({user.email})</button>
+                            }
+                          </div>
+                        );
+                      } catch { return null; }
+                    })()}
                   </div>
                 </div>
               ) : (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold flex items-center gap-2">🔓 ST Tools <span className="text-sm font-normal text-purple-400">— Storyteller Mode Active</span></h3>
-                    <button
-                      onClick={() => { setStModeUnlocked(false); localStorage.removeItem('stModeUnlocked'); }}
-                      className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded"
+                    <div className="flex items-center gap-2">
+                      {localStorage.getItem('stEmail') && (
+                        <button
+                          onClick={() => localStorage.removeItem('stEmail')}
+                          className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded text-gray-400"
+                          title="Stop auto-unlocking for this account"
+                        >Untrust account</button>
+                      )}
+                      <button
+                        onClick={() => { setStModeUnlocked(false); localStorage.removeItem('stModeUnlocked'); }}
+                        className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded"
                     >Lock</button>
+                    </div>
                   </div>
 
                   {/* NPC Subfaction Assignment */}
