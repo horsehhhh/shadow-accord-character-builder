@@ -149,6 +149,9 @@ const characterSchema = new mongoose.Schema({
     reason: String
   }],
   
+  // Tracks whether the player has completed the one-time freebie XP spend wizard
+  freebieWizardComplete: { type: Boolean, default: false },
+
   // Version and metadata
   version: { type: String, default: '0.3.3' }, // Updated to match frontend version
   lastModified: { type: Date, default: Date.now }
