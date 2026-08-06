@@ -596,8 +596,6 @@ function TagPreview({ itemName, itemType, energyType, attunement, isRelic, isArt
       </div>
     </div>
   );
-    </div>
-  );
 }
 
 function Section({ title, children }) {
