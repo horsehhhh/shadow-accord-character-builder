@@ -985,13 +985,9 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                   </div>
                   <div>
                     <label className={lbl}>Step 3 — Passive Trait (optional)</label>
-                    <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className={inp + ' mb-2'}>
+                    <p className="text-xs text-gray-400 mb-2">Weapon deals Agg damage.</p>
+                    <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className={inp}>
                       {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
-                    </select>
-                    <label className={lbl}>Damage Type (weapon)</label>
-                    <select value={klaiveP1DmgType ?? ''} onChange={e => setKlaiveP1DmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
-                      <option value="">None</option>
-                      {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
                     </select>
                   </div>
                   <div>
@@ -1039,13 +1035,9 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                     </div>
                     <div>
                       <label className={lbl}>Step 3 — Passive Trait (optional)</label>
-                      <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className={inp + ' mb-2'}>
+                      <p className="text-xs text-gray-400 mb-2">Weapon deals Agg damage.</p>
+                      <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className={inp}>
                         {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
-                      </select>
-                      <label className={lbl}>Damage Type (weapon)</label>
-                      <select value={klaiveP2DmgType ?? ''} onChange={e => setKlaiveP2DmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
-                        <option value="">None</option>
-                        {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
                       </select>
                     </div>
                     <div>

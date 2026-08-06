@@ -491,10 +491,10 @@ function ItemBuilder({ onBack }) {
                     </div>
                     <div>
                       <Label>Step 3 — Passive Trait (optional)</Label>
-                      <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                      <p className="text-xs text-gray-400 mb-2">Weapon deals Agg damage.</p>
+                      <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none">
                         {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
                       </select>
-                      <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP1DmgType} onChange={setKlaiveP1DmgType} mode="weapon" excludeAgg />
                     </div>
                     <div>
                       <Label>Step 4 — 2nd Benefit (optional)</Label>
@@ -543,10 +543,10 @@ function ItemBuilder({ onBack }) {
                       </div>
                       <div>
                         <Label>Step 3 — Passive Trait (optional)</Label>
-                        <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                        <p className="text-xs text-gray-400 mb-2">Weapon deals Agg damage.</p>
+                        <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none">
                           {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
                         </select>
-                        <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP2DmgType} onChange={setKlaiveP2DmgType} mode="weapon" excludeAgg />
                       </div>
                       <div>
                         <Label>Step 4 — 2nd Benefit (optional)</Label>
