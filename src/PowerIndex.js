@@ -9,6 +9,7 @@ function PowerIndex({ onBack, embedded = false }) {
   const [sourceFilter, setSourceFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [sortBy, setSortBy] = useState('name');
+  const [hideNpcOnly, setHideNpcOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
 
@@ -44,8 +45,9 @@ function PowerIndex({ onBack, embedded = false }) {
       
       const sourceMatch = sourceFilter === '' || power.sources.includes(sourceFilter);
       const typeMatch = typeFilter === '' || power.type === typeFilter;
+      const npcMatch = !hideNpcOnly || !/NPC Only/i.test(power.description);
       
-      return searchMatch && sourceMatch && typeMatch;
+      return searchMatch && sourceMatch && typeMatch && npcMatch;
     });
 
     // Sort the filtered results
@@ -63,7 +65,7 @@ function PowerIndex({ onBack, embedded = false }) {
     });
 
     return filtered;
-  }, [powers, searchTerm, sourceFilter, typeFilter, sortBy]);
+  }, [powers, searchTerm, sourceFilter, typeFilter, sortBy, hideNpcOnly]);
 
   if (isLoading) {
     return (
@@ -170,6 +172,14 @@ function PowerIndex({ onBack, embedded = false }) {
                 <option value="cost">Sort by Cost</option>
               </select>
             </div>
+          </div>
+
+          {/* Toggle row */}
+          <div className="flex flex-wrap items-center gap-4 mb-3">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300 select-none">
+              <input type="checkbox" checked={hideNpcOnly} onChange={e => setHideNpcOnly(e.target.checked)} className="accent-blue-500" />
+              Hide NPC-only powers
+            </label>
           </div>
 
           {/* Results count */}
