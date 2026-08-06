@@ -21,6 +21,17 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [Unreleased]
 
+### Added
+- **Klaive builder (2026 draft): Full Steps 2–5** — Both `MagicItemWizard.js` and `TokenWizardDraft.js` now implement the complete spirit-binding process per rulebook:
+  - Step 2: Power (optional, existing)
+  - Step 3: Passive Trait — +1 Damage (+4 att), +2 Damage (+6 att), and/or weapon damage type
+  - Step 4: 2nd Benefit — choose Power or Passive Trait (same options as Steps 2–3)
+  - Step 5: Scorch — select damage type to add scorch effect
+  - Grand Klaive shows independent Steps 2–5 for each spirit
+- Attunement formula updated to include passive/scorch costs for each spirit
+- Reset button and `resetKlaive()` clear all new step 3–5 state
+- Add to Cart detail string expanded to include passive/scorch info per spirit
+
 ---
 
 ## [v0.6.5] - 2026-08-05

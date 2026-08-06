@@ -263,6 +263,21 @@ function ItemBuilder({ onBack }) {
   const [klaiveBan2Att, setKlaiveBan2Att]           = useState(1);
   const [klaiveOptFlaw, setKlaiveOptFlaw]           = useState('');
   const [klaiveOptAtt, setKlaiveOptAtt]             = useState(0);
+  // Per-spirit steps 3–5 state
+  const [klaiveP1Pass, setKlaiveP1Pass]             = useState('none');
+  const [klaiveP1DmgType, setKlaiveP1DmgType]       = useState(null);
+  const [klaiveB2Type1, setKlaiveB2Type1]           = useState('none');
+  const [klaiveP1b, setKlaiveP1b]                   = useState(blankSlot());
+  const [klaiveP1bPass, setKlaiveP1bPass]           = useState('none');
+  const [klaiveP1bDmgType, setKlaiveP1bDmgType]     = useState(null);
+  const [klaiveScorch1, setKlaiveScorch1]           = useState(null);
+  const [klaiveP2Pass, setKlaiveP2Pass]             = useState('none');
+  const [klaiveP2DmgType, setKlaiveP2DmgType]       = useState(null);
+  const [klaiveB2Type2, setKlaiveB2Type2]           = useState('none');
+  const [klaiveP2b, setKlaiveP2b]                   = useState(blankSlot());
+  const [klaiveP2bPass, setKlaiveP2bPass]           = useState('none');
+  const [klaiveP2bDmgType, setKlaiveP2bDmgType]     = useState(null);
+  const [klaiveScorch2, setKlaiveScorch2]           = useState(null);
 
   useEffect(() => {
     if (slot1.power) { const d = detectModifiers(slot1.power, energyType); setSlot1(s => ({ ...s, ...d })); }
@@ -286,6 +301,17 @@ function ItemBuilder({ onBack }) {
     else c += 2;
     return c;
   }
+  const KLAIVE_PASSIVES = [
+    { key: 'none',  label: 'None',      cost: 0 },
+    { key: 'dmg_1', label: '+1 Damage', cost: 4 },
+    { key: 'dmg_2', label: '+2 Damage', cost: 6 },
+  ];
+  function kPCost(pKey, dmgIdx) {
+    const base = KLAIVE_PASSIVES.find(o => o.key === pKey)?.cost ?? 0;
+    const dt = dmgIdx !== null && DAMAGE_TYPES[dmgIdx] ? DAMAGE_TYPES[dmgIdx].weapon : 0;
+    return base + dt;
+  }
+  function kSCost(idx) { return (idx !== null && DAMAGE_TYPES[idx]?.scorch != null) ? DAMAGE_TYPES[idx].scorch : 0; }
   const isGrand       = klaiveSubMode.includes('grand');
   const isKlaiveUnfin = klaiveSubMode.includes('unfinished');
   const klaiveModeLabelMap = {
@@ -295,7 +321,15 @@ function ItemBuilder({ onBack }) {
     grand:            'Grand Klaive',
   };
   const klaiveFinalAtt = isKlaiveUnfin ? 3 : Math.max(1,
-    5 + pCost(klaivePower1) + (isGrand ? pCost(klaivePower2) : 0)
+    5
+    + pCost(klaivePower1) + kPCost(klaiveP1Pass, klaiveP1DmgType)
+    + (klaiveB2Type1 === 'power' ? pCost(klaiveP1b) : kPCost(klaiveP1bPass, klaiveP1bDmgType))
+    + kSCost(klaiveScorch1)
+    + (isGrand
+        ? pCost(klaivePower2) + kPCost(klaiveP2Pass, klaiveP2DmgType)
+          + (klaiveB2Type2 === 'power' ? pCost(klaiveP2b) : kPCost(klaiveP2bPass, klaiveP2bDmgType))
+          + kSCost(klaiveScorch2)
+        : 0)
     - klaiveBanAtt - (isGrand ? klaiveBan2Att : 0) - klaiveOptAtt
   );
   const klaiveTagCount = isKlaiveUnfin ? 1 : isGrand ? 3 : 2;
@@ -397,7 +431,7 @@ function ItemBuilder({ onBack }) {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(klaiveModeLabelMap).map(([id, label]) => (
-                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); }}
+                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null); setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null); }}
                   className={`py-2 text-sm rounded font-medium ${klaiveSubMode === id ? 'bg-amber-700 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-white'}`}
                 >{label}</button>
               ))}
@@ -436,10 +470,10 @@ function ItemBuilder({ onBack }) {
                     )}
                   </div>
                 </Section>
-                <Section title={isGrand ? 'Spirit Powers' : 'Spirit Power'}>
-                  <div className="space-y-3">
+                <Section title={isGrand ? 'Spirit 1 — Steps 2–5' : 'Steps 2–5'}>
+                  <div className="space-y-4">
                     <div>
-                      {isGrand && <Label>Spirit 1</Label>}
+                      <Label>Step 2 — Power (optional)</Label>
                       <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower1, p)} />
                       {klaivePower1.power && (
                         <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower1.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
@@ -448,9 +482,56 @@ function ItemBuilder({ onBack }) {
                         </div>
                       )}
                     </div>
-                    {isGrand && (
+                    <div>
+                      <Label>Step 3 — Passive Trait (optional)</Label>
+                      <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                        {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
+                      </select>
+                      <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP1DmgType} onChange={setKlaiveP1DmgType} mode="weapon" />
+                    </div>
+                    <div>
+                      <Label>Step 4 — 2nd Benefit (optional)</Label>
+                      <select value={klaiveB2Type1} onChange={e => { setKlaiveB2Type1(e.target.value); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); }} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                        <option value="none">None</option>
+                        <option value="power">Add a Power</option>
+                        <option value="passive">Add a Passive Trait</option>
+                      </select>
+                      {klaiveB2Type1 === 'power' && (
+                        <>
+                          <PowerSearch onSelect={p => selectKlaivePower(setKlaiveP1b, p)} />
+                          {klaiveP1b.power && (
+                            <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaiveP1b.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                              <span>{klaiveP1b.power.name} (Lv{klaiveP1b.level ?? 1}) +{pCost(klaiveP1b)} att</span>
+                              <button onClick={() => setKlaiveP1b(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {klaiveB2Type1 === 'passive' && (
+                        <>
+                          <select value={klaiveP1bPass} onChange={e => setKlaiveP1bPass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                            {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
+                          </select>
+                          <DmgTypeSelect label="Damage Type (2nd benefit)" value={klaiveP1bDmgType} onChange={setKlaiveP1bDmgType} mode="weapon" />
+                        </>
+                      )}
+                    </div>
+                    <div>
+                      <Label>Step 5 — Scorch (optional)</Label>
+                      <select value={klaiveScorch1 ?? ''} onChange={e => setKlaiveScorch1(e.target.value === '' ? null : parseInt(e.target.value))} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none">
+                        <option value="">None</option>
+                        {DAMAGE_TYPES.filter(dt => dt.scorch !== null).map(dt => (
+                          <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} Scorch ({dt.scorch})</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </Section>
+                {isGrand && (
+                  <Section title="Spirit 2 — Steps 2–5">
+                    <div className="space-y-4">
                       <div>
-                        <Label>Spirit 2</Label>
+                        <Label>Step 2 — Power (optional)</Label>
                         <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower2, p)} />
                         {klaivePower2.power && (
                           <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower2.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
@@ -459,9 +540,52 @@ function ItemBuilder({ onBack }) {
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                </Section>
+                      <div>
+                        <Label>Step 3 — Passive Trait (optional)</Label>
+                        <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                          {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
+                        </select>
+                        <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP2DmgType} onChange={setKlaiveP2DmgType} mode="weapon" />
+                      </div>
+                      <div>
+                        <Label>Step 4 — 2nd Benefit (optional)</Label>
+                        <select value={klaiveB2Type2} onChange={e => { setKlaiveB2Type2(e.target.value); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); }} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                          <option value="none">None</option>
+                          <option value="power">Add a Power</option>
+                          <option value="passive">Add a Passive Trait</option>
+                        </select>
+                        {klaiveB2Type2 === 'power' && (
+                          <>
+                            <PowerSearch onSelect={p => selectKlaivePower(setKlaiveP2b, p)} />
+                            {klaiveP2b.power && (
+                              <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaiveP2b.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
+                                <span>{klaiveP2b.power.name} (Lv{klaiveP2b.level ?? 1}) +{pCost(klaiveP2b)} att</span>
+                                <button onClick={() => setKlaiveP2b(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                              </div>
+                            )}
+                          </>
+                        )}
+                        {klaiveB2Type2 === 'passive' && (
+                          <>
+                            <select value={klaiveP2bPass} onChange={e => setKlaiveP2bPass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
+                              {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
+                            </select>
+                            <DmgTypeSelect label="Damage Type (2nd benefit)" value={klaiveP2bDmgType} onChange={setKlaiveP2bDmgType} mode="weapon" />
+                          </>
+                        )}
+                      </div>
+                      <div>
+                        <Label>Step 5 — Scorch (optional)</Label>
+                        <select value={klaiveScorch2 ?? ''} onChange={e => setKlaiveScorch2(e.target.value === '' ? null : parseInt(e.target.value))} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none">
+                          <option value="">None</option>
+                          {DAMAGE_TYPES.filter(dt => dt.scorch !== null).map(dt => (
+                            <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} Scorch ({dt.scorch})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </Section>
+                )}
                 <Section title="Mandatory Flaws">
                   <p className="text-xs text-gray-400 mb-3">Both flaws are required. Gnosis −2 while attuned is a feature, not a flaw.</p>
                   <div className="space-y-3">
@@ -515,8 +639,16 @@ function ItemBuilder({ onBack }) {
                 <Section title="Total Attunement">
                   <div className="space-y-1 mb-4">
                     <div className="flex justify-between text-sm"><span>Base (Klaive)</span><span className="font-mono text-amber-300">+5</span></div>
-                    {klaivePower1.power && <div className="flex justify-between text-sm"><span>+ {klaivePower1.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower1)}</span></div>}
-                    {isGrand && klaivePower2.power && <div className="flex justify-between text-sm"><span>+ {klaivePower2.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower2)}</span></div>}
+                    {klaivePower1.power && !klaivePower1.restriction && <div className="flex justify-between text-sm"><span>{isGrand ? 'S1 ' : ''}Power: {klaivePower1.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower1)}</span></div>}
+                    {kPCost(klaiveP1Pass, klaiveP1DmgType) > 0 && <div className="flex justify-between text-sm"><span>{isGrand ? 'S1 ' : ''}Passive</span><span className="font-mono text-amber-300">+{kPCost(klaiveP1Pass, klaiveP1DmgType)}</span></div>}
+                    {klaiveB2Type1 === 'power' && klaiveP1b.power && !klaiveP1b.restriction && <div className="flex justify-between text-sm"><span>{isGrand ? 'S1 ' : ''}2nd Power: {klaiveP1b.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaiveP1b)}</span></div>}
+                    {klaiveB2Type1 === 'passive' && kPCost(klaiveP1bPass, klaiveP1bDmgType) > 0 && <div className="flex justify-between text-sm"><span>{isGrand ? 'S1 ' : ''}2nd Passive</span><span className="font-mono text-amber-300">+{kPCost(klaiveP1bPass, klaiveP1bDmgType)}</span></div>}
+                    {klaiveScorch1 !== null && kSCost(klaiveScorch1) !== 0 && <div className="flex justify-between text-sm"><span>{isGrand ? 'S1 ' : ''}Scorch: {DAMAGE_TYPES[klaiveScorch1]?.label}</span><span className={`font-mono ${kSCost(klaiveScorch1) < 0 ? 'text-green-400' : 'text-amber-300'}`}>{kSCost(klaiveScorch1)}</span></div>}
+                    {isGrand && klaivePower2.power && !klaivePower2.restriction && <div className="flex justify-between text-sm"><span>S2 Power: {klaivePower2.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaivePower2)}</span></div>}
+                    {isGrand && kPCost(klaiveP2Pass, klaiveP2DmgType) > 0 && <div className="flex justify-between text-sm"><span>S2 Passive</span><span className="font-mono text-amber-300">+{kPCost(klaiveP2Pass, klaiveP2DmgType)}</span></div>}
+                    {isGrand && klaiveB2Type2 === 'power' && klaiveP2b.power && !klaiveP2b.restriction && <div className="flex justify-between text-sm"><span>S2 2nd Power: {klaiveP2b.power.name}</span><span className="font-mono text-amber-300">+{pCost(klaiveP2b)}</span></div>}
+                    {isGrand && klaiveB2Type2 === 'passive' && kPCost(klaiveP2bPass, klaiveP2bDmgType) > 0 && <div className="flex justify-between text-sm"><span>S2 2nd Passive</span><span className="font-mono text-amber-300">+{kPCost(klaiveP2bPass, klaiveP2bDmgType)}</span></div>}
+                    {isGrand && klaiveScorch2 !== null && kSCost(klaiveScorch2) !== 0 && <div className="flex justify-between text-sm"><span>S2 Scorch: {DAMAGE_TYPES[klaiveScorch2]?.label}</span><span className={`font-mono ${kSCost(klaiveScorch2) < 0 ? 'text-green-400' : 'text-amber-300'}`}>{kSCost(klaiveScorch2)}</span></div>}
                     {klaiveBanAtt > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 1)</span><span className="font-mono text-green-400">−{klaiveBanAtt}</span></div>}
                     {isGrand && klaiveBan2Att > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 2)</span><span className="font-mono text-green-400">−{klaiveBan2Att}</span></div>}
                     {klaiveOptFlaw && klaiveOptAtt > 0 && <div className="flex justify-between text-sm"><span>− Optional flaw</span><span className="font-mono text-green-400">−{klaiveOptAtt}</span></div>}
