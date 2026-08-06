@@ -80,6 +80,12 @@ const FLAWS = [
   { label: 'Cannot resist (choose: damage/Statuses/Mentals)',   reduction: 3 },
 ];
 
+const KLAIVE_PASSIVES = [
+  { key: 'none',  label: 'None',      cost: 0 },
+  { key: 'dmg_1', label: '+1 Damage', cost: 4 },
+  { key: 'dmg_2', label: '+2 Damage', cost: 6 },
+];
+
 function getPowerRestriction(power) {
   if (!power) return null;
   if (/NPC Only/i.test(power.description))               return 'npc-only';
@@ -305,11 +311,6 @@ function ItemBuilder({ onBack }) {
     else c += 2;
     return c;
   }
-  const KLAIVE_PASSIVES = [
-    { key: 'none',  label: 'None',      cost: 0 },
-    { key: 'dmg_1', label: '+1 Damage', cost: 4 },
-    { key: 'dmg_2', label: '+2 Damage', cost: 6 },
-  ];
   function kPCost(pKey, dmgIdx) {
     const base = KLAIVE_PASSIVES.find(o => o.key === pKey)?.cost ?? 0;
     const dt = dmgIdx !== null && DAMAGE_TYPES[dmgIdx] ? DAMAGE_TYPES[dmgIdx].weapon : 0;
@@ -656,6 +657,16 @@ function ItemBuilder({ onBack }) {
                     <span className={`text-3xl font-black ${klaiveFinalAtt >= 10 ? 'text-red-400' : klaiveFinalAtt >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{klaiveFinalAtt}</span>
                   </div>
                   <p className="text-xs text-gray-400 mt-2">Tags: {klaiveTagCount} {klaiveTagCount === 1 ? '(Klaive Tag)' : isGrand ? '(Grand Klaive Tag + 2× Klaive Spirit Tag)' : '(Klaive Tag + Klaive Spirit Tag)'}</p>
+                  {!isKlaiveUnfin && (
+                    <KlaiveTagPreview
+                      subMode={klaiveSubMode} name={klaiveName}
+                      spiritName1={klaiveSpiritName} spiritName2={klaiveSpiritName2}
+                      power1={klaivePower1} p1Pass={klaiveP1Pass} b2Type1={klaiveB2Type1} p1b={klaiveP1b} scorch1={klaiveScorch1}
+                      power2={klaivePower2} p2Pass={klaiveP2Pass} b2Type2={klaiveB2Type2} p2b={klaiveP2b} scorch2={klaiveScorch2}
+                      banFlaw={klaiveBanFlaw} ban2Flaw={klaiveBan2Flaw}
+                      optFlawIdx={klaiveOptFlaw} attunement={klaiveFinalAtt}
+                    />
+                  )}
                 </Section>
               </>
             )}
@@ -899,6 +910,68 @@ function DmgTypeSelect({ label, value, onChange, mode, excludeAgg }) {
           return <option key={dt.label} value={origIdx}>{dt.label} (+{cost})</option>;
         })}
       </select>
+    </div>
+  );
+}
+
+function KlaiveTagPreview({ subMode, name, spiritName1, spiritName2, power1, p1Pass, b2Type1, p1b, scorch1, power2, p2Pass, b2Type2, p2b, scorch2, banFlaw, ban2Flaw, optFlawIdx, attunement }) {
+  const isGrand = subMode.includes('grand');
+  const isUnfin = subMode.includes('unfinished');
+  const typeLabel = { unfinished: 'Unfinished Klaive', finished: 'Klaive', grand_unfinished: 'Unfinished Grand Klaive', grand: 'Grand Klaive' }[subMode] ?? 'Klaive';
+
+  const spiritLines = (power, pPass, b2Type, p2bSlot, scorch, spiritName, prefix) => {
+    const out = [];
+    if (spiritName) out.push(`Spirit: ${spiritName}`);
+    if (power?.power && !power.restriction) out.push(`${prefix}Power: ${power.power.name}`);
+    const pLabel = KLAIVE_PASSIVES.find(o => o.key === pPass)?.label;
+    if (pPass !== 'none' && pLabel) out.push(`${prefix}Trait: ${pLabel}`);
+    if (b2Type === 'power' && p2bSlot?.power && !p2bSlot.restriction) out.push(`${prefix}2nd Power: ${p2bSlot.power.name}`);
+    if (scorch !== null && DAMAGE_TYPES[scorch]) out.push(`${prefix}Scorch: ${DAMAGE_TYPES[scorch].label}`);
+    return out;
+  };
+
+  const lines = [];
+  if (isUnfin) {
+    if (spiritName1) lines.push(`Spirit: ${spiritName1}`);
+    lines.push('Silver 1H Melee Weapon');
+    lines.push('Relic');
+  } else {
+    lines.push(...spiritLines(power1, p1Pass, b2Type1, p1b, scorch1, spiritName1, isGrand ? 'S1 ' : ''));
+    if (isGrand) lines.push(...spiritLines(power2, p2Pass, b2Type2, p2b, scorch2, spiritName2, 'S2 '));
+    lines.push('Agg Damage · 1H Melee Weapon');
+    if (banFlaw) lines.push(`Ban (S1): ${banFlaw}`);
+    if (isGrand && ban2Flaw) lines.push(`Ban (S2): ${ban2Flaw}`);
+    if (optFlawIdx >= 0 && FLAWS[optFlawIdx]) lines.push(`Flaw: ${FLAWS[optFlawIdx].label}`);
+    lines.push('Gnosis \u22122 while attuned');
+  }
+
+  return (
+    <div className="mt-6 rounded-lg overflow-hidden shadow-xl border-2 border-[#2d4a1e] font-serif">
+      <div className="bg-[#2d4a1e] px-4 pt-3 pb-2.5 text-center">
+        <div className="text-white font-black text-lg tracking-wide uppercase leading-tight">{name || '[ Klaive Name ]'}</div>
+      </div>
+      <div className="bg-[#e8d5b0] px-4 py-1.5 text-center border-b border-[#b89060]">
+        <span className="text-[#2d4a1e] text-xs font-bold uppercase tracking-widest">{typeLabel}</span>
+        <span className="text-[#8b6914] text-xs mx-2">&middot;</span>
+        <span className="text-[#2d4a1e] text-xs uppercase tracking-wider">Gnosis (Shifter)</span>
+      </div>
+      <div className="bg-[#fdf6e3] px-4 py-3">
+        {lines.length === 0
+          ? <div className="text-[#9a7a4a] text-xs text-center italic">(no properties selected)</div>
+          : <div className="space-y-1.5">
+              {lines.map((l, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-gray-900">
+                  <span className="text-[#2d6b14] shrink-0 mt-0.5">&#9670;</span>
+                  <span>{l}</span>
+                </div>
+              ))}
+            </div>
+        }
+      </div>
+      <div className="bg-[#e8d5b0] border-t border-[#b89060] px-4 py-2.5 flex items-center justify-between">
+        <span className="text-[#2d4a1e] text-xs uppercase tracking-widest font-bold">Attunement</span>
+        <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-700' : attunement >= 6 ? 'text-amber-800' : 'text-green-700'}`}>{attunement}</span>
+      </div>
     </div>
   );
 }
