@@ -27,6 +27,7 @@ const DOCUMENTS = [
 const ST_PASSWORD = '1234!';
 
 const isTrustedUser = () => {
+  if (sessionStorage.getItem('stSessionUnlocked') === 'true') return true;
   try {
     const stEmail = localStorage.getItem('stEmail');
     if (!stEmail) return false;
@@ -458,7 +459,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
               onChange={e => { setLockInput(e.target.value); setLockError(false); }}
               onKeyDown={e => {
                 if (e.key === 'Enter') {
-                  if (lockInput === ST_PASSWORD) { setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
+                  if (lockInput === ST_PASSWORD) { sessionStorage.setItem('stSessionUnlocked', 'true'); setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
                   else setLockError(true);
                 }
                 if (e.key === 'Escape') setShowLockModal(false);
@@ -470,7 +471,7 @@ const RulesViewer = ({ onBack, themeClasses }) => {
               <button onClick={() => setShowLockModal(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
               <button
                 onClick={() => {
-                  if (lockInput === ST_PASSWORD) { setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
+                  if (lockInput === ST_PASSWORD) { sessionStorage.setItem('stSessionUnlocked', 'true'); setStUnlocked(true); setShowLockModal(false); switchDoc('st'); }
                   else setLockError(true);
                 }}
                 className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white text-sm rounded">

@@ -5,6 +5,7 @@ import { powersData } from '../data/powersData';
 const ST_PASSWORD = '1234!';
 
 const isTrustedUser = () => {
+  if (sessionStorage.getItem('stSessionUnlocked') === 'true') return true;
   try {
     const stEmail = localStorage.getItem('stEmail');
     if (!stEmail) return false;
@@ -539,7 +540,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
   const remaining  = totalTokens - totalSpent;
 
   if (!unlocked) {
-    const tryUnlock = () => { if (pwInput === ST_PASSWORD) setUnlocked(true); else setPwError(true); };
+    const tryUnlock = () => { if (pwInput === ST_PASSWORD) { sessionStorage.setItem('stSessionUnlocked', 'true'); setUnlocked(true); } else setPwError(true); };
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
         <div className="bg-gray-800 border border-gray-600 rounded-lg p-8 w-80 shadow-xl text-center">

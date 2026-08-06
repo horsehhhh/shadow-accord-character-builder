@@ -335,7 +335,10 @@ const ShadowAccordComplete = () => {
   const [creationStep, setCreationStep] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [freebieWizardTab, setFreebieWizardTab] = useState('merits');
-  const [stModeUnlocked, setStModeUnlocked] = useState(() => localStorage.getItem('stModeUnlocked') === 'true');
+  const [stModeUnlocked, setStModeUnlocked] = useState(() =>
+    localStorage.getItem('stModeUnlocked') === 'true' ||
+    sessionStorage.getItem('stSessionUnlocked') === 'true'
+  );
   const [stPasswordInput, setStPasswordInput] = useState('');
   const [stPasswordError, setStPasswordError] = useState(false);
 
@@ -13289,6 +13292,7 @@ Your character is ready to play!`;
                         if (e.key === 'Enter') {
                           const stored = localStorage.getItem('stPassword') || '1234!';
                           if (stPasswordInput === stored) {
+                            sessionStorage.setItem('stSessionUnlocked', 'true');
                             setStModeUnlocked(true);
                             localStorage.setItem('stModeUnlocked', 'true');
                             setStPasswordInput('');
@@ -13306,6 +13310,7 @@ Your character is ready to play!`;
                       onClick={() => {
                         const stored = localStorage.getItem('stPassword') || '1234!';
                         if (stPasswordInput === stored) {
+                          sessionStorage.setItem('stSessionUnlocked', 'true');
                           setStModeUnlocked(true);
                           localStorage.setItem('stModeUnlocked', 'true');
                           setStPasswordInput('');

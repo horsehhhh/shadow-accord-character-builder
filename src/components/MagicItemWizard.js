@@ -188,6 +188,7 @@ function getPassiveOptions(itemType) {
 }
 
 const isTrustedUser = () => {
+  if (sessionStorage.getItem('stSessionUnlocked') === 'true') return true;
   try {
     const stEmail = localStorage.getItem('stEmail');
     if (!stEmail) return false;
@@ -213,14 +214,14 @@ export default function MagicItemWizard({ onBack }) {
             placeholder="Password" value={pwInput}
             onChange={e => setPwInput(e.target.value)}
             onKeyDown={e => {
-              if (e.key === 'Enter') { if (pwInput === ST_PASSWORD) setUnlocked(true); else { setPwError('Incorrect password.'); setPwInput(''); } }
+              if (e.key === 'Enter') { if (pwInput === ST_PASSWORD) { sessionStorage.setItem('stSessionUnlocked', 'true'); setUnlocked(true); } else { setPwError('Incorrect password.'); setPwInput(''); } }
               if (e.key === 'Escape') onBack();
             }}
           />
           {pwError && <p className="text-red-400 text-sm mb-3">{pwError}</p>}
           <div className="flex gap-2">
             <button className="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 rounded font-semibold"
-              onClick={() => { if (pwInput === ST_PASSWORD) setUnlocked(true); else { setPwError('Incorrect password.'); setPwInput(''); } }}>Unlock</button>
+              onClick={() => { if (pwInput === ST_PASSWORD) { sessionStorage.setItem('stSessionUnlocked', 'true'); setUnlocked(true); } else { setPwError('Incorrect password.'); setPwInput(''); } }}>Unlock</button>
             <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded" onClick={onBack}>Back</button>
           </div>
         </div>

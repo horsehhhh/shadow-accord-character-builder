@@ -286,7 +286,7 @@ export const authAPI = {
     localStorage.removeItem('user');
   },
 
-  getProfile: () => api.get('/auth/me'),
+  getProfile: () => api.get('/auth/profile'),
 
   changePassword: (currentPassword, newPassword) => 
     api.put('/auth/change-password', { currentPassword, newPassword }),
