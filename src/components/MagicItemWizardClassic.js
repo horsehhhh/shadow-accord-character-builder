@@ -25,7 +25,7 @@ const ENERGY_TYPES = [
   'Gnosis (Shifter)',
   'Pathos (Wraith)',
   'Essence (Human / Sorcerer)',
-  'Quintessence',
+  'Vitality',
 ];
 
 const FACTION_CODE = {
@@ -33,6 +33,7 @@ const FACTION_CODE = {
   'Gnosis (Shifter)':           'S',
   'Pathos (Wraith)':            'W',
   'Essence (Human / Sorcerer)': 'H',
+  'Vitality':                   'H',
 };
 
 const ITEM_TYPES = [
