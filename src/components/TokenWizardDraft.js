@@ -963,7 +963,6 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                     <select value={klaiveB2Type1} onChange={e => { setKlaiveB2Type1(e.target.value); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); }} className={inp + ' mb-2'}>
                       <option value="none">None</option>
                       <option value="power">Add a Power</option>
-                      <option value="passive">Add a Passive Trait</option>
                     </select>
                     {klaiveB2Type1 === 'power' && (
                       <>
@@ -974,18 +973,6 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                             <button onClick={() => setKlaiveP1b(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
                           </div>
                         )}
-                      </>
-                    )}
-                    {klaiveB2Type1 === 'passive' && (
-                      <>
-                        <select value={klaiveP1bPass} onChange={e => setKlaiveP1bPass(e.target.value)} className={inp + ' mb-2'}>
-                          {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
-                        </select>
-                        <label className={lbl}>Damage Type (2nd benefit)</label>
-                        <select value={klaiveP1bDmgType ?? ''} onChange={e => setKlaiveP1bDmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
-                          <option value="">None</option>
-                          {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
-                        </select>
                       </>
                     )}
                   </div>
@@ -1030,7 +1017,6 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                       <select value={klaiveB2Type2} onChange={e => { setKlaiveB2Type2(e.target.value); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); }} className={inp + ' mb-2'}>
                         <option value="none">None</option>
                         <option value="power">Add a Power</option>
-                        <option value="passive">Add a Passive Trait</option>
                       </select>
                       {klaiveB2Type2 === 'power' && (
                         <>
@@ -1041,18 +1027,6 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                               <button onClick={() => setKlaiveP2b(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
                             </div>
                           )}
-                        </>
-                      )}
-                      {klaiveB2Type2 === 'passive' && (
-                        <>
-                          <select value={klaiveP2bPass} onChange={e => setKlaiveP2bPass(e.target.value)} className={inp + ' mb-2'}>
-                            {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
-                          </select>
-                          <label className={lbl}>Damage Type (2nd benefit)</label>
-                          <select value={klaiveP2bDmgType ?? ''} onChange={e => setKlaiveP2bDmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
-                            <option value="">None</option>
-                            {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
-                          </select>
                         </>
                       )}
                     </div>
