@@ -494,7 +494,7 @@ function ItemBuilder({ onBack }) {
                       <select value={klaiveP1Pass} onChange={e => setKlaiveP1Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
                         {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
                       </select>
-                      <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP1DmgType} onChange={setKlaiveP1DmgType} mode="weapon" />
+                      <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP1DmgType} onChange={setKlaiveP1DmgType} mode="weapon" excludeAgg />
                     </div>
                     <div>
                       <Label>Step 4 — 2nd Benefit (optional)</Label>
@@ -546,7 +546,7 @@ function ItemBuilder({ onBack }) {
                         <select value={klaiveP2Pass} onChange={e => setKlaiveP2Pass(e.target.value)} className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-2">
                           {KLAIVE_PASSIVES.map(o => <option key={o.key} value={o.key}>{o.label}{o.cost > 0 ? ` (+${o.cost})` : ''}</option>)}
                         </select>
-                        <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP2DmgType} onChange={setKlaiveP2DmgType} mode="weapon" />
+                        <DmgTypeSelect label="Damage Type (weapon)" value={klaiveP2DmgType} onChange={setKlaiveP2DmgType} mode="weapon" excludeAgg />
                       </div>
                       <div>
                         <Label>Step 4 — 2nd Benefit (optional)</Label>
@@ -884,8 +884,8 @@ function PowerSlotRow({ slot, label, onSelect, onClear }) {
   );
 }
 
-function DmgTypeSelect({ label, value, onChange, mode }) {
-  const options = DAMAGE_TYPES.filter(dt => mode === 'weapon' ? dt.weapon !== null : dt.armor !== null);
+function DmgTypeSelect({ label, value, onChange, mode, excludeAgg }) {
+  const options = DAMAGE_TYPES.filter(dt => (mode === 'weapon' ? dt.weapon !== null : dt.armor !== null) && (!excludeAgg || dt.label !== 'Agg'));
   return (
     <div>
       <Label>{label}</Label>

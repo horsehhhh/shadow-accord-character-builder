@@ -991,7 +991,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                     <label className={lbl}>Damage Type (weapon)</label>
                     <select value={klaiveP1DmgType ?? ''} onChange={e => setKlaiveP1DmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
                       <option value="">None</option>
-                      {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
+                      {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
                     </select>
                   </div>
                   <div>
@@ -1045,7 +1045,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                       <label className={lbl}>Damage Type (weapon)</label>
                       <select value={klaiveP2DmgType ?? ''} onChange={e => setKlaiveP2DmgType(e.target.value === '' ? null : parseInt(e.target.value))} className={inp}>
                         <option value="">None</option>
-                        {DAMAGE_TYPES.filter(dt => dt.weapon !== null).map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
+                        {DAMAGE_TYPES.filter(dt => dt.weapon !== null && dt.label !== 'Agg').map(dt => <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} (+{dt.weapon})</option>)}
                       </select>
                     </div>
                     <div>
