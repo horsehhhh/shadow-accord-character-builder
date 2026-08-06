@@ -49,6 +49,42 @@ const RESTRICTION_MSG = {
   'fundamental-or-merit-only': '⛔ Fundamental / Merit-only — cannot be placed on items.',
 };
 
+const FLAWS = [
+  { label: 'Augment reduced by 1',                              reduction: 3 },
+  { label: 'Regeneration Rate reduced by 1 (min 0)',            reduction: 3 },
+  { label: 'Maximum Health reduced by X',                       reduction: null, hasX: true },
+  { label: 'Cannot speak (per Silence)',                        reduction: 3 },
+  { label: 'Cannot lie',                                        reduction: 3 },
+  { label: 'Cannot run',                                        reduction: 5 },
+  { label: 'All powers cost double',                            reduction: 5 },
+  { label: 'All Ritual costs are doubled',                      reduction: 3 },
+  { label: 'Cannot cast rituals',                               reduction: 5 },
+  { label: 'Cannot Frenzy',                                     reduction: null, hasVG: true, energyNote: 'Vitae=2, Gnosis=4' },
+  { label: 'All damage is considered Agg',                      reduction: 5 },
+  { label: 'Sunsickness',                                       reduction: 1, energyNote: 'Any non-Vitae' },
+  { label: 'Demonic Vice <Vice>',                               reduction: 3 },
+  { label: 'Cannot spend Virtue as Willpower while Tainted',    reduction: 1 },
+  { label: 'Affected by a Fae Echo (ST decides)',               reduction: null, stRange: '1-5' },
+  { label: 'Item may only be carried in hand',                  reduction: 4 },
+  { label: 'Shadow in Control while touching (not Catharsis)',  reduction: 3, energyNote: 'Pathos + Shadow' },
+  { label: 'Immediately enter Catharsis; cannot end voluntarily', reduction: 5, energyNote: 'Pathos + Shadow' },
+  { label: 'Call no effect to Disquiet',                        reduction: 3, energyNote: 'Pathos + Shadow' },
+  { label: 'Cannot harvest chosen Passion while attuned',       reduction: 3, energyNote: 'Pathos + Harvesting' },
+  { label: 'Gain clan curse of [Clan]',                         reduction: 1, energyNote: 'Vitae + Vampire' },
+  { label: 'Amaranth Count reads as X higher',                  reduction: 1, energyNote: 'Vitae + Vampire' },
+  { label: 'Cannot consume more than 3 Vitae in a Draining',   reduction: 3, energyNote: 'Vitae + Vampire' },
+  { label: 'Always in Homid Form',                              reduction: 1, energyNote: 'Gnosis + Shifter' },
+  { label: 'Always in Crinos',                                  reduction: 4, energyNote: 'Gnosis + Shifter' },
+  { label: 'Cannot Step Sideways',                              reduction: 2, energyNote: 'Gnosis + Step Sideways' },
+  { label: 'Must adhere to a spirit Ban',                       reduction: null, stRange: '1-5', energyNote: 'Gnosis or Essence' },
+  { label: 'Derangement',                                       reduction: 3 },
+  { label: 'Using any power causes 1 damage',                   reduction: 3, energyNote: 'Essence only' },
+  { label: 'Cannot resist <Specific Power>',                    reduction: 1 },
+  { label: 'Cannot flee from an attacker',                      reduction: 2 },
+  { label: 'Limited Attunement to specific energy type(s)',     reduction: 0 },
+  { label: 'Cannot resist (choose: damage/Statuses/Mentals)',   reduction: 3 },
+];
+
 const RITUAL_COSTS  = { simple: 1, complex: 2, expert: 3, cryptic: 10 };
 const RITUAL_LABELS = { simple: 'Simple / Public', complex: 'Complex / Guarded', expert: 'Expert / Secret', cryptic: 'Cryptic' };
 
@@ -541,7 +577,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
   const [klaiveBanAtt, setKlaiveBanAtt]         = useState(1);
   const [klaiveBan2Flaw, setKlaiveBan2Flaw]     = useState('');
   const [klaiveBan2Att, setKlaiveBan2Att]       = useState(1);
-  const [klaiveOptFlaw, setKlaiveOptFlaw]       = useState('');
+  const [klaiveOptFlaw, setKlaiveOptFlaw]       = useState(-1);
   const [klaiveOptAtt, setKlaiveOptAtt]         = useState(0);
   // Per-spirit steps 3–5 state
   const [klaiveP1Pass, setKlaiveP1Pass]         = useState('none');
@@ -889,7 +925,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
           setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot());
           setKlaiveBanFlaw(''); setKlaiveBanAtt(1);
           setKlaiveBan2Flaw(''); setKlaiveBan2Att(1);
-          setKlaiveOptFlaw(''); setKlaiveOptAtt(0);
+          setKlaiveOptFlaw(-1); setKlaiveOptAtt(0);
           setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null);
           setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null);
           setKlaiveShowP1(false); setKlaiveShowP2(false);
@@ -898,7 +934,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(modeLabelMap).map(([id, label]) => (
-                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null); setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null); setKlaiveShowP1(false); setKlaiveShowP2(false); }}
+                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(-1); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null); setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null); setKlaiveShowP1(false); setKlaiveShowP2(false); }}
                   className={`py-2 text-sm rounded font-medium ${klaiveSubMode === id ? 'bg-amber-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
                 >{label}</button>
               ))}
@@ -1074,8 +1110,14 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
 
                 <div>
                   <label className={lbl}>Optional 3rd Flaw <span className="text-gray-500">(non-Ban)</span></label>
-                  <input type="text" placeholder="Optional flaw (leave blank for none)" value={klaiveOptFlaw} onChange={e => setKlaiveOptFlaw(e.target.value)} className={inp} />
-                  {klaiveOptFlaw && (
+                  <select value={klaiveOptFlaw} onChange={e => { const i = parseInt(e.target.value); setKlaiveOptFlaw(i); if (i >= 0 && FLAWS[i]?.reduction !== null && !FLAWS[i]?.hasX && !FLAWS[i]?.stRange && !FLAWS[i]?.hasVG) setKlaiveOptAtt(FLAWS[i].reduction); else setKlaiveOptAtt(0); }} className={inp}>
+                    <option value={-1}>None</option>
+                    {FLAWS.map((f, idx) => {
+                      const redStr = f.stRange ? `-(ST: ${f.stRange})` : f.hasX ? '-X' : f.hasVG ? '-2/-4' : f.reduction !== null ? `-${f.reduction}` : '';
+                      return <option key={idx} value={idx}>{f.label} ({redStr}){f.energyNote ? ` — ${f.energyNote}` : ''}</option>;
+                    })}
+                  </select>
+                  {klaiveOptFlaw >= 0 && (FLAWS[klaiveOptFlaw]?.hasX || FLAWS[klaiveOptFlaw]?.stRange || FLAWS[klaiveOptFlaw]?.hasVG) && (
                     <>
                       <label className={lbl + ' mt-2'}>Att Reduction</label>
                       <div className="flex gap-1 mt-1">
@@ -1104,7 +1146,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                   {isGrand && klaiveScorch2 !== null && kSCost(klaiveScorch2) !== 0 && <div className="flex justify-between"><span className="text-gray-400">S2 Scorch: {DAMAGE_TYPES[klaiveScorch2]?.label}</span><span className={kSCost(klaiveScorch2) < 0 ? 'text-red-300' : 'text-green-300'}>{kSCost(klaiveScorch2)}</span></div>}
                   {klaiveBanAtt > 0 && <div className="flex justify-between"><span className="text-gray-400">− Ban (Spirit 1)</span><span className="text-red-300">−{klaiveBanAtt}</span></div>}
                   {isGrand && klaiveBan2Att > 0 && <div className="flex justify-between"><span className="text-gray-400">− Ban (Spirit 2)</span><span className="text-red-300">−{klaiveBan2Att}</span></div>}
-                  {klaiveOptFlaw && klaiveOptAtt > 0 && <div className="flex justify-between"><span className="text-gray-400">− Optional flaw</span><span className="text-red-300">−{klaiveOptAtt}</span></div>}
+                  {klaiveOptFlaw >= 0 && klaiveOptAtt > 0 && <div className="flex justify-between"><span className="text-gray-400">− {FLAWS[klaiveOptFlaw]?.label ?? 'Optional flaw'}</span><span className="text-red-300">−{klaiveOptAtt}</span></div>}
                   <div className="flex justify-between border-t border-gray-700 pt-1 mt-1 font-bold">
                     <span className="text-white">Final Att</span><span className="text-amber-300">{klaiveFinalAtt}</span>
                   </div>
@@ -1138,7 +1180,7 @@ const TokenWizardDraft = ({ onBack, powerTrees = [], skills = [] }) => {
                       isGrand && klaiveScorch2 !== null && `S2 Scorch: ${DAMAGE_TYPES[klaiveScorch2]?.label}`,
                       `Ban: ${klaiveBanFlaw} (−${klaiveBanAtt})`,
                       isGrand && `Ban 2: ${klaiveBan2Flaw} (−${klaiveBan2Att})`,
-                      klaiveOptFlaw && `Flaw: ${klaiveOptFlaw} (−${klaiveOptAtt})`,
+                      klaiveOptFlaw >= 0 && `Flaw: ${FLAWS[klaiveOptFlaw]?.label} (−${klaiveOptAtt})`,
                       `Gnosis −2 attuned`,
                       `${klaiveTagCount} tags`,
                     ].filter(Boolean).join(' | ');

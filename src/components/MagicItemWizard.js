@@ -262,7 +262,7 @@ function ItemBuilder({ onBack }) {
   const [klaiveBanAtt, setKlaiveBanAtt]             = useState(1);
   const [klaiveBan2Flaw, setKlaiveBan2Flaw]         = useState('');
   const [klaiveBan2Att, setKlaiveBan2Att]           = useState(1);
-  const [klaiveOptFlaw, setKlaiveOptFlaw]           = useState('');
+  const [klaiveOptFlaw, setKlaiveOptFlaw]           = useState(-1);
   const [klaiveOptAtt, setKlaiveOptAtt]             = useState(0);
   // Per-spirit steps 3–5 state
   const [klaiveP1Pass, setKlaiveP1Pass]             = useState('none');
@@ -435,7 +435,7 @@ function ItemBuilder({ onBack }) {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(klaiveModeLabelMap).map(([id, label]) => (
-                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(''); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null); setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null); }}
+                <button key={id} onClick={() => { setKlaiveSubMode(id); setKlaivePower1(blankSlot()); setKlaivePower2(blankSlot()); setKlaiveBanFlaw(''); setKlaiveBan2Flaw(''); setKlaiveOptFlaw(-1); setKlaiveBanAtt(1); setKlaiveBan2Att(1); setKlaiveOptAtt(0); setKlaiveP1Pass('none'); setKlaiveP1DmgType(null); setKlaiveB2Type1('none'); setKlaiveP1b(blankSlot()); setKlaiveP1bPass('none'); setKlaiveP1bDmgType(null); setKlaiveScorch1(null); setKlaiveP2Pass('none'); setKlaiveP2DmgType(null); setKlaiveB2Type2('none'); setKlaiveP2b(blankSlot()); setKlaiveP2bPass('none'); setKlaiveP2bDmgType(null); setKlaiveScorch2(null); }}
                   className={`py-2 text-sm rounded font-medium ${klaiveSubMode === id ? 'bg-amber-700 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-white'}`}
                 >{label}</button>
               ))}
@@ -613,9 +613,15 @@ function ItemBuilder({ onBack }) {
                   </div>
                 </Section>
                 <Section title="Optional 3rd Flaw (non-Ban)">
-                  <input className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
-                    placeholder="Leave blank for none" value={klaiveOptFlaw} onChange={e => setKlaiveOptFlaw(e.target.value)} />
-                  {klaiveOptFlaw && (
+                  <select className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
+                    value={klaiveOptFlaw} onChange={e => { const i = parseInt(e.target.value); setKlaiveOptFlaw(i); if (i >= 0 && FLAWS[i]?.reduction !== null && !FLAWS[i]?.hasX && !FLAWS[i]?.stRange && !FLAWS[i]?.hasVG) setKlaiveOptAtt(FLAWS[i].reduction); else setKlaiveOptAtt(0); }}>
+                    <option value={-1}>None</option>
+                    {FLAWS.map((f, i) => {
+                      const redStr = f.stRange ? `-(ST: ${f.stRange})` : f.hasX ? '-X' : f.hasVG ? '-2/-4' : f.reduction !== null ? `-${f.reduction}` : '';
+                      return <option key={i} value={i}>{f.label} ({redStr}){f.energyNote ? ` — ${f.energyNote}` : ''}</option>;
+                    })}
+                  </select>
+                  {klaiveOptFlaw >= 0 && (FLAWS[klaiveOptFlaw]?.hasX || FLAWS[klaiveOptFlaw]?.stRange || FLAWS[klaiveOptFlaw]?.hasVG) && (
                     <>
                       <Label>Att Reduction</Label>
                       <div className="flex gap-1 mt-1">
@@ -643,7 +649,7 @@ function ItemBuilder({ onBack }) {
                     {isGrand && klaiveScorch2 !== null && kSCost(klaiveScorch2) !== 0 && <div className="flex justify-between text-sm"><span>S2 Scorch: {DAMAGE_TYPES[klaiveScorch2]?.label}</span><span className={`font-mono ${kSCost(klaiveScorch2) < 0 ? 'text-green-400' : 'text-amber-300'}`}>{kSCost(klaiveScorch2)}</span></div>}
                     {klaiveBanAtt > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 1)</span><span className="font-mono text-green-400">−{klaiveBanAtt}</span></div>}
                     {isGrand && klaiveBan2Att > 0 && <div className="flex justify-between text-sm"><span>− Ban flaw (Spirit 2)</span><span className="font-mono text-green-400">−{klaiveBan2Att}</span></div>}
-                    {klaiveOptFlaw && klaiveOptAtt > 0 && <div className="flex justify-between text-sm"><span>− Optional flaw</span><span className="font-mono text-green-400">−{klaiveOptAtt}</span></div>}
+                    {klaiveOptFlaw >= 0 && klaiveOptAtt > 0 && <div className="flex justify-between text-sm"><span>− {FLAWS[klaiveOptFlaw]?.label ?? 'Optional flaw'}</span><span className="font-mono text-green-400">−{klaiveOptAtt}</span></div>}
                   </div>
                   <div className="border-t border-gray-600 pt-3 flex justify-between items-center">
                     <span className="text-lg font-bold">Final Attunement Cost</span>
