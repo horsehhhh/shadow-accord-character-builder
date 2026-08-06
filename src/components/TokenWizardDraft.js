@@ -146,15 +146,16 @@ function KlaiveTagPreview({ subMode, name, spiritName1, spiritName2, power1, p1P
     return out;
   };
 
+  const handedness = isGrand ? '2H' : '1H';
   const lines = [];
   if (isUnfin) {
     if (spiritName1) lines.push(`Spirit: ${spiritName1}`);
-    lines.push('Silver 1H Melee Weapon');
+    lines.push(`Silver Damage \u00b7 ${handedness} Melee Weapon`);
     lines.push('Relic');
   } else {
     lines.push(...spiritLines(power1, p1Pass, b2Type1, p1b, scorch1, spiritName1, isGrand ? 'S1 ' : ''));
     if (isGrand) lines.push(...spiritLines(power2, p2Pass, b2Type2, p2b, scorch2, spiritName2, 'S2 '));
-    lines.push('Agg Damage \u00b7 1H Melee Weapon');
+    lines.push(`Agg Damage \u00b7 ${handedness} Melee Weapon`);
     if (banFlaw) lines.push(`Ban (S1): ${banFlaw}`);
     if (isGrand && ban2Flaw) lines.push(`Ban (S2): ${ban2Flaw}`);
     if (optFlawIdx >= 0 && FLAWS[optFlawIdx]) lines.push(`Flaw: ${FLAWS[optFlawIdx].label}`);

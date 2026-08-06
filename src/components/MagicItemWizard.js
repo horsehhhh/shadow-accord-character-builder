@@ -657,8 +657,7 @@ function ItemBuilder({ onBack }) {
                     <span className={`text-3xl font-black ${klaiveFinalAtt >= 10 ? 'text-red-400' : klaiveFinalAtt >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{klaiveFinalAtt}</span>
                   </div>
                   <p className="text-xs text-gray-400 mt-2">Tags: {klaiveTagCount} {klaiveTagCount === 1 ? '(Klaive Tag)' : isGrand ? '(Grand Klaive Tag + 2× Klaive Spirit Tag)' : '(Klaive Tag + Klaive Spirit Tag)'}</p>
-                  {!isKlaiveUnfin && (
-                    <KlaiveTagPreview
+                  <KlaiveTagPreview
                       subMode={klaiveSubMode} name={klaiveName}
                       spiritName1={klaiveSpiritName} spiritName2={klaiveSpiritName2}
                       power1={klaivePower1} p1Pass={klaiveP1Pass} b2Type1={klaiveB2Type1} p1b={klaiveP1b} scorch1={klaiveScorch1}
@@ -666,7 +665,6 @@ function ItemBuilder({ onBack }) {
                       banFlaw={klaiveBanFlaw} ban2Flaw={klaiveBan2Flaw}
                       optFlawIdx={klaiveOptFlaw} attunement={klaiveFinalAtt}
                     />
-                  )}
                 </Section>
               </>
             )}
@@ -930,15 +928,16 @@ function KlaiveTagPreview({ subMode, name, spiritName1, spiritName2, power1, p1P
     return out;
   };
 
+  const handedness = isGrand ? '2H' : '1H';
   const lines = [];
   if (isUnfin) {
     if (spiritName1) lines.push(`Spirit: ${spiritName1}`);
-    lines.push('Silver 1H Melee Weapon');
+    lines.push(`Silver Damage \u00b7 ${handedness} Melee Weapon`);
     lines.push('Relic');
   } else {
     lines.push(...spiritLines(power1, p1Pass, b2Type1, p1b, scorch1, spiritName1, isGrand ? 'S1 ' : ''));
     if (isGrand) lines.push(...spiritLines(power2, p2Pass, b2Type2, p2b, scorch2, spiritName2, 'S2 '));
-    lines.push('Agg Damage · 1H Melee Weapon');
+    lines.push(`Agg Damage \u00b7 ${handedness} Melee Weapon`);
     if (banFlaw) lines.push(`Ban (S1): ${banFlaw}`);
     if (isGrand && ban2Flaw) lines.push(`Ban (S2): ${ban2Flaw}`);
     if (optFlawIdx >= 0 && FLAWS[optFlawIdx]) lines.push(`Flaw: ${FLAWS[optFlawIdx].label}`);
