@@ -111,7 +111,7 @@ function PowerSearch({ onSelect }) {
         onChange={e => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
       />
-      {open && results.length > 0 && (
+      {open && (results.length > 0 || !query.trim()) && (
         <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded max-h-52 overflow-y-auto shadow-xl">
           <button className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:bg-gray-700 italic" onClick={() => { onSelect(null); setQuery(''); setOpen(false); }}>— No Power —</button>
           {results.map(p => {
