@@ -279,6 +279,8 @@ function ItemBuilder({ onBack }) {
   const [klaiveP2bPass, setKlaiveP2bPass]           = useState('none');
   const [klaiveP2bDmgType, setKlaiveP2bDmgType]     = useState(null);
   const [klaiveScorch2, setKlaiveScorch2]           = useState(null);
+  const [klaiveShowP1, setKlaiveShowP1]             = useState(false);
+  const [klaiveShowP2, setKlaiveShowP2]             = useState(false);
 
   useEffect(() => {
     if (slot1.power) { const d = detectModifiers(slot1.power, energyType); setSlot1(s => ({ ...s, ...d })); }
@@ -476,12 +478,15 @@ function ItemBuilder({ onBack }) {
                   <div className="space-y-4">
                     <div>
                       <Label>Step 2 — Power (optional)</Label>
-                      <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower1, p)} />
-                      {klaivePower1.power && (
+                      {klaivePower1.power ? (
                         <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower1.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
                           <span>{klaivePower1.power.name} (Lv{klaivePower1.level ?? 1}) +{pCost(klaivePower1)} att{klaivePower1.restriction ? ` — ${RESTRICTION_MSG[klaivePower1.restriction] || klaivePower1.restriction}` : ''}</span>
-                          <button onClick={() => setKlaivePower1(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                          <button onClick={() => { setKlaivePower1(blankSlot()); setKlaiveShowP1(false); }} className="ml-2 text-gray-500 hover:text-white">✕</button>
                         </div>
+                      ) : klaiveShowP1 ? (
+                        <PowerSearch onSelect={p => { selectKlaivePower(setKlaivePower1, p); setKlaiveShowP1(false); }} />
+                      ) : (
+                        <button onClick={() => setKlaiveShowP1(true)} className="mt-1 text-sm text-amber-400 hover:text-amber-300 underline">+ Select power…</button>
                       )}
                     </div>
                     <div>
@@ -534,12 +539,15 @@ function ItemBuilder({ onBack }) {
                     <div className="space-y-4">
                       <div>
                         <Label>Step 2 — Power (optional)</Label>
-                        <PowerSearch onSelect={p => selectKlaivePower(setKlaivePower2, p)} />
-                        {klaivePower2.power && (
+                        {klaivePower2.power ? (
                           <div className={`mt-1 flex items-center justify-between text-xs px-2 py-1 rounded ${klaivePower2.restriction ? 'bg-red-900 text-red-300' : 'bg-gray-700 text-gray-300'}`}>
                             <span>{klaivePower2.power.name} (Lv{klaivePower2.level ?? 1}) +{pCost(klaivePower2)} att{klaivePower2.restriction ? ` — ${RESTRICTION_MSG[klaivePower2.restriction] || klaivePower2.restriction}` : ''}</span>
-                            <button onClick={() => setKlaivePower2(blankSlot())} className="ml-2 text-gray-500 hover:text-white">✕</button>
+                            <button onClick={() => { setKlaivePower2(blankSlot()); setKlaiveShowP2(false); }} className="ml-2 text-gray-500 hover:text-white">✕</button>
                           </div>
+                        ) : klaiveShowP2 ? (
+                          <PowerSearch onSelect={p => { selectKlaivePower(setKlaivePower2, p); setKlaiveShowP2(false); }} />
+                        ) : (
+                          <button onClick={() => setKlaiveShowP2(true)} className="mt-1 text-sm text-amber-400 hover:text-amber-300 underline">+ Select power…</button>
                         )}
                       </div>
                       <div>
