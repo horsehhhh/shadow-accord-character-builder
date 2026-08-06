@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Cloud, CloudOff, Wifi, WifiOff, Settings as SettingsIcon, Clock, RotateCw, FileText, Database, FileSpreadsheet, Lock } from 'lucide-react';
 import { useCharacters } from '../hooks/useCharacters';
-import { testConnectivity } from '../services/api';
+import { testConnectivity, authAPI } from '../services/api';
 
 const Settings = ({ 
   darkMode, 
@@ -26,6 +26,21 @@ const Settings = ({
   const [stPwInput, setStPwInput] = useState('');
   const [stPwError, setStPwError] = useState(false);
   const [stPwSuccess, setStPwSuccess] = useState('');
+  const [currentUserEmail, setCurrentUserEmail] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user'))?.email || ''; } catch { return ''; }
+  });
+
+  // Fetch user profile if authenticated but email not yet in localStorage
+  useEffect(() => {
+    if (!isAuthenticated || currentUserEmail) return;
+    authAPI.getProfile().then(res => {
+      const user = res.data?.user || res.data;
+      if (user?.email) {
+        localStorage.setItem('user', JSON.stringify(user));
+        setCurrentUserEmail(user.email);
+      }
+    }).catch(() => {});
+  }, [isAuthenticated, currentUserEmail]);
 
   // Mobile-optimized handler for export buttons
   const createMobileHandler = (handler) => {
@@ -687,37 +702,33 @@ const Settings = ({
             {stPwSuccess && <p className="text-green-400 text-xs">{stPwSuccess}</p>}
           </div>
         ) : isAuthenticated ? (
-          (() => {
-            try {
-              const user = JSON.parse(localStorage.getItem('user'));
-              if (!user?.email) return <p className="text-sm text-gray-500">Your account profile hasn&apos;t loaded yet — try refreshing.</p>;
-              return (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Enter the ST password to trust <strong>{user.email}</strong> — all ST locks will auto-unlock when this account is logged in.
-                  </p>
-                  <div className="flex gap-2">
-                    <input type="password" placeholder="ST password" autoComplete="off"
-                      value={stPwInput} onChange={e => { setStPwInput(e.target.value); setStPwError(false); setStPwSuccess(''); }}
-                      onKeyDown={e => { if (e.key !== 'Enter') return;
-                        const stored = localStorage.getItem('stPassword') || '1234!';
-                        if (stPwInput === stored) { localStorage.setItem('stEmail', user.email); setStTrustedEmail(user.email); setStPwInput(''); setStPwSuccess('Account trusted!'); }
-                        else setStPwError(true);
-                      }}
-                      className={`flex-1 text-sm px-3 py-1.5 rounded border ${themeClasses.input}`}
-                    />
-                    <button onClick={() => {
-                      const stored = localStorage.getItem('stPassword') || '1234!';
-                      if (stPwInput === stored) { localStorage.setItem('stEmail', user.email); setStTrustedEmail(user.email); setStPwInput(''); setStPwSuccess('Account trusted!'); }
-                      else setStPwError(true);
-                    }} className="px-3 py-1.5 text-sm bg-amber-700 hover:bg-amber-600 text-white rounded">Trust my account</button>
-                  </div>
-                  {stPwError && <p className="text-red-400 text-xs">Incorrect ST password.</p>}
-                  {stPwSuccess && <p className="text-green-400 text-xs">{stPwSuccess}</p>}
-                </div>
-              );
-            } catch { return <p className="text-sm text-gray-500">Could not read account info.</p>; }
-          })()
+          currentUserEmail ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Enter the ST password to trust <strong>{currentUserEmail}</strong> — all ST locks will auto-unlock when this account is logged in.
+              </p>
+              <div className="flex gap-2">
+                <input type="password" placeholder="ST password" autoComplete="off"
+                  value={stPwInput} onChange={e => { setStPwInput(e.target.value); setStPwError(false); setStPwSuccess(''); }}
+                  onKeyDown={e => { if (e.key !== 'Enter') return;
+                    const stored = localStorage.getItem('stPassword') || '1234!';
+                    if (stPwInput === stored) { localStorage.setItem('stEmail', currentUserEmail); setStTrustedEmail(currentUserEmail); setStPwInput(''); setStPwSuccess('Account trusted!'); }
+                    else setStPwError(true);
+                  }}
+                  className={`flex-1 text-sm px-3 py-1.5 rounded border ${themeClasses.input}`}
+                />
+                <button onClick={() => {
+                  const stored = localStorage.getItem('stPassword') || '1234!';
+                  if (stPwInput === stored) { localStorage.setItem('stEmail', currentUserEmail); setStTrustedEmail(currentUserEmail); setStPwInput(''); setStPwSuccess('Account trusted!'); }
+                  else setStPwError(true);
+                }} className="px-3 py-1.5 text-sm bg-amber-700 hover:bg-amber-600 text-white rounded">Trust my account</button>
+              </div>
+              {stPwError && <p className="text-red-400 text-xs">Incorrect ST password.</p>}
+              {stPwSuccess && <p className="text-green-400 text-xs">{stPwSuccess}</p>}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">Loading account info…</p>
+          )
         ) : (
           <p className="text-sm text-gray-500">Log in to your account to enable trusted auto-unlock for ST tools.</p>
         )}
