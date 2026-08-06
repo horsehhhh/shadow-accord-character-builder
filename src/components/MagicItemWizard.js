@@ -141,6 +141,7 @@ function PowerSearch({ onSelect }) {
       />
       {open && results.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded max-h-60 overflow-y-auto shadow-xl">
+          <button className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:bg-gray-700 italic" onClick={() => { onSelect(null); setQuery(''); setOpen(false); }}>— No Power —</button>
           {results.map(p => {
             const restriction = getPowerRestriction(p);
             return (
@@ -291,6 +292,7 @@ function ItemBuilder({ onBack }) {
 
   const KLAIVE_ENERGY = 'Gnosis (Shifter)';
   function selectKlaivePower(setter, power) {
+    if (!power) { setter(blankSlot()); return; }
     setter({ power, restriction: getPowerRestriction(power), ...detectModifiers(power, KLAIVE_ENERGY) });
   }
   function pCost(slot) {
