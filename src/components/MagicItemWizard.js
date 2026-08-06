@@ -456,6 +456,14 @@ function ItemBuilder({ onBack }) {
                   <div className="text-gray-300">Tags: <span className="text-white">1 tag (Klaive Tag)</span></div>
                   <p className="text-xs text-amber-400 pt-1">Requires ST approval and character attunement before becoming a finished Klaive.</p>
                 </div>
+                <KlaiveTagPreview
+                  subMode={klaiveSubMode} name={klaiveName}
+                  spiritName1={klaiveSpiritName} spiritName2={klaiveSpiritName2}
+                  power1={klaivePower1} p1Pass={klaiveP1Pass} b2Type1={klaiveB2Type1} p1b={klaiveP1b} scorch1={klaiveScorch1}
+                  power2={klaivePower2} p2Pass={klaiveP2Pass} b2Type2={klaiveB2Type2} p2b={klaiveP2b} scorch2={klaiveScorch2}
+                  banFlaw={klaiveBanFlaw} ban2Flaw={klaiveBan2Flaw}
+                  optFlawIdx={klaiveOptFlaw} attunement={klaiveFinalAtt}
+                />
               </Section>
             ) : (
               <>
