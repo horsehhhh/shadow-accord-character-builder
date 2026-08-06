@@ -798,43 +798,37 @@ function TagPreview({ itemName, itemType, energyType, attunement, isTainted, isK
   if (flawIndex >= 0 && FLAWS[flawIndex]) lines.push(`Flaw: ${FLAWS[flawIndex].label.replace('X', flawXValue)}`);
 
   return (
-    <div className="mt-6 rounded-xl overflow-hidden shadow-2xl font-mono" style={{ border: '2px solid #78350f' }}>
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
-      <div className="bg-gradient-to-b from-amber-950 to-stone-950">
-        <div className="px-5 pt-4 pb-2.5 text-center border-b border-amber-900/60">
-          <div className="text-amber-100 font-black text-lg tracking-widest uppercase leading-tight">{itemName || '[ Item Name ]'}</div>
-          <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
-            <span className="text-amber-500 text-xs uppercase tracking-widest">{itemType}</span>
-            <span className="text-amber-800 text-xs">·</span>
-            <span className="text-amber-400 text-xs">{energyType}</span>
-          </div>
-          {(isKlaive || isTainted) && (
-            <div className="flex justify-center gap-2 mt-2 flex-wrap">
-              {isKlaive && !isKlaiveUnfinished && <span className="text-xs bg-amber-900 border border-amber-700 text-amber-300 px-2 py-0.5 rounded font-bold">{klaiveGrand ? 'Grand Klaive' : 'Klaive'}</span>}
-              {isKlaiveUnfinished && <span className="text-xs bg-gray-900 border border-gray-600 text-gray-400 px-2 py-0.5 rounded">⚠ Unfinished Klaive</span>}
-              {isTainted && <span className="text-xs bg-red-950 border border-red-700 text-red-400 px-2 py-0.5 rounded font-bold">⚠ TAINTED</span>}
-            </div>
-          )}
-        </div>
-        <div className="px-5 py-3 min-h-12">
-          {lines.length === 0
-            ? <div className="text-amber-800 text-xs text-center italic">(no properties selected)</div>
-            : <div className="space-y-1.5">
-                {lines.map((l, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm text-amber-100">
-                    <span className="text-amber-700 shrink-0 mt-0.5">◆</span>
-                    <span>{l}</span>
-                  </div>
-                ))}
-              </div>
-          }
-        </div>
-        <div className="border-t border-amber-900/60 px-5 py-2.5 flex items-center justify-between bg-black/20">
-          <span className="text-amber-600 text-xs uppercase tracking-widest font-semibold">Attunement</span>
-          <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-400' : attunement >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{attunement}</span>
-        </div>
+    <div className="mt-6 rounded-lg overflow-hidden shadow-xl border-2 border-gray-800 font-serif">
+      <div className="bg-[#5c1a0a] px-4 pt-3 pb-2.5 text-center">
+        <div className="text-white font-black text-lg tracking-wide uppercase leading-tight">{itemName || '[ Item Name ]'}</div>
       </div>
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
+      <div className="bg-[#e8d5b0] px-4 py-1.5 text-center border-b border-[#b89060]">
+        <span className="text-[#5c1a0a] text-xs font-bold uppercase tracking-widest">{itemType}</span>
+        <span className="text-[#8b6914] text-xs mx-2">·</span>
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-wider">{energyType}</span>
+      </div>
+      {isTainted && (
+        <div className="bg-[#fdf6e3] px-4 py-1.5 flex justify-center border-b border-[#c9a96e]/40">
+          <span className="text-xs bg-red-100 border border-red-400 text-red-700 px-2 py-0.5 rounded font-bold">⚠ TAINTED</span>
+        </div>
+      )}
+      <div className="bg-[#fdf6e3] px-4 py-3">
+        {lines.length === 0
+          ? <div className="text-[#9a7a4a] text-xs text-center italic">(no properties selected)</div>
+          : <div className="space-y-1.5">
+              {lines.map((l, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-gray-900">
+                  <span className="text-[#7a200d] shrink-0 mt-0.5">◆</span>
+                  <span>{l}</span>
+                </div>
+              ))}
+            </div>
+        }
+      </div>
+      <div className="bg-[#e8d5b0] border-t border-[#b89060] px-4 py-2.5 flex items-center justify-between">
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-widest font-bold">Attunement</span>
+        <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-700' : attunement >= 6 ? 'text-amber-800' : 'text-green-700'}`}>{attunement}</span>
+      </div>
     </div>
   );
 }

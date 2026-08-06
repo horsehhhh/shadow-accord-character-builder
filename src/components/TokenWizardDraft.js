@@ -188,22 +188,35 @@ function TagPreview2026({ itemName, itemType, energyType, finalAtt, tokenCost, i
   if (isTainted) lines.push('TAINTED');
 
   return (
-    <div className="mt-4 border-2 border-amber-700 rounded-lg bg-amber-950 p-4 font-mono text-sm shadow-inner">
-      <div className="text-center text-amber-200 font-bold text-base mb-1 border-b border-amber-700 pb-1">
-        {itemName || '[ Item Name ]'}
+    <div className="mt-4 rounded-lg overflow-hidden shadow-xl border-2 border-gray-800 font-serif">
+      <div className="bg-[#5c1a0a] px-4 pt-3 pb-2.5 text-center">
+        <div className="text-white font-black text-base tracking-wide uppercase">{itemName || '[ Item Name ]'}</div>
       </div>
-      <div className="text-center text-amber-300 text-xs mb-3">
-        {itemType.charAt(0).toUpperCase() + itemType.slice(1)} — {energyType || '—'}
+      <div className="bg-[#e8d5b0] px-4 py-1.5 text-center border-b border-[#b89060]">
+        <span className="text-[#5c1a0a] text-xs font-bold uppercase tracking-widest">{itemType.charAt(0).toUpperCase() + itemType.slice(1)}</span>
+        <span className="text-[#8b6914] text-xs mx-2">·</span>
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-wider">{energyType || '—'}</span>
       </div>
-      {lines.length === 0
-        ? <div className="text-amber-600 text-center text-xs">(no selections)</div>
-        : <ul className="space-y-1">{lines.map((l, i) => <li key={i} className="text-amber-100">• {l}</li>)}</ul>
-      }
-      <div className="border-t border-amber-700 mt-3 pt-2 flex justify-between items-center">
-        <span className="text-amber-400 font-bold">Attunement: {finalAtt}</span>
-        <span className="text-yellow-300 font-bold">{tokenCost} tokens</span>
+      {isTainted && (
+        <div className="bg-[#fdf6e3] px-4 py-1 flex justify-center border-b border-[#c9a96e]/40">
+          <span className="text-xs bg-red-100 border border-red-400 text-red-700 px-2 py-0.5 rounded font-bold">⚠ TAINTED</span>
+        </div>
+      )}
+      <div className="bg-[#fdf6e3] px-4 py-3">
+        {lines.length === 0
+          ? <div className="text-[#9a7a4a] text-xs text-center italic">(no selections)</div>
+          : <ul className="space-y-1">{lines.map((l, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-gray-900">
+                <span className="text-[#7a200d] shrink-0">◆</span>
+                <span>{l}</span>
+              </li>
+            ))}</ul>
+        }
       </div>
-      {isTainted && <div className="text-center text-red-400 font-bold text-xs mt-1">TAINTED</div>}
+      <div className="bg-[#e8d5b0] border-t border-[#b89060] px-4 py-2 flex justify-between items-center">
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-widest font-bold">Attunement: <span className={`font-black text-lg ${finalAtt >= 10 ? 'text-red-700' : finalAtt >= 6 ? 'text-amber-800' : 'text-green-700'}`}>{finalAtt}</span></span>
+        <span className="text-[#5c1a0a] font-bold text-sm">{tokenCost} tokens</span>
+      </div>
     </div>
   );
 }

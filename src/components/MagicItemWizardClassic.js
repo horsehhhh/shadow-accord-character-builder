@@ -67,12 +67,12 @@ const BENEFIT_GROUP = {
 };
 
 const RESTRICTION_MSG = {
-  'npc-only':                  'NPC-Only â€” cannot be placed on items.',
+  'npc-only':                  'NPC-Only Ã¢â‚¬â€ cannot be placed on items.',
   'not-for-items':             'Not intended for items per rulebook.',
-  'fundamental-or-merit-only': 'Fundamental / Merit-only â€” cannot be placed on items.',
+  'fundamental-or-merit-only': 'Fundamental / Merit-only Ã¢â‚¬â€ cannot be placed on items.',
 };
 
-// Old flaws table (2025 rules â€” free-form reduction, ST judgment)
+// Old flaws table (2025 rules Ã¢â‚¬â€ free-form reduction, ST judgment)
 const FLAWS = [
   'Your Augment is reduced by 1',
   'Your Regeneration Rate is reduced by 1',
@@ -156,7 +156,7 @@ function PowerSearch({ onSelect }) {
     <div ref={ref} className="relative">
       <input
         className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none"
-        placeholder="Search powersâ€¦"
+        placeholder="Search powersÃ¢â‚¬Â¦"
         value={query}
         onChange={e => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
@@ -172,7 +172,7 @@ function PowerSearch({ onSelect }) {
               >
                 <span className="font-medium">{p.name}</span>
                 <span className="text-gray-400 ml-2 text-xs">{p.sources}</span>
-                {restriction && <span className="ml-2 text-xs">â›” {RESTRICTION_MSG[restriction]}</span>}
+                {restriction && <span className="ml-2 text-xs">Ã¢â€ºâ€ {RESTRICTION_MSG[restriction]}</span>}
               </button>
             );
           })}
@@ -210,7 +210,7 @@ export default function MagicItemWizardClassic({ onBack }) {
           <div className="flex flex-col items-center mb-6 gap-3">
             <Lock className="text-amber-400" size={40} />
             <h2 className="text-xl font-bold">ST Magic Item Wizard</h2>
-            <p className="text-gray-400 text-sm text-center">Restricted to Storytellers â€” 2025 Rules</p>
+            <p className="text-gray-400 text-sm text-center">Restricted to Storytellers Ã¢â‚¬â€ 2025 Rules</p>
           </div>
           <input type="password" autoFocus
             className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-amber-400 focus:outline-none mb-3"
@@ -305,7 +305,7 @@ function ItemBuilder({ onBack }) {
         lines.push({ label: `${label}: ${dt.label} Type Armor`, value: dt.armor });
         total += dt.armor;
       } else if (b.type.startsWith('power')) {
-        if (b.slot.restriction) { lines.push({ label: `${label}: ${b.slot.power?.name} (RESTRICTED â€” excluded)`, value: 0, warn: true }); return; }
+        if (b.slot.restriction) { lines.push({ label: `${label}: ${b.slot.power?.name} (RESTRICTED Ã¢â‚¬â€ excluded)`, value: 0, warn: true }); return; }
         if (!b.slot.power) return;
         const lvl = b.slot.level ?? 1;
         const base = lvl === 1 ? 2 : lvl === 2 ? 4 : 6;
@@ -313,7 +313,7 @@ function ItemBuilder({ onBack }) {
         total += base;
         if (b.slot.notAvailable) { lines.push({ label: '  Not available for this faction', value: 2 }); total += 2; }
         else if (b.slot.corrupted) {
-          if (isTainted) lines.push({ label: '  Corrupted/Dark Arcanoi â€” Tainted overrides', value: 0 });
+          if (isTainted) lines.push({ label: '  Corrupted/Dark Arcanoi Ã¢â‚¬â€ Tainted overrides', value: 0 });
           else { lines.push({ label: '  Corrupted/Dark Arcanoi', value: 2 }); total += 2; }
         } else if (b.slot.rare) { lines.push({ label: '  Rare in faction', value: 1 }); total += 1; }
       } else {
@@ -359,7 +359,7 @@ function ItemBuilder({ onBack }) {
           value={b.type}
           onChange={e => setB({ ...blankBenefit(), type: e.target.value })}
         >
-          <option value="">â€” None â€”</option>
+          <option value="">Ã¢â‚¬â€ None Ã¢â‚¬â€</option>
           {getBenefitOptions(otherB).map(o => (
             <option key={o.value} value={o.value}>{o.label}{o.cost !== null ? ` (+${o.cost})` : ' (see type)'}</option>
           ))}
@@ -373,7 +373,7 @@ function ItemBuilder({ onBack }) {
               value={b.typeIdx ?? ''}
               onChange={e => setB(prev => ({ ...prev, typeIdx: e.target.value === '' ? null : parseInt(e.target.value) }))}
             >
-              <option value="">â€” Select Type â€”</option>
+              <option value="">Ã¢â‚¬â€ Select Type Ã¢â‚¬â€</option>
               {DAMAGE_TYPES.filter(dt => isDmgType ? dt.weapon !== null : dt.armor !== null).map(dt => {
                 const origIdx = DAMAGE_TYPES.indexOf(dt);
                 const cost = isDmgType ? dt.weapon : dt.armor;
@@ -390,7 +390,7 @@ function ItemBuilder({ onBack }) {
             {b.slot.power && (
               <div className="mt-1">
                 {b.slot.restriction ? (
-                  <p className="text-red-400 text-sm">â›” {RESTRICTION_MSG[b.slot.restriction]}</p>
+                  <p className="text-red-400 text-sm">Ã¢â€ºâ€ {RESTRICTION_MSG[b.slot.restriction]}</p>
                 ) : (
                   <div className="space-y-2">
                     <div className="text-sm">
@@ -429,8 +429,8 @@ function ItemBuilder({ onBack }) {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="max-w-3xl mx-auto">        <div className="flex items-center gap-3 mb-6">          <button className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" onClick={onBack}>â† Back</button>
-          <h1 className="text-2xl font-bold text-amber-400">âš”ï¸ Magic Item Wizard</h1>
+      <div className="max-w-3xl mx-auto">        <div className="flex items-center gap-3 mb-6">          <button className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm" onClick={onBack}>Ã¢â€ Â Back</button>
+          <h1 className="text-2xl font-bold text-amber-400">Ã¢Å¡â€Ã¯Â¸Â Magic Item Wizard</h1>
           <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">2025 Rules</span>
         </div>
         <div className="space-y-4">
@@ -480,7 +480,7 @@ function ItemBuilder({ onBack }) {
                 <option key={dt.label} value={DAMAGE_TYPES.indexOf(dt)}>{dt.label} Scorch ({dt.scorch})</option>
               ))}
             </select>
-            {scorchConflict && <p className="text-red-400 text-xs mt-1">â›” Conflict: same type used for armor and scorch.</p>}
+            {scorchConflict && <p className="text-red-400 text-xs mt-1">Ã¢â€ºâ€ Conflict: same type used for armor and scorch.</p>}
           </Section>
 
           <Section title="Flaw (optional)">
@@ -492,7 +492,7 @@ function ItemBuilder({ onBack }) {
             </select>
             {flawIndex >= 0 && (
               <div className="flex items-center gap-3">
-                <Label>Attunement Reduction (ST judgment, 0â€“4)</Label>
+                <Label>Attunement Reduction (ST judgment, 0Ã¢â‚¬â€œ4)</Label>
                 <input type="number" min={0} max={4}
                   className="w-20 bg-gray-700 text-white px-2 py-1 rounded border border-gray-600"
                   value={flawReduction} onChange={e => setFlawReduction(Math.min(4, Math.max(0, parseInt(e.target.value) || 0)))} />
@@ -516,7 +516,7 @@ function ItemBuilder({ onBack }) {
                 <div key={i} className={`flex justify-between text-sm ${l.warn ? 'text-amber-300' : ''}`}>
                   <span>{l.label}</span>
                   <span className={`font-mono ${l.value > 0 ? 'text-amber-300' : l.value < 0 ? 'text-green-400' : 'text-gray-400'}`}>
-                    {l.value > 0 ? `+${l.value}` : l.value === 0 ? 'â€”' : l.value}
+                    {l.value > 0 ? `+${l.value}` : l.value === 0 ? 'Ã¢â‚¬â€' : l.value}
                   </span>
                 </div>
               ))}
@@ -532,7 +532,7 @@ function ItemBuilder({ onBack }) {
                 {breakdown.finalAtt}
               </span>
             </div>
-            {breakdown.total < 1 && <p className="text-xs text-amber-400 mt-1">âš  Raw total {breakdown.total}; minimum attunement is 1.</p>}
+            {breakdown.total < 1 && <p className="text-xs text-amber-400 mt-1">Ã¢Å¡Â  Raw total {breakdown.total}; minimum attunement is 1.</p>}
 
             <TagPreview
               itemName={itemName} itemType={itemType} energyType={energyType}
@@ -561,43 +561,41 @@ function TagPreview({ itemName, itemType, energyType, attunement, isRelic, isArt
   if (flawIndex >= 0 && FLAWS[flawIndex]) lines.push(`Flaw: ${FLAWS[flawIndex]}`);
 
   return (
-    <div className="mt-6 rounded-xl overflow-hidden shadow-2xl font-mono" style={{ border: '2px solid #78350f' }}>
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
-      <div className="bg-gradient-to-b from-amber-950 to-stone-950">
-        <div className="px-5 pt-4 pb-2.5 text-center border-b border-amber-900/60">
-          <div className="text-amber-100 font-black text-lg tracking-widest uppercase leading-tight">{itemName || '[ Item Name ]'}</div>
-          <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
-            <span className="text-amber-500 text-xs uppercase tracking-widest">{itemType}</span>
-            <span className="text-amber-800 text-xs">Â·</span>
-            <span className="text-amber-400 text-xs">{energyType}</span>
-          </div>
-          {(isRelic || isArtifact || isTainted) && (
-            <div className="flex justify-center gap-2 mt-2 flex-wrap">
-              {isArtifact && <span className="text-xs bg-purple-950 border border-purple-700 text-purple-300 px-2 py-0.5 rounded font-bold">Artifact</span>}
-              {!isArtifact && isRelic && <span className="text-xs bg-blue-950 border border-blue-700 text-blue-300 px-2 py-0.5 rounded">Relic</span>}
-              {isTainted && <span className="text-xs bg-red-950 border border-red-700 text-red-400 px-2 py-0.5 rounded font-bold">âš  TAINTED</span>}
-            </div>
-          )}
-        </div>
-        <div className="px-5 py-3 min-h-12">
-          {lines.length === 0
-            ? <div className="text-amber-800 text-xs text-center italic">(no properties selected)</div>
-            : <div className="space-y-1.5">
-                {lines.map((l, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm text-amber-100">
-                    <span className="text-amber-700 shrink-0 mt-0.5">â—†</span>
-                    <span>{l}</span>
-                  </div>
-                ))}
-              </div>
-          }
-        </div>
-        <div className="border-t border-amber-900/60 px-5 py-2.5 flex items-center justify-between bg-black/20">
-          <span className="text-amber-600 text-xs uppercase tracking-widest font-semibold">Attunement</span>
-          <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-400' : attunement >= 6 ? 'text-amber-300' : 'text-green-400'}`}>{attunement}</span>
-        </div>
+    <div className="mt-6 rounded-lg overflow-hidden shadow-xl border-2 border-gray-800 font-serif">
+      <div className="bg-[#5c1a0a] px-4 pt-3 pb-2.5 text-center">
+        <div className="text-white font-black text-lg tracking-wide uppercase leading-tight">{itemName || '[ Item Name ]'}</div>
       </div>
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
+      <div className="bg-[#e8d5b0] px-4 py-1.5 text-center border-b border-[#b89060]">
+        <span className="text-[#5c1a0a] text-xs font-bold uppercase tracking-widest">{itemType}</span>
+        <span className="text-[#8b6914] text-xs mx-2">&middot;</span>
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-wider">{energyType}</span>
+      </div>
+      {(isRelic || isArtifact || isTainted) && (
+        <div className="bg-[#fdf6e3] px-4 py-1.5 flex justify-center gap-2 flex-wrap border-b border-[#c9a96e]/40">
+          {isArtifact && <span className="text-xs bg-purple-100 border border-purple-400 text-purple-800 px-2 py-0.5 rounded font-bold">Artifact</span>}
+          {!isArtifact && isRelic && <span className="text-xs bg-blue-100 border border-blue-400 text-blue-800 px-2 py-0.5 rounded">Relic</span>}
+          {isTainted && <span className="text-xs bg-red-100 border border-red-400 text-red-700 px-2 py-0.5 rounded font-bold">&#9888; TAINTED</span>}
+        </div>
+      )}
+      <div className="bg-[#fdf6e3] px-4 py-3">
+        {lines.length === 0
+          ? <div className="text-[#9a7a4a] text-xs text-center italic">(no properties selected)</div>
+          : <div className="space-y-1.5">
+              {lines.map((l, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-gray-900">
+                  <span className="text-[#7a200d] shrink-0 mt-0.5">&#9670;</span>
+                  <span>{l}</span>
+                </div>
+              ))}
+            </div>
+        }
+      </div>
+      <div className="bg-[#e8d5b0] border-t border-[#b89060] px-4 py-2.5 flex items-center justify-between">
+        <span className="text-[#5c1a0a] text-xs uppercase tracking-widest font-bold">Attunement</span>
+        <span className={`font-black text-2xl leading-none ${attunement >= 10 ? 'text-red-700' : attunement >= 6 ? 'text-amber-800' : 'text-green-700'}`}>{attunement}</span>
+      </div>
+    </div>
+  );
     </div>
   );
 }
