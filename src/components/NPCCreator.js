@@ -682,6 +682,18 @@ const NPCCreator = ({ onBack }) => {
   const [weaknesses, setWeaknesses]             = useState([{ text: '', condition: '' }]);
   const [senseFaction, setSenseFaction]         = useState('Monster');
 
+  // Powers
+  const [powerTrees, setPowerTrees]             = useState([]);
+  const [specialAbilities, setSpecialAbilities] = useState([]);
+  const [fundamentals, setFundamentals]         = useState([]);
+
+  // Skills
+  const [skills, setSkills] = useState([{ name: '', dots: 1 }]);
+
+  // Merits + notes
+  const [merits, setMerits]   = useState(['']);
+  const [notes, setNotes]     = useState('');
+
   // Health (non-monster): base 10 + 4 per Toughness power + 2 per Healthy merit
   const calcHealth = useCallback((trees, meritsArr) => {
     const hasToughness = trees.some(pt => {
@@ -694,18 +706,6 @@ const NPCCreator = ({ onBack }) => {
   const [healthOverride, setHealthOverride]     = useState(null); // null = use auto-calc
   const autoHealth = useMemo(() => calcHealth(powerTrees, merits), [calcHealth, powerTrees, merits]);
   const health = healthOverride !== null ? healthOverride : autoHealth;
-
-  // Powers
-  const [powerTrees, setPowerTrees]             = useState([]);
-  const [specialAbilities, setSpecialAbilities] = useState([]);
-  const [fundamentals, setFundamentals]         = useState([]);
-
-  // Skills
-  const [skills, setSkills] = useState([{ name: '', dots: 1 }]);
-
-  // Merits + notes
-  const [merits, setMerits]   = useState(['']);
-  const [notes, setNotes]     = useState('');
   const [isPermatainted, setIsPermatainted] = useState(false);
 
   const nextPowerId  = useRef(1);
@@ -822,7 +822,7 @@ const NPCCreator = ({ onBack }) => {
       notes, generation, road, amaranth, breed, auspice, rank, legion, guild, passions,
       shadowArchetype, thorn, lineage, court, echoes, trueName, celestialName, appellation,
       demonicVice, extraField1, extraField2, monsterHealth, isRealmbound, isHealthAsEnergy,
-      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction, health, healthOverride]);
+      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction, healthOverride]);
 
   const deleteFromBank = useCallback(async (entry) => {
     if (!window.confirm(`Delete "${entry.name}" from the bank?`)) return;
