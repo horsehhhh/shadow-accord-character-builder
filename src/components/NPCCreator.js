@@ -169,6 +169,23 @@ const FACTION_TREES = {
   monster: [],
 };
 
+// Tree access per human subfaction
+const _SORCERER_TREES  = ['Animal','Body','Curse','Healer','Mind','Patterns','Perception','Protection','Spirit','Warrior','Death','Demonology','Madness','Ruin','Ahl-i-batin','Craftmason','Messianic Voices','Old Faith','Order of Hermes','Spirit Talkers','Valdaermen','Veneficti'];
+const _FELLOWSHIP_TREES = ['Affinity','Champion','Discernment','Purity','Solace','Spiritual'];
+const _TALENT_TREES     = ['Brash','Brawny','Inquisitive','Sturdy'];
+const _CLAIMED_TREES    = ['Stasis','Weaver','Onesong','Enticer','Ferectori','Gorehound','Toad','Gorgon'];
+const SUBFACTION_TREES = {
+  'Ghoul':            [...FACTION_TREES.vampire, ..._CLAIMED_TREES],
+  'Sorcerer':         [..._SORCERER_TREES, ..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
+  'Mage':             [..._SORCERER_TREES, ..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
+  'Gifted Kinfolk':   [...FACTION_TREES.shifter, ..._CLAIMED_TREES],
+  'Faithful':         [..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
+  'Commoner':         [..._TALENT_TREES, ..._CLAIMED_TREES],
+  'Claimed (Drone)':  FACTION_TREES.human,
+  'Claimed (Gorgon)': FACTION_TREES.human,
+  'Claimed (Fomori)': FACTION_TREES.human,
+};
+
 // Powers granted at each dot level per tree (tree_name → [dot1, dot2, dot3])
 const POWER_TREE_LOOKUP = {
   'Ahroun':                              ['Silver Claws', 'Might', 'Brutal Strike'],
@@ -1136,9 +1153,7 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
   const removeMeritRow = idx => setMerits(m => m.filter((_, i) => i !== idx));
 
   const treeListId = `trees-${faction}-${subfaction}`;
-  const treeSuggestions = subfaction === 'Gifted Kinfolk'
-    ? [...(FACTION_TREES[faction] || []), ...FACTION_TREES.shifter]
-    : (FACTION_TREES[faction] || []);
+  const treeSuggestions = SUBFACTION_TREES[subfaction] || FACTION_TREES[faction] || [];
   const isShifterMode = faction === 'shifter' || subfaction === 'Gifted Kinfolk';
 
   return (
