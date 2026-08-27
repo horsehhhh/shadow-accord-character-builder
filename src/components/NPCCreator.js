@@ -173,7 +173,6 @@ const FACTION_TREES = {
 const _SORCERER_TREES  = ['Animal','Body','Curse','Healer','Mind','Patterns','Perception','Protection','Spirit','Warrior','Death','Demonology','Madness','Ruin','Ahl-i-batin','Craftmason','Messianic Voices','Old Faith','Order of Hermes','Spirit Talkers','Valdaermen','Veneficti'];
 const _FELLOWSHIP_TREES = ['Affinity','Champion','Discernment','Purity','Solace','Spiritual'];
 const _TALENT_TREES     = ['Brash','Brawny','Inquisitive','Sturdy'];
-const _CLAIMED_TREES    = ['Stasis','Weaver','Onesong','Enticer','Ferectori','Gorehound','Toad','Gorgon'];
 const SUBFACTION_TREES = {
   'Ghoul':            FACTION_TREES.vampire,
   'Sorcerer':         [..._SORCERER_TREES, ..._FELLOWSHIP_TREES],
