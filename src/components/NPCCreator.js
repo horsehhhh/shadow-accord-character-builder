@@ -295,52 +295,52 @@ const POWER_TREE_LOOKUP = {
 };
 
 const SKILL_DATA = {
-  'Academics': { cat: 'OTHER',      desc: 'Literacy - read/write languages; Tutor - teach extra skill; Mentor - teach extra power' },
-  'Alchemy':   { cat: 'PRODUCTION', desc: 'Bottle Essence; Energy Conversion; Alchemical Wisdom', restriction: 'Sorcerer' },
-  'Archery':   { cat: 'COMBAT',     desc: 'Bow/crossbow proficiency; Pinning Shot - Root power; Overdraw - Brutal Strike power' },
-  'Armory':    { cat: 'PRODUCTION', desc: 'Weapon/armor crafting; Repair armor; Rapid Repair' },
-  'Brawl':     { cat: 'COMBAT',     desc: 'Dual brawl boffers; Deflect with brawl boffers; Knockout - Daze power' },
-  'Guidance':  { cat: 'OTHER',      desc: 'Fascination - Guidance+Passion; Inspiration - Guidance+Meditate; Foreboding - Guidance+Despair' },
-  'Herbalism': { cat: 'PRODUCTION', desc: 'Herbalism Points for potions/poisons; Medicinal Application; Mithridatism - Resist Poison' },
-  'Holy Water':{ cat: 'PRODUCTION', desc: 'Holy Water production; Purify - Cleanse power; Sanctify - Sanctuary power', restriction: 'Human' },
-  'Locksmith': { cat: 'PRODUCTION', desc: 'Keysmith; Lock production; Lockpick' },
-  'Medicine':  { cat: 'OTHER',      desc: 'Health Check (●●/Sense Health); First Aid (●●●●/Detect Dead/Dying/Incapacitated); Diagnosis (●●●●●●/Detect Condition)' },
-  'Melee':     { cat: 'COMBAT',     desc: 'Martial weapon proficiency; Great Weapons - 2 damage; Flourish - Disarm power' },
-  'Rituals':   { cat: 'OTHER',      desc: '1: Scribe (1 Simple Public ritual); 2: Journey Scribe (1 Simple/Guarded OR Research); 3: Expert Scribe (1 Simple/Guarded/Secret OR Thesis)' },
-  'Shields':   { cat: 'COMBAT',     desc: 'Shield proficiency; Glancing Blow - Withstand power; Deflection - Avoidance power' },
+  'Academics': { cat: 'OTHER',      levels: ['Literacy - read/write languages', 'Tutor - teach extra skill', 'Mentor - teach extra power'] },
+  'Alchemy':   { cat: 'PRODUCTION', levels: ['Bottle Essence', 'Energy Conversion', 'Alchemical Wisdom'], restriction: 'Sorcerer' },
+  'Archery':   { cat: 'COMBAT',     levels: ['Bow/crossbow proficiency', 'Pinning Shot - Root power', 'Overdraw - Brutal Strike power'] },
+  'Armory':    { cat: 'PRODUCTION', levels: ['Weapon/armor crafting', 'Repair armor', 'Rapid Repair'] },
+  'Brawl':     { cat: 'COMBAT',     levels: ['Dual brawl boffers', 'Deflect with brawl boffers', 'Knockout - Daze power'] },
+  'Guidance':  { cat: 'OTHER',      levels: ['Fascination - Guidance+Passion', 'Inspiration - Guidance+Meditate', 'Foreboding - Guidance+Despair'] },
+  'Herbalism': { cat: 'PRODUCTION', levels: ['Herbalism Points for potions/poisons', 'Medicinal Application', 'Mithridatism - Resist Poison'] },
+  'Holy Water':{ cat: 'PRODUCTION', levels: ['Holy Water production', 'Purify - Cleanse power', 'Sanctify - Sanctuary power'], restriction: 'Human' },
+  'Locksmith': { cat: 'PRODUCTION', levels: ['Keysmith', 'Lock production', 'Lockpick'] },
+  'Medicine':  { cat: 'OTHER',      levels: ['Health Check / Sense Health', 'First Aid / Detect Dead, Dying, Incapacitated', 'Diagnosis / Detect Condition'] },
+  'Melee':     { cat: 'COMBAT',     levels: ['Martial weapon proficiency', 'Great Weapons - 2 damage', 'Flourish - Disarm power'] },
+  'Rituals':   { cat: 'OTHER',      levels: ['Scribe - receive 1 Simple Public ritual', 'Journey Scribe - 1 Simple/Guarded OR Research (3 Simple+ scrolls)', 'Expert Scribe - 1 Simple/Guarded/Secret OR Thesis (3 Complex+ scrolls)'] },
+  'Shields':   { cat: 'COMBAT',     levels: ['Shield proficiency', 'Glancing Blow - Withstand power', 'Deflection - Avoidance power'] },
 };
 
 const MERIT_DATA = {
-  'Adept':               { level: 1, desc: 'Additional production item per check-in (except Alchemy)' },
-  'Antiquarian':         { level: 1, desc: 'Attunement pool increased by 4 points' },
-  'Averted Weakness':    { level: 2, desc: 'Do not suffer clan weakness (not available to Gargoyles/Cappadocians/Nosferatu)', restriction: 'Vampire' },
-  'Delirium':            { level: 1, desc: 'Supernatural events cause Confusion or Frenzy; memory erased. Spend Willpower to resist for 10 min. Cannot take if Unveiled.', restriction: 'Human' },
-  'Doomslayer':          { level: 2, desc: 'Use Dark Arcanoi without Catharsis (repeatable)', restriction: 'Wraith' },
-  'Eidolon':             { level: 1, desc: 'Leave Catharsis after 5 minutes instead of 10', restriction: 'Wraith' },
-  'Enhanced Blood Buff': { level: 1, desc: 'Spend 3 Energy for Augment 1 for 10 minutes', restriction: 'Vampire' },
-  'Escape Artist':       { level: 1, desc: 'Gain Escape power - slip free of restraints in 60 seconds' },
-  'Font of Sustenance':  { level: 1, desc: 'Your blood worth one additional Vitae per Health once per event', restriction: 'Ghoul' },
-  'Hardy':               { level: 1, desc: 'Resist one status per day' },
-  'Healthy':             { level: 1, desc: 'Maximum health increased by 2' },
-  'Herd':                { level: 1, desc: 'Source of vitae outside town (repeatable)', restriction: 'Vampire' },
-  'Hidden Amaranth':     { level: 1, desc: 'Always answer Sense Amaranth with Zero', restriction: 'Vampire' },
-  'Hypnotist':           { level: 1, desc: 'Gain Hypnotism power for truth-telling' },
-  'Income':              { level: 1, desc: 'Gain 6 copper per check-in or 1 Bit for wraiths (repeatable)' },
-  'Kinfolk':             { level: 3, desc: 'Related to a shifter tribe - select specific tribe' },
-  'Lost Soul':           { level: 2, desc: 'Option to become wraith when you die', restriction: 'Shifter/Vampire' },
-  'Medium':              { level: 1, desc: 'Can hear the Umbra' },
-  'Misplaced Heart':     { level: 1, desc: 'Heart relocated to arm or leg - choose location at purchase', restriction: 'Vampire' },
-  'Mix Morph':           { level: 1, desc: 'Use claws without mask but without war form augment', restriction: 'Shifter' },
-  'Moon Ties':           { level: 2, desc: 'Complex auspice benefits and foibles based on lunar phase', restriction: 'Shifter' },
-  'Nimble':              { level: 1, desc: 'Resist one damage attack per day' },
-  'Oracle':              { level: 2, desc: 'Receive prophecy at check-in. Requires: Theurge/Dementation 1/Fatalism 1/Guidance 3' },
-  'Pale Aura':           { level: 1, desc: 'Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality' },
-  'Steel Trap':          { level: 1, desc: 'Aware when targeted by Forgetful Mind' },
-  'Strong Will':         { level: 1, desc: 'Mental powers last 5 minutes instead of 10' },
-  'Tainted Soul':        { level: 1, desc: 'Permanently tainted' },
-  'Taste of Oblivion':   { level: 2, desc: 'When drained while tainted causes Catharsis in drainer (only while Tainted)', restriction: 'Wraith' },
-  'Umbral Affinity':     { level: 1, desc: 'Step Sideways takes 30 seconds instead of 60', restriction: 'Shifter' },
-  'Unbondable':          { level: 2, desc: 'Requires 3 feedings (at least 10 min apart) from same Vampire in same event to become Blood Bound', restriction: 'Human' },
+  'Adept':               { desc: 'Additional production item per check-in (except Alchemy)' },
+  'Antiquarian':         { desc: 'Attunement pool increased by 4 points' },
+  'Averted Weakness':    { desc: 'Do not suffer clan weakness (not available to Gargoyles/Cappadocians/Nosferatu)' },
+  'Delirium':            { desc: 'Supernatural events cause Confusion or Frenzy; memory erased. Spend Willpower to resist for 10 min. Cannot take if Unveiled.' },
+  'Doomslayer':          { desc: 'Use Dark Arcanoi without Catharsis (repeatable)' },
+  'Eidolon':             { desc: 'Leave Catharsis after 5 minutes instead of 10' },
+  'Enhanced Blood Buff': { desc: 'Spend 3 Energy for Augment 1 for 10 minutes' },
+  'Escape Artist':       { desc: 'Gain Escape power - slip free of restraints in 60 seconds' },
+  'Font of Sustenance':  { desc: 'Your blood worth one additional Vitae per Health once per event' },
+  'Hardy':               { desc: 'Resist one status per day' },
+  'Healthy':             { desc: 'Maximum health increased by 2' },
+  'Herd':                { desc: 'Source of vitae outside town (repeatable)' },
+  'Hidden Amaranth':     { desc: 'Always answer Sense Amaranth with Zero' },
+  'Hypnotist':           { desc: 'Gain Hypnotism power for truth-telling' },
+  'Income':              { desc: 'Gain 6 copper per check-in or 1 Bit for wraiths (repeatable)' },
+  'Kinfolk':             { desc: 'Related to a shifter tribe - select specific tribe' },
+  'Lost Soul':           { desc: 'Option to become wraith when you die' },
+  'Medium':              { desc: 'Can hear the Umbra' },
+  'Misplaced Heart':     { desc: 'Heart relocated to arm or leg - choose location at purchase' },
+  'Mix Morph':           { desc: 'Use claws without mask but without war form augment' },
+  'Moon Ties':           { desc: 'Complex auspice benefits and foibles based on lunar phase' },
+  'Nimble':              { desc: 'Resist one damage attack per day' },
+  'Oracle':              { desc: 'Receive prophecy at check-in. Requires: Theurge/Dementation 1/Fatalism 1/Guidance 3' },
+  'Pale Aura':           { desc: 'Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality' },
+  'Steel Trap':          { desc: 'Aware when targeted by Forgetful Mind' },
+  'Strong Will':         { desc: 'Mental powers last 5 minutes instead of 10' },
+  'Tainted Soul':        { desc: 'Permanently tainted' },
+  'Taste of Oblivion':   { desc: 'When drained while tainted causes Catharsis in drainer (only while Tainted)' },
+  'Umbral Affinity':     { desc: 'Step Sideways takes 30 seconds instead of 60' },
+  'Unbondable':          { desc: 'Requires 3 feedings (at least 10 min apart) from same Vampire in same event to become Blood Bound' },
 };
 
 // ── Dot rating display ─────────────────────────────────────────────────────────
@@ -378,7 +378,15 @@ function SkillRow({ skill }) {
         <span className="font-semibold">{skill.name}</span>
         {info && <span className="text-gray-500">[{info.cat}]</span>}
       </div>
-      {info && <div className="ml-7 mt-0.5 text-gray-400">{info.desc}</div>}
+      {info && (
+        <div className="ml-7 mt-0.5 space-y-0.5">
+          {Array.from({ length: skill.dots }, (_, i) => (
+            <div key={i} className="text-gray-400">
+              <span className="text-gray-500">{i + 1}:</span> {info.levels[i]}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -387,10 +395,7 @@ function MeritRow({ merit }) {
   const info = MERIT_DATA[merit];
   return (
     <div className="text-xs text-gray-200">
-      <div className="flex items-baseline gap-2">
-        <span className="font-semibold">{merit}</span>
-        {info && <span className="text-gray-500">({info.level}pt)</span>}
-      </div>
+      <span className="font-semibold">{merit}</span>
       {info && <div className="ml-3 mt-0.5 text-gray-400">{info.desc}</div>}
     </div>
   );
@@ -430,6 +435,7 @@ function NPCCard({ npc, resolvedFaction }) {
     lineage, court, echoes,
     trueName, celestialName, appellation, demonicVice,
     extraField1, extraField2,
+    health,
     monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
     scorchTypes, immunities, weaknesses, senseFaction,
   } = npc;
@@ -501,6 +507,7 @@ function NPCCard({ npc, resolvedFaction }) {
           <StatRow label="Willpower" value={willpower} />
           <StatRow label="Virtue" value={virtue !== 'None' ? `${virtueValue} (${virtue})` : 'N/A'} />
           {regenRate > 0 && <StatRow label="Regen Rate" value={regenRate} />}
+          {faction !== 'monster' && <StatRow label="Health" value={health ?? 5} accent />}
           {faction === 'monster' && <StatRow label="Health" value={monsterHealth} accent />}
           {faction === 'monster' && monsterAugment > 0 && <StatRow label="Augment" value={monsterAugment} />}
           {faction === 'vampire' && generation && (
@@ -675,6 +682,19 @@ const NPCCreator = ({ onBack }) => {
   const [weaknesses, setWeaknesses]             = useState([{ text: '', condition: '' }]);
   const [senseFaction, setSenseFaction]         = useState('Monster');
 
+  // Health (non-monster): base 10 + 4 per Toughness power + 2 per Healthy merit
+  const calcHealth = useCallback((trees, meritsArr) => {
+    const hasToughness = trees.some(pt => {
+      const lvls = POWER_TREE_LOOKUP[pt.tree] || [];
+      return lvls.slice(0, pt.level).some(l => l.split(' / ').some(p => p.trim() === 'Toughness'));
+    });
+    const healthyCount = meritsArr.filter(m => m.trim() === 'Healthy').length;
+    return 10 + (hasToughness ? 4 : 0) + (healthyCount * 2);
+  }, []);
+  const [healthOverride, setHealthOverride]     = useState(null); // null = use auto-calc
+  const autoHealth = useMemo(() => calcHealth(powerTrees, merits), [calcHealth, powerTrees, merits]);
+  const health = healthOverride !== null ? healthOverride : autoHealth;
+
   // Powers
   const [powerTrees, setPowerTrees]             = useState([]);
   const [specialAbilities, setSpecialAbilities] = useState([]);
@@ -777,6 +797,7 @@ const NPCCreator = ({ onBack }) => {
       lineage, court, echoes,
       trueName, celestialName, appellation, demonicVice,
       extraField1, extraField2,
+      healthOverride,
       monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
       scorchTypes, immunities, weaknesses, senseFaction,
     };
@@ -801,7 +822,7 @@ const NPCCreator = ({ onBack }) => {
       notes, generation, road, amaranth, breed, auspice, rank, legion, guild, passions,
       shadowArchetype, thorn, lineage, court, echoes, trueName, celestialName, appellation,
       demonicVice, extraField1, extraField2, monsterHealth, isRealmbound, isHealthAsEnergy,
-      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction]);
+      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction, health, healthOverride]);
 
   const deleteFromBank = useCallback(async (entry) => {
     if (!window.confirm(`Delete "${entry.name}" from the bank?`)) return;
@@ -853,6 +874,7 @@ const NPCCreator = ({ onBack }) => {
     setExtraField1(d.extraField1 || '');
     setExtraField2(d.extraField2 || '');
     setMonsterHealth(d.monsterHealth ?? 10);
+    setHealthOverride(d.healthOverride ?? null);
     setIsRealmbound(d.isRealmbound !== false);
     setIsHealthAsEnergy(!!d.isHealthAsEnergy);
     setMonsterAugment(d.monsterAugment ?? 1);
@@ -906,7 +928,7 @@ const NPCCreator = ({ onBack }) => {
     };
     const monsterExtra = d.faction === 'monster' && d.scorchTypes?.length
       ? `<table class="stats-table">${row('Scorch', d.scorchTypes.join(', '))}</table>` : '';
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.power-detail{font-size:11px;color:#555;margin-left:20px;margin-top:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span><div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', (d.merits || []).filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail"><strong>${info.level}pt</strong> \u2014 ${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.power-detail{font-size:11px;color:#555;margin-left:20px;margin-top:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction !== 'monster' ? row('Health', d.health ?? 10) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span>` : ''}${info?.levels ? `<div class="power-detail">${Array.from({ length: s.dots }, (_, i) => `${i + 1}: ${esc(info.levels[i] || '')}`).join(' &bull; ')}</div>` : ''}</div>`; }).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', (d.merits || []).filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
     const win = window.open('', '_blank', 'width=750,height=950');
     win.document.write(html);
     win.document.close();
@@ -927,6 +949,8 @@ const NPCCreator = ({ onBack }) => {
     lineage, court, echoes,
     trueName, celestialName, appellation, demonicVice,
     extraField1, extraField2,
+    health,
+    healthOverride,
     monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
     scorchTypes, immunities, weaknesses, senseFaction,
   };
@@ -1030,6 +1054,7 @@ body { font-family: Georgia, serif; font-size: 13px; color: #000; background: #f
   ${row('Willpower', d.willpower)}
   ${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}
   ${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}
+  ${d.faction !== 'monster' ? row('Health', d.health ?? d.autoHealth ?? 10) : ''}
   ${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}
   ${d.faction === 'monster' && d.monsterAugment > 0 ? row('Augment', d.monsterAugment) : ''}
   ${d.faction === 'vampire' && d.generation ? row('Generation', GENERATION_TABLE.find(g => g.gen === Number(d.generation))?.label || d.generation) : ''}
@@ -1040,8 +1065,8 @@ ${d.fundamentals.filter(Boolean).length > 0 ? section('Fundamental Powers', d.fu
 ${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}
 ${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}
 ${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}
-${d.skills.some(s => s.name) ? section('Skills', d.skills.filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span><div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}
-${d.merits.some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail"><strong>${info.level}pt</strong> — ${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}
+${d.skills.some(s => s.name) ? section('Skills', d.skills.filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; const lvls = info?.levels || []; const detail = Array.from({ length: s.dots }, (_, i) => `${i + 1}: ${esc(lvls[i] || '')}`).join(' &bull; '); return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span>` : ''}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`; }).join('')) : ''}
+${d.merits.some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}
 ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
 </body></html>`;
 
@@ -1244,6 +1269,16 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                   <div>
                     <label className={lbl}>Energy {resolvedFaction && `(${resolvedFaction.energyMin}–${resolvedFaction.energyMax})`}</label>
                     <input type="number" className={inp} min={resolvedFaction?.energyMin ?? 0} max={resolvedFaction?.energyMax ?? 999} value={energy} onChange={e => setEnergy(Number(e.target.value))} />
+                  </div>
+                  <div>
+                    <label className={lbl}>Health{autoHealth !== healthOverride && healthOverride !== null ? '' : ` (auto: ${autoHealth})`}</label>
+                    <div className="flex gap-2 items-center">
+                      <input type="number" className={`${inp} flex-1`} min={1} value={health}
+                        onChange={e => setHealthOverride(Number(e.target.value))} />
+                      {healthOverride !== null && (
+                        <button onClick={() => setHealthOverride(null)} className="text-xs text-gray-500 hover:text-gray-300 whitespace-nowrap">reset</button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className={lbl}>Willpower (1–10)</label>
@@ -1618,9 +1653,7 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                     {merits.length > 1 && <button onClick={() => removeMeritRow(i)} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
                   </div>
                   {MERIT_DATA[m.trim()] && (
-                    <p className="ml-1 text-xs text-gray-500 italic">
-                      <span className="text-gray-400 not-italic font-medium">{MERIT_DATA[m.trim()].level}pt</span> — {MERIT_DATA[m.trim()].desc}
-                    </p>
+                    <p className="ml-1 text-xs text-gray-500 italic">{MERIT_DATA[m.trim()].desc}</p>
                   )}
                 </div>
               ))}
