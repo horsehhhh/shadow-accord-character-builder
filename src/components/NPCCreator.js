@@ -1127,8 +1127,10 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
   const removeSkillRow = idx => setSkills(s => s.filter((_, i) => i !== idx));
   const removeMeritRow = idx => setMerits(m => m.filter((_, i) => i !== idx));
 
-  const treeListId = `trees-${faction}`;
-  const treeSuggestions = FACTION_TREES[faction] || [];
+  const treeListId = `trees-${faction}-${subfaction}`;
+  const treeSuggestions = subfaction === 'Gifted Kinfolk'
+    ? [...(FACTION_TREES[faction] || []), ...FACTION_TREES.shifter]
+    : (FACTION_TREES[faction] || []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
