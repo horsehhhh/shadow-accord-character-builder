@@ -175,12 +175,12 @@ const _FELLOWSHIP_TREES = ['Affinity','Champion','Discernment','Purity','Solace'
 const _TALENT_TREES     = ['Brash','Brawny','Inquisitive','Sturdy'];
 const _CLAIMED_TREES    = ['Stasis','Weaver','Onesong','Enticer','Ferectori','Gorehound','Toad','Gorgon'];
 const SUBFACTION_TREES = {
-  'Ghoul':            [...FACTION_TREES.vampire, ..._CLAIMED_TREES],
-  'Sorcerer':         [..._SORCERER_TREES, ..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
-  'Mage':             [..._SORCERER_TREES, ..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
-  'Gifted Kinfolk':   [...FACTION_TREES.shifter, ..._CLAIMED_TREES],
-  'Faithful':         [..._FELLOWSHIP_TREES, ..._CLAIMED_TREES],
-  'Commoner':         [..._TALENT_TREES, ..._CLAIMED_TREES],
+  'Ghoul':            FACTION_TREES.vampire,
+  'Sorcerer':         [..._SORCERER_TREES, ..._FELLOWSHIP_TREES],
+  'Mage':             [..._SORCERER_TREES, ..._FELLOWSHIP_TREES],
+  'Gifted Kinfolk':   FACTION_TREES.shifter,
+  'Faithful':         _FELLOWSHIP_TREES,
+  'Commoner':         _TALENT_TREES,
   'Claimed (Drone)':  FACTION_TREES.human,
   'Claimed (Gorgon)': FACTION_TREES.human,
   'Claimed (Fomori)': FACTION_TREES.human,
