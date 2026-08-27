@@ -197,7 +197,79 @@ const SUBFACTION_TREES = {
   'Claimed (Fomori)': FACTION_TREES.human,
 };
 
-// Powers granted at each dot level per tree (tree_name → [dot1, dot2, dot3])
+// Tree name → source label for multi-faction NPC display
+const TREE_SOURCE_MAP = {
+  // Sorcerer regular trees
+  Animal:'Sorcerer', Body:'Sorcerer', Curse:'Sorcerer', Healer:'Sorcerer', Mind:'Sorcerer',
+  Patterns:'Sorcerer', Perception:'Sorcerer', Protection:'Sorcerer', Spirit:'Sorcerer', Warrior:'Sorcerer',
+  // Fallen Paths
+  Death:'Fallen Path', Demonology:'Fallen Path', Madness:'Fallen Path', Ruin:'Fallen Path',
+  // Sorcerer Fellowships (the tree representing the whole Fellowship)
+  'Ahl-i-batin':'Sorcerer Fellowship', Craftmason:'Sorcerer Fellowship',
+  'Messianic Voices':'Sorcerer Fellowship', 'Old Faith':'Sorcerer Fellowship',
+  'Order of Hermes':'Sorcerer Fellowship', 'Spirit Talkers':'Sorcerer Fellowship',
+  Valdaermen:'Sorcerer Fellowship', Veneficti:'Sorcerer Fellowship',
+  // Faithful Fellowship trees
+  Affinity:'Faithful', Champion:'Faithful', Discernment:'Faithful',
+  Purity:'Faithful', Solace:'Faithful', Spiritual:'Faithful',
+  // Talent trees (Commoner)
+  Brash:'Talent', Brawny:'Talent', Inquisitive:'Talent', Sturdy:'Talent',
+  // Claimed-specific trees
+  Stasis:'Drone', Weaver:'Drone', Onesong:'Drone',
+  Enticer:'Fomori', Ferectori:'Fomori', Gorehound:'Fomori', Toad:'Fomori', Gorgon:'Gorgon',
+  // Mage Pillar trees (by Fellowship)
+  'Al-Anbiya':'Ahl-i-Batin Pillar', 'Al-Fatihah':'Ahl-i-Batin Pillar',
+  'Al-Hajj':'Ahl-i-Batin Pillar', 'Al-Layl':'Ahl-i-Batin Pillar',
+  Anima:'Mage Pillar', Corona:'Mage Pillar', Materia:'Craftmasons Pillar', Vires:'Mage Pillar',
+  'Mikha-el':'Messianic Voices Pillar', 'Gavri-el':'Messianic Voices Pillar',
+  'Repha-el':'Messianic Voices Pillar', 'Uri-el':'Messianic Voices Pillar',
+  Infernalists:'Nephandi Pillar', "K'llasshaa":'Nephandi Pillar', Malfeans:'Nephandi Pillar',
+  Autumn:'Old Faith Pillar', Spring:'Old Faith Pillar', Summer:'Old Faith Pillar', Winter:'Old Faith Pillar',
+  Primus:'Order of Hermes Pillar',
+  Chieftain:'Spirit Talkers Pillar', Trickster:'Spirit Talkers Pillar',
+  'Spirit Talkers: Warrior':'Spirit Talkers Pillar', 'Wise One':'Spirit Talkers Pillar',
+  Fara:'Valdaermen Pillar', Forlog:'Valdaermen Pillar', Galdrar:'Valdaermen Pillar', Hjaldar:'Valdaermen Pillar',
+  Abomination:'Veneficti Pillar', Diabolism:'Veneficti Pillar',
+  Malediction:'Veneficti Pillar', Subversion:'Veneficti Pillar',
+  // Vampire
+  Animalism:'Vampire', Auspex:'Vampire', Celerity:'Vampire', Dominate:'Vampire',
+  Fortitude:'Vampire', Obfuscate:'Vampire', Potence:'Vampire', Presence:'Vampire',
+  Daimoinon:'Vampire', Deimos:'Vampire', Dementation:'Vampire', Mortis:'Vampire',
+  Necromancy:'Vampire', Obtenebration:'Vampire', Protean:'Vampire',
+  Quietus:'Vampire', 'Valeren Healer':'Vampire', 'Valeren Warrior':'Vampire',
+  Vicissitude:'Vampire', Visceratika:'Vampire',
+  'Thaumaturgy: Creo Ignem':'Vampire', 'Thaumaturgy: Rego Aquam':'Vampire',
+  'Thaumaturgy: Rego Vitae':'Vampire', 'Path of the Defiler':'Vampire',
+  'Rego Dolor (Path of Pain)':'Vampire', 'Rego Manes (Path of Spirit)':'Vampire',
+  'Rego Pestis (Path of Pestilence)':'Vampire', 'Rego Phobos (Path of Fear)':'Vampire',
+  // Shifter
+  Ahroun:'Shifter', Galliard:'Shifter', Philodox:'Shifter', Ragabash:'Shifter', Theurge:'Shifter',
+  Homid:'Shifter', Lupus:'Shifter', Natus:'Shifter',
+  'Black Fury Gift':'Shifter', 'Bone Gnawer Gift':'Shifter', 'Child of Gaia Gift':'Shifter',
+  'Fenrir Gift':'Shifter', 'Fianna Gift':'Shifter', 'Red Talon Gift':'Shifter',
+  'Shadow Lord Gift':'Shifter', 'Silent Strider Gift':'Shifter', 'Silver Fang Gift':'Shifter',
+  'Warder of Man Gift':'Shifter',
+  'Ananasi Gift':'Shifter', 'Bagheera Gift':'Shifter', 'Bubasti Gift':'Shifter',
+  'Ceilican Gift':'Shifter', 'Corax Gift':'Shifter', 'Ratkin Gift':'Shifter', 'Swara Gift':'Shifter',
+  'Corruption (Wyrm)':'Wyrm', 'Cunning (Wyrm)':'Wyrm', 'Defiling (Wyrm)':'Wyrm',
+  'Fear (Wyrm)':'Wyrm', 'Madness (Wyrm)':'Wyrm', 'Strength (Wyrm)':'Wyrm',
+  Nephandi:'Wyrm',
+  // Wraith
+  Argos:'Wraith', Castigate:'Wraith', Embody:'Wraith', Fatalism:'Wraith',
+  Flux:'Wraith', Inhabit:'Wraith', Intimation:'Wraith', Keening:'Wraith',
+  Lifeweb:'Wraith', Mnemosynis:'Wraith', Moliate:'Wraith', Outrage:'Wraith',
+  Pandemonium:'Wraith', Phantasm:'Wraith', Puppetry:'Wraith', Usury:'Wraith',
+  Contaminate:'Wraith', 'Hive Mind':'Wraith', Larceny:'Wraith',
+  Maleficence:'Wraith', 'Tempest Weaving':'Wraith',
+  // Fae
+  Chicanery:'Fae', Legerdemain:'Fae', Metamorphosis:'Fae', Naming:'Fae',
+  Primal:'Fae', Soothsay:'Fae', Sovereign:'Fae', Wayfare:'Fae',
+  // Demon Lores
+  'Lore of the Fundament':'Demon Lore', 'Lore of Humanity':'Demon Lore',
+  'Lore of the Winds':'Demon Lore', 'Lore of Storms':'Demon Lore',
+  'Lore of the Earth':'Demon Lore', 'Lore of the Forge':'Demon Lore',
+  'Lore of the Flame':'Demon Lore', 'Lore of the Celestials':'Demon Lore',
+};
 const POWER_TREE_LOOKUP = {
   'Ahroun':                              ['Silver Claws', 'Might', 'Brutal Strike'],
   'Ananasi Gift':                        ['Cloak', 'Venom', 'Meld'],
@@ -473,6 +545,7 @@ function MeritRow({ merit }) {
 
 function PowerRow({ power }) {
   const levels = POWER_TREE_LOOKUP[power.tree] || [];
+  const source = TREE_SOURCE_MAP[power.tree];
   const displayEntries = power.exact
     ? (levels[power.level - 1] ? [{ i: power.level - 1, lvl: levels[power.level - 1] }] : [])
     : Array.from({ length: power.level }, (_, i) => ({ i, lvl: levels[i] })).filter(e => e.lvl);
@@ -481,6 +554,7 @@ function PowerRow({ power }) {
       <div className="flex items-baseline gap-2">
         <Dots n={power.level} max={3} />
         <span className="font-semibold">{power.tree}</span>
+        {source && <span className="text-gray-500 italic">[{source}]</span>}
       </div>
       {displayEntries.length > 0 && (
         <div className="ml-7 mt-0.5 space-y-0.5">
@@ -1043,12 +1117,13 @@ const NPCCreator = ({ onBack }) => {
     const learned = (d.powerTrees || []).filter(p => p.cat === 'learned');
     const powerLine = p => {
       const lvls = POWER_TREE_LOOKUP[p.tree] || [];
+      const src = TREE_SOURCE_MAP[p.tree];
       const detail = lvls.length > 0
         ? (p.exact
           ? (lvls[p.level - 1] ? esc(lvls[p.level - 1]) : '')
           : Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; '))
         : '';
-      return `<div class="item"><span class="dots">${powerDotsStr(p.level)}</span> ${esc(p.tree)}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
+      return `<div class="item"><span class="dots">${powerDotsStr(p.level)}</span> ${esc(p.tree)}${src ? ` <span class="src">[${src}]</span>` : ''}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
     };
     const monsterExtra = d.faction === 'monster' && d.scorchTypes?.length
       ? `<table class="stats-table">${row('Scorch', d.scorchTypes.join(', '))}</table>` : '';
@@ -1091,12 +1166,13 @@ const NPCCreator = ({ onBack }) => {
       ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
     const powerLine = p => {
       const lvls = POWER_TREE_LOOKUP[p.tree] || [];
+      const src = TREE_SOURCE_MAP[p.tree];
       const detail = lvls.length > 0
         ? (p.exact
           ? (lvls[p.level - 1] ? esc(lvls[p.level - 1]) : '')
           : Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; '))
         : '';
-      return `<div class="item">${p.level ? `<span class="dots">${powerDotsStr(p.level)}</span> ` : ''}${esc(p.tree)}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
+      return `<div class="item">${p.level ? `<span class="dots">${powerDotsStr(p.level)}</span> ` : ''}${esc(p.tree)}${src ? ` <span class="src">[${src}]</span>` : ''}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
     };
 
     const specs = [];
@@ -1706,19 +1782,27 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                 : 'Pick tree + level. Innate = clan/tribe/etc., Learned = bought with XP.'}
             </p>
             <datalist id={treeListId}>
-              {treeSuggestions.map(t => <option key={t} value={t} />)}
+              {treeSuggestions.map(t => {
+                const src = TREE_SOURCE_MAP[t];
+                return <option key={t} value={t} label={src ? `${t} [${src}]` : t} />;
+              })}
             </datalist>
             {powerTrees.length > 0 && (
               <div className="space-y-1.5">
                 {powerTrees.map((pt, i) => (
-                  <div key={pt.id} className="flex gap-2 items-center">
-                    <input
-                      list={treeListId}
-                      className={`${inp} flex-1`}
-                      placeholder="Tree name (e.g. Celerity)"
-                      value={pt.tree}
-                      onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, tree: e.target.value } : x))}
-                    />
+                  <div key={pt.id} className="flex gap-2 items-center flex-wrap">
+                    <div className="flex gap-1 items-center flex-1 min-w-0">
+                      <input
+                        list={treeListId}
+                        className={`${inp} flex-1`}
+                        placeholder="Tree name (e.g. Celerity)"
+                        value={pt.tree}
+                        onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, tree: e.target.value } : x))}
+                      />
+                      {TREE_SOURCE_MAP[pt.tree] && (
+                        <span className="text-xs text-gray-500 italic whitespace-nowrap">[{TREE_SOURCE_MAP[pt.tree]}]</span>
+                      )}
+                    </div>
                     <select
                       value={pt.level}
                       onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, level: Number(e.target.value) } : x))}
