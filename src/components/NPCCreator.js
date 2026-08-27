@@ -824,6 +824,26 @@ const NPCCreator = ({ onBack }) => {
       demonicVice, extraField1, extraField2, monsterHealth, isRealmbound, isHealthAsEnergy,
       monsterAugment, scorchTypes, immunities, weaknesses, senseFaction, healthOverride]);
 
+  const clearForm = useCallback(() => {
+    loadingRef.current = true;
+    setName(''); setTitle(''); setSubfaction(''); setIsLegendary(false); setIsPermatainted(false);
+    setFaction('vampire');
+    setEnergy(15); setEnergyType('Vitae'); setWillpower(6);
+    setVirtue('Road'); setVirtueValue(6); setRegenRate(1);
+    setGeneration(10); setRoad('Road of Humanity'); setAmaranth(0);
+    setBreed('Homid'); setAuspice('Ahroun'); setRank(1);
+    setLegion('No Legion'); setGuild('No Guild'); setPassions(''); setShadowArchetype(''); setThorn('');
+    setLineage(''); setCourt(''); setEchoes('');
+    setTrueName(''); setCelestialName(''); setAppellation(''); setDemonicVice('');
+    setExtraField1(''); setExtraField2('');
+    setMonsterHealth(10); setIsRealmbound(true); setIsHealthAsEnergy(false); setMonsterAugment(1);
+    setScorchTypes(['Fire']); setImmunities([{ text: '', condition: '' }]); setWeaknesses([{ text: '', condition: '' }]); setSenseFaction('Monster');
+    setPowerTrees([]); setSpecialAbilities([]); setFundamentals([]);
+    setSkills([{ name: '', dots: 1 }]); setMerits(['']); setNotes('');
+    setHealthOverride(null);
+    setTimeout(() => { loadingRef.current = false; }, 0);
+  }, []);
+
   const deleteFromBank = useCallback(async (entry) => {
     if (!window.confirm(`Delete "${entry.name}" from the bank?`)) return;
     try {
@@ -1118,6 +1138,9 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
         <h1 className="text-lg font-bold text-purple-400 mr-auto">NPC Creator</h1>
         {activeTab === 'create' && (
           <>
+            <button onClick={clearForm} className="text-xs bg-gray-700 hover:bg-red-900 text-gray-300 hover:text-red-200 px-3 py-1.5 rounded border border-gray-600 hover:border-red-700">
+              New NPC
+            </button>
             <button onClick={saveToBank} className="text-xs bg-purple-800 hover:bg-purple-700 text-purple-200 px-3 py-1.5 rounded border border-purple-600">
               Save to Bank
             </button>
