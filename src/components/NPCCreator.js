@@ -403,17 +403,21 @@ function MeritRow({ merit }) {
 
 function PowerRow({ power }) {
   const levels = POWER_TREE_LOOKUP[power.tree] || [];
+  const displayEntries = power.exact
+    ? (levels[power.level - 1] ? [{ i: power.level - 1, lvl: levels[power.level - 1] }] : [])
+    : Array.from({ length: power.level }, (_, i) => ({ i, lvl: levels[i] })).filter(e => e.lvl);
   return (
     <div className="text-xs text-gray-200">
       <div className="flex items-baseline gap-2">
         <Dots n={power.level} max={3} />
         <span className="font-semibold">{power.tree}</span>
       </div>
-      {levels.length > 0 && (
+      {displayEntries.length > 0 && (
         <div className="ml-7 mt-0.5 space-y-0.5">
-          {Array.from({ length: power.level }, (_, i) => (
+          {displayEntries.map(({ i, lvl }) => (
             <div key={i} className="text-gray-400">
-              <span className="text-gray-500">{i + 1}:</span> {levels[i]}
+              {!power.exact && <span className="text-gray-500">{i + 1}: </span>}
+              {lvl}
             </div>
           ))}
         </div>
@@ -942,7 +946,9 @@ const NPCCreator = ({ onBack }) => {
     const powerLine = p => {
       const lvls = POWER_TREE_LOOKUP[p.tree] || [];
       const detail = lvls.length > 0
-        ? Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; ')
+        ? (p.exact
+          ? (lvls[p.level - 1] ? esc(lvls[p.level - 1]) : '')
+          : Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; '))
         : '';
       return `<div class="item"><span class="dots">${powerDotsStr(p.level)}</span> ${esc(p.tree)}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
     };
@@ -987,7 +993,9 @@ const NPCCreator = ({ onBack }) => {
     const powerLine = p => {
       const lvls = POWER_TREE_LOOKUP[p.tree] || [];
       const detail = lvls.length > 0
-        ? Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; ')
+        ? (p.exact
+          ? (lvls[p.level - 1] ? esc(lvls[p.level - 1]) : '')
+          : Array.from({ length: p.level }, (_, i) => `${i + 1}: ${esc(lvls[i])}`).join(' &bull; '))
         : '';
       return `<div class="item">${p.level ? `<span class="dots">${powerDotsStr(p.level)}</span> ` : ''}${esc(p.tree)}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
     };
@@ -1131,6 +1139,7 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
   const treeSuggestions = subfaction === 'Gifted Kinfolk'
     ? [...(FACTION_TREES[faction] || []), ...FACTION_TREES.shifter]
     : (FACTION_TREES[faction] || []);
+  const isShifterMode = faction === 'shifter' || subfaction === 'Gifted Kinfolk';
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -1570,7 +1579,11 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
           {/* Power Trees */}
           <div className={sec}>
             <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Power Trees</h2>
-            <p className="text-xs text-gray-500">Pick tree + level. Innate = clan/tribe/etc., Learned = bought with XP.</p>
+            <p className="text-xs text-gray-500">
+              {isShifterMode
+                ? 'Each row is one individual gift. Pick tree + tier (dots indicate gift level, not cumulative tree rank).'
+                : 'Pick tree + level. Innate = clan/tribe/etc., Learned = bought with XP.'}
+            </p>
             <datalist id={treeListId}>
               {treeSuggestions.map(t => <option key={t} value={t} />)}
             </datalist>
@@ -1589,7 +1602,11 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                       value={pt.level}
                       onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, level: Number(e.target.value) } : x))}
                       className="bg-gray-700 text-white text-sm rounded px-2 py-2 border border-gray-600 shrink-0">
-                      {[1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
+                      {[1,2,3].map(n => {
+                        const giftName = pt.exact && POWER_TREE_LOOKUP[pt.tree]?.[n - 1];
+                        const label = giftName ? `${n} – ${giftName.split(' / ')[0]}` : `${n}`;
+                        return <option key={n} value={n}>{label}</option>;
+                      })}
                     </select>
                     <select
                       value={pt.cat}
@@ -1604,9 +1621,9 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
               </div>
             )}
             <button
-              onClick={() => setPowerTrees(prev => [...prev, { id: nextPowerId.current++, tree: '', level: 1, cat: 'innate' }])}
+              onClick={() => setPowerTrees(prev => [...prev, { id: nextPowerId.current++, tree: '', level: 1, cat: 'innate', exact: isShifterMode }])}
               className="text-xs text-green-400 hover:text-green-300 border border-green-800 rounded px-2 py-1">
-              + Add Tree
+              {isShifterMode ? '+ Add Gift' : '+ Add Tree'}
             </button>
           </div>
 
