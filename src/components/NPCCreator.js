@@ -877,6 +877,10 @@ const NPCCreator = ({ onBack }) => {
     const d = saved;
     const powerDotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 3 - n));
     const row = (label, value) => (value != null && value !== '' && value !== false)
+      ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
+    const section = (title, content) => content
+      ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
+    const fLabel = rf?.label || saved.faction;
     const specs = [];
     if (d.faction === 'vampire') {
       const genRow = GENERATION_TABLE.find(g => g.gen === Number(d.generation));
@@ -931,6 +935,10 @@ const NPCCreator = ({ onBack }) => {
     const fLabel = resolvedFaction?.label || faction;
     const powerDotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 3 - n));
     const row = (label, value) => (value != null && value !== '' && value !== false)
+      ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
+    const section = (title, content) => content
+      ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
+    const powerLine = p => {
       const lvls = POWER_TREE_LOOKUP[p.tree] || [];
       const detail = lvls.length > 0
         ? Array.from({ length: p.level }, (_, i) => `${i + 1}: ${lvls[i]}`).join(' &bull; ')
