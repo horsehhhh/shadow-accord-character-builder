@@ -169,9 +169,183 @@ const FACTION_TREES = {
   monster: [],
 };
 
+// Powers granted at each dot level per tree (tree_name → [dot1, dot2, dot3])
+const POWER_TREE_LOOKUP = {
+  'Ahroun':                              ['Silver Claws', 'Might', 'Brutal Strike'],
+  'Ananasi Gift':                        ['Cloak', 'Venom', 'Meld'],
+  'Animalism':                           ['Beast Mind', 'Disquiet / Induce Frenzy', 'Frenzy Control'],
+  'Animal':                              ['Beast Mind', 'Disquiet / Induce Frenzy', 'Frenzy Control'],
+  'Argos':                               ['Cloak', 'Resilience', 'Hasty Escape'],
+  'Auspex':                              ['Sense Amaranth / Sense Emotion / Sense Item / Sense Vitae', 'Telepathy', 'Cloak Sight'],
+  'Bagheera Gift':                       ['Detect Taint', 'Fire Weapon', 'Daze'],
+  'Bubasti Gift':                        ['Forgetful Mind', 'Entrancement', 'Form of Vapor'],
+  'Ceilican Gift':                       ['Hallucination / Withstand', 'Fire Weapon', 'Hasty Escape'],
+  'Swara Gift':                          ['Razor Claws', 'Mask of a Thousand Faces', 'Gauntlet Walk'],
+  'Black Fury Gift':                     ['Detect Taint', 'Body Wrack', 'Aggravated 1'],
+  'Body':                                ['Withstand / Endure', 'Resilience', 'Resist Taint'],
+  'Bone Gnawer Gift':                    ['Forgetful Mind', 'Ranged 2 <Stone>', 'Resist Taint'],
+  'Castigate':                           ['Detect Taint / Sense Angst / Sense Shadow', 'Disquiet / Shadow Coax', 'Sanctuary'],
+  'Celerity':                            ['Disarm', 'Avoidance', 'Hasty Escape'],
+  'Child of Gaia Gift':                  ['Healing Touch', 'Serenity', 'Silver Armor'],
+  'Contaminate':                         ['Sense Fetter / Taint', 'Rend the Lifeweb', 'Induce Catharsis'],
+  'Corax Gift':                          ['Insight', 'Fire 2', 'Hasty Escape'],
+  'Curse':                               ['Forgetful Mind', 'Body Wrack', 'Paralyze'],
+  'Daimoinon':                           ['Sense Desire', 'Hellborn Investiture', 'Balefire'],
+  'Death':                               ['<Tainted> Silence', 'Insight', '<Tainted> Decay'],
+  'Deimos':                              ['Black Ichor', 'Dreamshape', 'Ranged 4 (Bile)'],
+  'Dementation':                         ['Confusion', 'Visions', 'Derange / Passion'],
+  'Demonology':                          ['Sense Demon / Scion of Evil', 'Umbra Sight', 'Subjugate'],
+  'Dominate':                            ['Forgetful Mind', 'Obedience', 'Conditioning'],
+  'Embody':                              ['Disembodied', 'Appear', 'Materialize'],
+  'Fatalism':                            ['Insight / Sense Pathos', 'Visions', 'Cloak Sight'],
+  'Fenrir Gift':                         ['Razor Claws', 'Venom', "Hero's Stand"],
+  'Fianna Gift':                         ['Fast Healing', 'Woadling', 'Form of Vapor'],
+  'Flux':                                ['Move Object / Sense Item', 'Shatter / Wither', 'Ranged 4 (Earth)'],
+  'Fortitude':                           ['Endure / Withstand', 'Resilience', 'Toughness'],
+  'Galliard':                            ['Taunt', 'Dreamshape', 'Song of Rage'],
+  'Healer':                              ['Healing Touch', 'Serenity', 'Revive'],
+  'Hive Mind':                           ['Detect Taint / Sense Angst / Sense Shadow', 'Telepathy', 'Subjugate'],
+  'Homid':                               ['Avert', 'Avoidance', 'Paralyze'],
+  'Inhabit':                             ['Sense Item / Withstand', 'Might', 'Dark Sword / Fabricate Armor'],
+  'Intimation':                          ['Sense Desire', 'Induce Sin', 'Craving'],
+  'Keening':                             ['Passion', 'Ranged 2 (Sonic)', 'Conditioning'],
+  'Larceny':                             ['Fast Healing', 'Devour / Expel Corpus / Health Exchange / Paralyzing Touch', 'Toughness'],
+  'Lifeweb':                             ['Fetter Creation / Sense Fetter', 'Detect Fetter / Fetter Consumption', 'Disable'],
+  'Lupus':                               ['Snarl', 'Resilience', 'Frenzy Control'],
+  'Madness':                             ['<Tainted> Monsters', 'Derange', 'Horrid Reality'],
+  'Maleficence':                         ['Detect Taint / Scion of Evil', '<Tainted> Silence', '<Tainted> Horrid Reality'],
+  'Mind':                                ['Confusion', 'Telepathy', 'Obedience'],
+  'Mnemosynis':                          ['Forgetful Mind', 'Telepathy', 'Obedience'],
+  'Moliate':                             ['Weaponry', 'Imitate', 'Resilience / Powerful Form'],
+  'Mortis':                              ['Wither', 'Meld', 'Decay'],
+  'Natus':                               ['Wither', 'Telepathy', 'Passion / Terror'],
+  'Necromancy':                          ['Insight', 'Umbra Sight', 'Umbra Drain'],
+  'Obfuscate':                           ['Cloak', 'Mask of a Thousand Faces', 'Cloak Gathering'],
+  'Obtenebration':                       ['Root / Tentacles', 'Terror', 'Form of Vapor'],
+  'Outrage':                             ['Stonehand Punch', 'Move Object / Realm Grasp', 'Aggravated 1'],
+  'Pandemonium':                         ['Confusion', 'Monsters', 'Avoidance / Root'],
+  'Patterns':                            ['Shatter', 'Fabricate Armor', 'Disable'],
+  'Perception':                          ['Sense Item / Sense Essence', 'Read Magic / Sense Spirit', 'Detect Taint / Sense Confidence / Sense Desire'],
+  'Phantasm':                            ['Cognizance', 'Dreamshape', 'Daze'],
+  'Philodox':                            ['Sense Gnosis / Sense Item', 'Meditate', 'Toughness'],
+  'Potence':                             ['Shatter', 'Might', 'Brutal Strike'],
+  'Presence':                            ['Snarl', 'Entrancement', 'Majesty'],
+  'Protection':                          ['Avert', 'Cloak', 'Sanctuary'],
+  'Protean':                             ['Clawed Form: Wolf Mask / Razor Claws', 'Meld', 'Aggravated Claws'],
+  'Puppetry':                            ['Control Voice', 'Control Body', 'Puppet Control'],
+  'Quietus':                             ['Silence', 'Venom', 'Daze'],
+  'Ragabash':                            ['Confusion', 'Disembodied / Realm Grasp', 'Mimic'],
+  'Ratkin Gift':                         ['Cloak', 'Monsters', 'Aggravated 1'],
+  'Red Talon Gift':                      ['Shatter', 'Beast Mind / Root', 'Fire 4'],
+  'Ruin':                                ['<Tainted> Wither', 'Ranged 2 <Dark>', 'Brittle Bones'],
+  'Shadow Lord Gift':                    ['Disarm', 'Wounding Lies', 'Disable'],
+  'Tempest Weaving':                     ['Cloak', 'Meld', 'Form of Vapor'],
+  'Silent Strider Gift':                 ['Silence', 'Horrid Reality', 'Gauntlet Walk'],
+  'Silver Fang Gift':                    ['Detect Taint', 'True Form', 'Obedience'],
+  'Spirit':                              ['Resist Gauntlet', 'Cleanse', 'Exorcism'],
+  'Thaumaturgy: Creo Ignem':             ['Fire 2', '<Fire> Weapon', 'Fire 4'],
+  'Thaumaturgy: Rego Aquam':             ['Silence', 'Fabricate Armor', 'Paralyze'],
+  'Thaumaturgy: Rego Vitae':             ['Sense Vitae / Test Generation / Test Blood Bond', 'Ranged 2 <Blood>', 'Aggravated 1'],
+  'Path of the Defiler':                 ['Taint', 'Derange', 'Balefire'],
+  'Rego Dolor (Path of Pain)':           ['Silence', 'Body Wrack', 'Horrid Reality'],
+  'Rego Manes (Path of Spirit)':         ['Scion of Evil / Sense Demon / Sense Spirit', 'Umbra Sight', 'Subjugate'],
+  'Rego Pestis (Path of Pestilence)':    ['Wither', 'Venom', 'Brittle Bones'],
+  'Rego Phobos (Path of Fear)':          ['Monsters', 'Dreamshape / Terror', 'Leech of Fear'],
+  'Theurge':                             ['Release Spirit / Sense Spirit', 'Umbra Sight', 'Umbra Strike'],
+  'Usury':                               ['Pathos Exchange / Paralyzing Touch', 'Devour / Expel Corpus / Health Exchange', 'Pathos Investment'],
+  'Valeren Healer':                      ['Healing Touch', 'Serenity', 'Revive'],
+  'Valeren Warrior':                     ['Sense Max Health / Sense Mental / Sense Health', 'Body Wrack', 'Light Weapon / Vengeance of Samiel'],
+  'Vicissitude':                         ['Weaponry', 'Imitate', 'Resilience / Powerful Form: Green and Black Spiked Mask'],
+  'Visceratika':                         ['Cloak / Clawed Form', 'Avoidance', 'Powerful Form / Resilience'],
+  'Warder of Man Gift':                  ['Pence from Heaven', 'Fabricate Armor', 'Cloak Sight'],
+  'Warrior':                             ['Taunt', 'Might', 'Avoidance / Disarm'],
+  'Ahl-i-batin':                         ['Visions', 'Mask of a Thousand Faces', 'Hasty Escape'],
+  'Craftmason':                          ['Pence from Heaven', 'Meditate', 'Daze'],
+  'Messianic Voices':                    ['Sense Demon / Silence', 'Ranged 2 (Holy)', 'Majesty'],
+  'Old Faith':                           ['Root', 'Wither', 'Entrancement / Passion'],
+  'Order of Hermes':                     ['Fire 2', 'True Form / Daze', 'Disembodied'],
+  'Spirit Talkers':                      ['Hallucination', 'Dreamshape', 'Umbra Sight'],
+  'Valdaermen':                          ['Snarl', 'Clawed Form / Powerful Form', 'Toughness'],
+  'Veneficti':                           ['Sense Demon / Venom', 'Induce Sin', 'Silver Tongue'],
+  'Affinity':                            ['Pence from Heaven', 'Taunt', 'Hypnotism'],
+  'Champion':                            ['Heal Self', 'Resilience', 'Avoidance / Disarm'],
+  'Discernment':                         ['Detect Taint', 'Sense Amaranth / Sense Demon / Sense Rank', 'Cloak Sight'],
+  'Purity':                              ['Avert', 'Serenity', 'Cleanse'],
+  'Solace':                              ['Sense Angst / Sense Fetter / Sense Shadow', 'Detect Fetter / Fetter Consumption', 'Exorcism'],
+  'Spiritual':                           ['Sense Spirit / Resist Gauntlet', 'Umbra Sight', 'Umbra Strike'],
+  'Stasis':                              ['Cloak Gathering', 'Fabricate Armor', 'Toughness'],
+  'Weaver':                              ['Taint / True Form', 'Paralyze', 'Disable'],
+  'Onesong':                             ['Forgetful Mind / Visions', 'Telepathy', 'Conditioning / Entrancement'],
+  'Enticer':                             ['Tentacles', '<Tainted> Entrancement', 'Paralyze'],
+  'Ferectori':                           ['<Tainted> Snarl', 'Terror', 'Gauntlet Walk'],
+  'Gorehound':                           ['Fast Healing', '<Tainted> Body Wrack', 'Might'],
+  'Toad':                                ['Ranged 2 <Acid>', 'Taint / Venom', 'Form of Vapor'],
+  'Gorgon':                              ['Hallucination', 'Dreamshape', 'Gauntlet Walk / Umbra Sight'],
+  'Brash':                               ['Taunt', 'Disarm', 'Avoidance'],
+  'Brawny':                              ['Shatter', 'Might', 'Brutal Strike'],
+  'Inquisitive':                         ['Sense Emotion', 'Sense Mental', 'Sense Vitality'],
+  'Sturdy':                              ['Endure & Withstand', 'Resilience', 'Toughness'],
+  'Corruption (Wyrm)':                   ['Taint', 'Corrupted Powers', 'Subjugate'],
+  'Cunning (Wyrm)':                      ['Smell Fear', 'Cloak Gathering', 'Hidden Taint'],
+  'Defiling (Wyrm)':                     ['Detect Taint / Scion of Evil', 'Induce Sin', 'Tainted Induce Frenzy / Terror'],
+  'Fear (Wyrm)':                         ['Sense Confidence', 'Horrid Reality', 'Disable'],
+  'Madness (Wyrm)':                      ['Tainted Confusion', 'Tainted Derange', 'Tainted Decay'],
+  'Strength (Wyrm)':                     ['Hide of the Wyrm', 'Totemic Form / Resilience', 'Balefire'],
+  'Nephandi':                            ['Ranged 2 <Void>', 'Induce Frenzy / Taint', 'Hidden Taint'],
+};
+
+const SKILL_DATA = {
+  'Academics': { cat: 'OTHER',      desc: 'Literacy - read/write languages; Tutor - teach extra skill; Mentor - teach extra power' },
+  'Alchemy':   { cat: 'PRODUCTION', desc: 'Bottle Essence; Energy Conversion; Alchemical Wisdom', restriction: 'Sorcerer' },
+  'Archery':   { cat: 'COMBAT',     desc: 'Bow/crossbow proficiency; Pinning Shot - Root power; Overdraw - Brutal Strike power' },
+  'Armory':    { cat: 'PRODUCTION', desc: 'Weapon/armor crafting; Repair armor; Rapid Repair' },
+  'Brawl':     { cat: 'COMBAT',     desc: 'Dual brawl boffers; Deflect with brawl boffers; Knockout - Daze power' },
+  'Guidance':  { cat: 'OTHER',      desc: 'Fascination - Guidance+Passion; Inspiration - Guidance+Meditate; Foreboding - Guidance+Despair' },
+  'Herbalism': { cat: 'PRODUCTION', desc: 'Herbalism Points for potions/poisons; Medicinal Application; Mithridatism - Resist Poison' },
+  'Holy Water':{ cat: 'PRODUCTION', desc: 'Holy Water production; Purify - Cleanse power; Sanctify - Sanctuary power', restriction: 'Human' },
+  'Locksmith': { cat: 'PRODUCTION', desc: 'Keysmith; Lock production; Lockpick' },
+  'Medicine':  { cat: 'OTHER',      desc: 'Health Check (●●/Sense Health); First Aid (●●●●/Detect Dead/Dying/Incapacitated); Diagnosis (●●●●●●/Detect Condition)' },
+  'Melee':     { cat: 'COMBAT',     desc: 'Martial weapon proficiency; Great Weapons - 2 damage; Flourish - Disarm power' },
+  'Rituals':   { cat: 'OTHER',      desc: '1: Scribe (1 Simple Public ritual); 2: Journey Scribe (1 Simple/Guarded OR Research); 3: Expert Scribe (1 Simple/Guarded/Secret OR Thesis)' },
+  'Shields':   { cat: 'COMBAT',     desc: 'Shield proficiency; Glancing Blow - Withstand power; Deflection - Avoidance power' },
+};
+
+const MERIT_DATA = {
+  'Adept':               { level: 1, desc: 'Additional production item per check-in (except Alchemy)' },
+  'Antiquarian':         { level: 1, desc: 'Attunement pool increased by 4 points' },
+  'Averted Weakness':    { level: 2, desc: 'Do not suffer clan weakness (not available to Gargoyles/Cappadocians/Nosferatu)', restriction: 'Vampire' },
+  'Delirium':            { level: 1, desc: 'Supernatural events cause Confusion or Frenzy; memory erased. Spend Willpower to resist for 10 min. Cannot take if Unveiled.', restriction: 'Human' },
+  'Doomslayer':          { level: 2, desc: 'Use Dark Arcanoi without Catharsis (repeatable)', restriction: 'Wraith' },
+  'Eidolon':             { level: 1, desc: 'Leave Catharsis after 5 minutes instead of 10', restriction: 'Wraith' },
+  'Enhanced Blood Buff': { level: 1, desc: 'Spend 3 Energy for Augment 1 for 10 minutes', restriction: 'Vampire' },
+  'Escape Artist':       { level: 1, desc: 'Gain Escape power - slip free of restraints in 60 seconds' },
+  'Font of Sustenance':  { level: 1, desc: 'Your blood worth one additional Vitae per Health once per event', restriction: 'Ghoul' },
+  'Hardy':               { level: 1, desc: 'Resist one status per day' },
+  'Healthy':             { level: 1, desc: 'Maximum health increased by 2' },
+  'Herd':                { level: 1, desc: 'Source of vitae outside town (repeatable)', restriction: 'Vampire' },
+  'Hidden Amaranth':     { level: 1, desc: 'Always answer Sense Amaranth with Zero', restriction: 'Vampire' },
+  'Hypnotist':           { level: 1, desc: 'Gain Hypnotism power for truth-telling' },
+  'Income':              { level: 1, desc: 'Gain 6 copper per check-in or 1 Bit for wraiths (repeatable)' },
+  'Kinfolk':             { level: 3, desc: 'Related to a shifter tribe - select specific tribe' },
+  'Lost Soul':           { level: 2, desc: 'Option to become wraith when you die', restriction: 'Shifter/Vampire' },
+  'Medium':              { level: 1, desc: 'Can hear the Umbra' },
+  'Misplaced Heart':     { level: 1, desc: 'Heart relocated to arm or leg - choose location at purchase', restriction: 'Vampire' },
+  'Mix Morph':           { level: 1, desc: 'Use claws without mask but without war form augment', restriction: 'Shifter' },
+  'Moon Ties':           { level: 2, desc: 'Complex auspice benefits and foibles based on lunar phase', restriction: 'Shifter' },
+  'Nimble':              { level: 1, desc: 'Resist one damage attack per day' },
+  'Oracle':              { level: 2, desc: 'Receive prophecy at check-in. Requires: Theurge/Dementation 1/Fatalism 1/Guidance 3' },
+  'Pale Aura':           { level: 1, desc: 'Answer Sense Faction as Human; answer Yes to Sense Living; treated as if you have Vitality' },
+  'Steel Trap':          { level: 1, desc: 'Aware when targeted by Forgetful Mind' },
+  'Strong Will':         { level: 1, desc: 'Mental powers last 5 minutes instead of 10' },
+  'Tainted Soul':        { level: 1, desc: 'Permanently tainted' },
+  'Taste of Oblivion':   { level: 2, desc: 'When drained while tainted causes Catharsis in drainer (only while Tainted)', restriction: 'Wraith' },
+  'Umbral Affinity':     { level: 1, desc: 'Step Sideways takes 30 seconds instead of 60', restriction: 'Shifter' },
+  'Unbondable':          { level: 2, desc: 'Requires 3 feedings (at least 10 min apart) from same Vampire in same event to become Blood Bound', restriction: 'Human' },
+};
+
 // ── Dot rating display ─────────────────────────────────────────────────────────
-function Dots({ n }) {
-  return <span className="tracking-tight">{Array.from({ length: 5 }, (_, i) => (
+function Dots({ n, max = 5 }) {
+  return <span className="tracking-tight">{Array.from({ length: max }, (_, i) => (
     <span key={i} className={i < n ? 'text-white' : 'text-gray-600'}>●</span>
   ))}</span>;
 }
@@ -195,11 +369,50 @@ function CardSection({ title, color = 'text-purple-400', children }) {
   );
 }
 
-function PowerRow({ power }) {
+function SkillRow({ skill }) {
+  const info = SKILL_DATA[skill.name];
   return (
-    <div className="text-xs text-gray-200 flex items-baseline gap-2">
-      <Dots n={power.level} />
-      <span>{power.tree}</span>
+    <div className="text-xs text-gray-200">
+      <div className="flex items-baseline gap-2">
+        <Dots n={skill.dots} max={3} />
+        <span className="font-semibold">{skill.name}</span>
+        {info && <span className="text-gray-500">[{info.cat}]</span>}
+      </div>
+      {info && <div className="ml-7 mt-0.5 text-gray-400">{info.desc}</div>}
+    </div>
+  );
+}
+
+function MeritRow({ merit }) {
+  const info = MERIT_DATA[merit];
+  return (
+    <div className="text-xs text-gray-200">
+      <div className="flex items-baseline gap-2">
+        <span className="font-semibold">{merit}</span>
+        {info && <span className="text-gray-500">({info.level}pt)</span>}
+      </div>
+      {info && <div className="ml-3 mt-0.5 text-gray-400">{info.desc}</div>}
+    </div>
+  );
+}
+
+function PowerRow({ power }) {
+  const levels = POWER_TREE_LOOKUP[power.tree] || [];
+  return (
+    <div className="text-xs text-gray-200">
+      <div className="flex items-baseline gap-2">
+        <Dots n={power.level} max={3} />
+        <span className="font-semibold">{power.tree}</span>
+      </div>
+      {levels.length > 0 && (
+        <div className="ml-7 mt-0.5 space-y-0.5">
+          {Array.from({ length: power.level }, (_, i) => (
+            <div key={i} className="text-gray-400">
+              <span className="text-gray-500">{i + 1}:</span> {levels[i]}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -374,18 +587,16 @@ function NPCCard({ npc, resolvedFaction }) {
 
         {skills.some(s => s.name) && (
           <CardSection title="Skills" color="text-gray-300">
-            <div className="flex flex-wrap gap-x-5 gap-y-0.5">
-              {skills.filter(s => s.name).map((s, i) => (
-                <span key={i} className="text-xs text-gray-200">{s.name} <Dots n={s.dots} /></span>
-              ))}
+            <div className="space-y-1.5">
+              {skills.filter(s => s.name).map((s, i) => <SkillRow key={i} skill={s} />)}
             </div>
           </CardSection>
         )}
 
         {merits.some(m => m.trim()) && (
           <CardSection title="Merits" color="text-gray-300">
-            <div className="space-y-0.5">
-              {merits.filter(m => m.trim()).map((m, i) => <div key={i} className="text-xs text-gray-200">{m}</div>)}
+            <div className="space-y-1.5">
+              {merits.filter(m => m.trim()).map((m, i) => <MeritRow key={i} merit={m} />)}
             </div>
           </CardSection>
         )}
@@ -665,6 +876,7 @@ const NPCCreator = ({ onBack }) => {
     const rf = FACTIONS[saved.faction];
     const d = saved;
     const dotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 5 - n));
+    const powerDotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 3 - n));
     const row = (label, value) => (value != null && value !== '' && value !== false)
       ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
     const section = (title, content) => content
@@ -685,10 +897,16 @@ const NPCCreator = ({ onBack }) => {
     }
     const innate  = (d.powerTrees || []).filter(p => p.cat === 'innate');
     const learned = (d.powerTrees || []).filter(p => p.cat === 'learned');
-    const powerLine = p => `<div class="item"><span class="dots">${dotsStr(p.level)}</span> ${p.tree}</div>`;
+    const powerLine = p => {
+      const lvls = POWER_TREE_LOOKUP[p.tree] || [];
+      const detail = lvls.length > 0
+        ? Array.from({ length: p.level }, (_, i) => `${i + 1}: ${lvls[i]}`).join(' &bull; ')
+        : '';
+      return `<div class="item"><span class="dots">${powerDotsStr(p.level)}</span> ${p.tree}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
+    };
     const monsterExtra = d.faction === 'monster' && d.scorchTypes?.length
       ? `<table class="stats-table">${row('Scorch', d.scorchTypes.join(', '))}</table>` : '';
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => `<div class="item">${s.name} ${dotsStr(s.dots)}</div>`).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => `<div class="item">${m}</div>`).join('')) : ''}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.power-detail{font-size:11px;color:#555;margin-left:20px;margin-top:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${s.name}${info ? ` <span class="src">[${info.cat}]</span><div class="power-detail">${info.desc}</div>` : ''}</div>`; }).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', (d.merits || []).filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${m}${info ? `<div class="power-detail"><strong>${info.level}pt</strong> \u2014 ${info.desc}</div>` : ''}</div>`; }).join('')) : ''}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
     const win = window.open('', '_blank', 'width=750,height=950');
     win.document.write(html);
     win.document.close();
@@ -717,12 +935,18 @@ const NPCCreator = ({ onBack }) => {
     const d = npcData;
     const fLabel = resolvedFaction?.label || faction;
     const dotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 5 - n));
+    const powerDotsStr = n => '\u25cf'.repeat(Math.max(0, n)) + '\u25cb'.repeat(Math.max(0, 3 - n));
     const row = (label, value) => (value != null && value !== '' && value !== false)
       ? `<tr><td class="lbl">${label}</td><td>${value}</td></tr>` : '';
     const section = (title, content) => content
       ? `<div class="sec"><div class="sec-title">${title}</div>${content}</div>` : '';
-    const powerLine = p =>
-      `<div class="item">${p.level ? `<span class="dots">${dotsStr(p.level)}</span> ` : ''}${p.tree}</div>`;
+    const powerLine = p => {
+      const lvls = POWER_TREE_LOOKUP[p.tree] || [];
+      const detail = lvls.length > 0
+        ? Array.from({ length: p.level }, (_, i) => `${i + 1}: ${lvls[i]}`).join(' &bull; ')
+        : '';
+      return `<div class="item">${p.level ? `<span class="dots">${powerDotsStr(p.level)}</span> ` : ''}${p.tree}${detail ? `<div class="power-detail">${detail}</div>` : ''}</div>`;
+    };
 
     const specs = [];
     if (d.faction === 'vampire') {
@@ -784,6 +1008,7 @@ body { font-family: Georgia, serif; font-size: 13px; color: #000; background: #f
 .sec-title { font-weight: bold; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 5px; }
 .item { font-size: 12px; margin: 2px 0; line-height: 1.5; }
 .dots { font-family: monospace; letter-spacing: 1px; }
+.power-detail { font-size: 11px; color: #555; margin-left: 20px; margin-top: 1px; }
 .src { color: #555; font-size: 11px; }
 .skills-wrap { display: flex; flex-wrap: wrap; gap: 0 28px; }
 .notes-text { font-style: italic; white-space: pre-wrap; color: #333; line-height: 1.6; }
@@ -815,8 +1040,8 @@ ${d.fundamentals.filter(Boolean).length > 0 ? section('Fundamental Powers', d.fu
 ${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}
 ${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}
 ${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}
-${d.skills.some(s => s.name) ? section('Skills', `<div class="skills-wrap">${d.skills.filter(s => s.name).map(s => `<div class="item"><span class="dots">${dotsStr(s.dots)}</span> ${s.name}</div>`).join('')}</div>`) : ''}
-${d.merits.some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => `<div class="item">${m}</div>`).join('')) : ''}
+${d.skills.some(s => s.name) ? section('Skills', d.skills.filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${s.name}${info ? ` <span class="src">[${info.cat}]</span><div class="power-detail">${info.desc}</div>` : ''}</div>`; }).join('')) : ''}
+${d.merits.some(m => m.trim()) ? section('Merits', d.merits.filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${m}${info ? `<div class="power-detail"><strong>${info.level}pt</strong> — ${info.desc}</div>` : ''}</div>`; }).join('')) : ''}
 ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
 </body></html>`;
 
@@ -1304,7 +1529,7 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                       value={pt.level}
                       onChange={e => setPowerTrees(prev => prev.map((x, j) => j === i ? { ...x, level: Number(e.target.value) } : x))}
                       className="bg-gray-700 text-white text-sm rounded px-2 py-2 border border-gray-600 shrink-0">
-                      {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                      {[1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
                     <select
                       value={pt.cat}
@@ -1350,17 +1575,25 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
           {/* Skills */}
           <div className={sec}>
             <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Skills</h2>
+            <datalist id="skill-list">
+              {Object.keys(SKILL_DATA).map(s => <option key={s} value={s} />)}
+            </datalist>
             <div className="space-y-2">
               {skills.map((s, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input className={`${inp} flex-1`} placeholder="Skill name"
-                    value={s.name} onChange={e => setSkills(prev => prev.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
-                  <select value={s.dots}
-                    onChange={e => setSkills(prev => prev.map((x, j) => j === i ? { ...x, dots: Number(e.target.value) } : x))}
-                    className="bg-gray-700 text-white text-sm rounded px-2 py-2 border border-gray-600 shrink-0">
-                    {[1,2,3,4,5].map(d => <option key={d} value={d}>{['●','●●','●●●','●●●●','●●●●●'][d-1]}</option>)}
-                  </select>
-                  {skills.length > 1 && <button onClick={() => removeSkillRow(i)} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                <div key={i} className="space-y-1">
+                  <div className="flex gap-2 items-center">
+                    <input list="skill-list" className={`${inp} flex-1`} placeholder="Skill name"
+                      value={s.name} onChange={e => setSkills(prev => prev.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
+                    <select value={s.dots}
+                      onChange={e => setSkills(prev => prev.map((x, j) => j === i ? { ...x, dots: Number(e.target.value) } : x))}
+                      className="bg-gray-700 text-white text-sm rounded px-2 py-2 border border-gray-600 shrink-0">
+                      {[1,2,3].map(d => <option key={d} value={d}>{['●','●●','●●●'][d-1]}</option>)}
+                    </select>
+                    {skills.length > 1 && <button onClick={() => removeSkillRow(i)} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                  </div>
+                  {SKILL_DATA[s.name] && (
+                    <p className="ml-1 text-xs text-gray-500 italic">{SKILL_DATA[s.name].desc}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -1373,12 +1606,22 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
           {/* Merits */}
           <div className={sec}>
             <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Merits / Flaws</h2>
+            <datalist id="merit-list">
+              {Object.keys(MERIT_DATA).map(m => <option key={m} value={m} />)}
+            </datalist>
             <div className="space-y-2">
               {merits.map((m, i) => (
-                <div key={i} className="flex gap-2">
-                  <input className={`${inp} flex-1`} placeholder="Merit or flaw name"
-                    value={m} onChange={e => setMerits(prev => prev.map((x, j) => j === i ? e.target.value : x))} />
-                  {merits.length > 1 && <button onClick={() => removeMeritRow(i)} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                <div key={i} className="space-y-1">
+                  <div className="flex gap-2">
+                    <input list="merit-list" className={`${inp} flex-1`} placeholder="Merit or flaw name"
+                      value={m} onChange={e => setMerits(prev => prev.map((x, j) => j === i ? e.target.value : x))} />
+                    {merits.length > 1 && <button onClick={() => removeMeritRow(i)} className="text-red-400 hover:text-red-300 text-sm">✕</button>}
+                  </div>
+                  {MERIT_DATA[m.trim()] && (
+                    <p className="ml-1 text-xs text-gray-500 italic">
+                      <span className="text-gray-400 not-italic font-medium">{MERIT_DATA[m.trim()].level}pt</span> — {MERIT_DATA[m.trim()].desc}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
