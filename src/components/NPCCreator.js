@@ -173,10 +173,22 @@ const FACTION_TREES = {
 const _SORCERER_TREES  = ['Animal','Body','Curse','Healer','Mind','Patterns','Perception','Protection','Spirit','Warrior','Death','Demonology','Madness','Ruin','Ahl-i-batin','Craftmason','Messianic Voices','Old Faith','Order of Hermes','Spirit Talkers','Valdaermen','Veneficti'];
 const _FELLOWSHIP_TREES = ['Affinity','Champion','Discernment','Purity','Solace','Spiritual'];
 const _TALENT_TREES     = ['Brash','Brawny','Inquisitive','Sturdy'];
+// Mage Pillar trees grouped by Fellowship (for datalist suggestions)
+const _MAGE_PILLAR_TREES = [
+  'Al-Anbiya','Al-Fatihah','Al-Hajj','Al-Layl',                      // Ahl-i-Batin
+  'Anima','Corona','Materia','Vires',                                  // Craftmasons (Anima/Corona/Vires shared w/ Hermes)
+  'Mikha-el','Gavri-el','Repha-el','Uri-el',                          // Messianic Voices
+  'Infernalists',"K'llasshaa",'Malfeans',                             // Nephandi
+  'Autumn','Spring','Summer','Winter',                                  // Old Faith
+  'Primus',                                                             // Order of Hermes only
+  'Chieftain','Trickster','Spirit Talkers: Warrior','Wise One',        // Spirit Talkers
+  'Fara','Forlog','Galdrar','Hjaldar',                                 // Valdaermen
+  'Abomination','Diabolism','Malediction','Subversion',               // Veneficti
+];
 const SUBFACTION_TREES = {
   'Ghoul':            FACTION_TREES.vampire,
   'Sorcerer':         [..._SORCERER_TREES, ..._FELLOWSHIP_TREES],
-  'Mage':             [..._SORCERER_TREES, ..._FELLOWSHIP_TREES],
+  'Mage':             [..._SORCERER_TREES, ..._MAGE_PILLAR_TREES],  // Faithful fellowship trees excluded
   'Gifted Kinfolk':   FACTION_TREES.shifter,
   'Faithful':         _FELLOWSHIP_TREES,
   'Commoner':         _TALENT_TREES,
@@ -308,6 +320,48 @@ const POWER_TREE_LOOKUP = {
   'Madness (Wyrm)':                      ['Tainted Confusion', 'Tainted Derange', 'Tainted Decay'],
   'Strength (Wyrm)':                     ['Hide of the Wyrm', 'Totemic Form / Resilience', 'Balefire'],
   'Nephandi':                            ['Ranged 2 <Void>', 'Induce Frenzy / Taint', 'Hidden Taint'],
+  // ── Mage Pillar Trees (by Fellowship) ─────────────────────────────────────
+  // Ahl-i-Batin
+  'Al-Anbiya':                           ['Sense Power', 'Grant Power <Cloak Sight> / Grant Power <Umbra Sight>', 'Q: Know the Truth'],
+  'Al-Fatihah':                          ['Sense Desire / Sense Emotion', 'Sense Confidence / Obedience', 'Q: Commanding Voice'],
+  'Al-Hajj':                             ['Pass Ward', 'Shunt', 'Q: Reform'],
+  'Al-Layl':                             ['Cloak Gathering', 'Chameleon', 'Q: Out of Touch'],
+  // Craftmasons (Anima, Corona, Vires shared with Order of Hermes)
+  'Anima':                               ['Healing Touch / Sense Maximum Health', 'Fortitude', 'Q: Perfect Body'],
+  'Corona':                              ['Forgetful Mind', 'Obedience', 'Q: Enhance Consciousness'],
+  'Materia':                             ['Shatter', 'Empower Weapon', 'Q: Rationalize'],
+  'Vires':                               ['Strength', 'Absorb Magic', 'Q: Raw Power'],
+  // Messianic Voices
+  'Mikha-el':                            ['Strength', 'Ranged 4 <Light>', 'Q: Right Hand of God'],
+  'Gavri-el':                            ['Heal Self', '<Fire> Weapon', 'Q: Master of Dreams'],
+  'Repha-el':                            ['Avert', 'Healing Touch 10', "Q: God's Grace"],
+  'Uri-el':                              ['Energy Exchange', 'Aggravated 4', 'Q: Touch of Death'],
+  // Nephandi Mage Pillars
+  'Infernalists':                        ['<Tainted> Forgetful Mind', 'Silver Tongue', 'Q: Infernal Torment'],
+  "K'llasshaa":                          ['Tentacles', '<Tainted> Body Wrack', 'Q: Distant Wails'],
+  'Malfeans':                            ['<Tainted> Aggravated 1', 'Chameleon', 'Q: Voice of Malfeas'],
+  // Old Faith
+  'Autumn':                              ['Wither', 'Fortitude', "Q: Autumn's Champion"],
+  'Spring':                              ['Healing Touch / Sense Health', 'Break Attunement', "Q: Spring's Bounty"],
+  'Summer':                              ['Induce Frenzy', 'Fire 4', "Q: Summer's Fury"],
+  'Winter':                              ['Terror', 'Decay', "Q: Winter's Touch"],
+  // Order of Hermes only
+  'Primus':                              ['Paralyze', 'Natural Armor', 'Q: Essence Font'],
+  // Spirit Talkers ("Warrior" prefixed to avoid conflict with Sorcerer Warrior tree)
+  'Chieftain':                           ['Taunt', 'Entrancement', 'Q: Control Crowd'],
+  'Trickster':                           ['Hallucination / Imitate', 'Chameleon', 'Q: Secret Identity'],
+  'Spirit Talkers: Warrior':             ['Endure / Withstand', 'Brutal Strike', 'Q: Frenzied Warrior'],
+  'Wise One':                            ['Release Spirit / Sense Spirit', 'Umbra Strike', 'Q: Call Back the Spirits'],
+  // Valdaermen
+  'Fara':                                ['Pass Ward', 'Form of Vapor', 'Q: Unchained'],
+  'Forlog':                              ['Confusion', 'Grant Power <Strength>', 'Q: Call to Adventure'],
+  'Galdrar':                             ['Sense Fetter', 'True Form', 'Q: Undying'],
+  'Hjaldar':                             ['Passion', 'Aggravated Claws / Strength', 'Q: Fear Me'],
+  // Veneficti Mage Pillars
+  'Abomination':                         ['Sense Desire', 'Grant Power <Strength> / Strength', 'Q: Master of Corruption'],
+  'Diabolism':                           ['Aggravated 1', 'Banish Demon', 'Q: Master of Hell'],
+  'Malediction':                         ['Craving', 'Forgetful Mind / Grant Power <Strength>', 'Q: Master of Illusion'],
+  'Subversion':                          ['Obedience / Read & Write Infernal Text', 'False Memory', 'Q: Control Freak'],
 };
 
 const SKILL_DATA = {
@@ -456,6 +510,7 @@ function NPCCard({ npc, resolvedFaction }) {
     trueName, celestialName, appellation, demonicVice,
     extraField1, extraField2,
     health,
+    quintessence, mageFellowship,
     monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
     scorchTypes, immunities, weaknesses, senseFaction,
   } = npc;
@@ -489,6 +544,9 @@ function NPCCard({ npc, resolvedFaction }) {
     if (celestialName) factionSpecifics.push(`Celestial Name: ${celestialName}`);
     if (appellation) factionSpecifics.push(`Appellation: ${appellation}`);
     if (demonicVice) factionSpecifics.push(`Vice: ${demonicVice}`);
+  } else if (faction === 'human' && subfaction === 'Mage') {
+    if (mageFellowship) factionSpecifics.push(`Fellowship: ${mageFellowship}`);
+    factionSpecifics.push(`Quintessence: ${quintessence ?? 5}`);
   } else if (faction === 'plasmic' || faction === 'spirit') {
     if (extraField1) factionSpecifics.push(`Type: ${extraField1}`);
     if (extraField2) factionSpecifics.push(extraField2);
@@ -527,6 +585,7 @@ function NPCCard({ npc, resolvedFaction }) {
           <StatRow label="Willpower" value={willpower} />
           <StatRow label="Virtue" value={virtue !== 'None' ? `${virtueValue} (${virtue})` : 'N/A'} />
           {regenRate > 0 && <StatRow label="Regen Rate" value={regenRate} />}
+          {faction === 'human' && subfaction === 'Mage' && <StatRow label="Quintessence" value={quintessence ?? 5} />}
           {faction !== 'monster' && <StatRow label="Health" value={health ?? 5} accent />}
           {faction === 'monster' && <StatRow label="Health" value={monsterHealth} accent />}
           {faction === 'monster' && monsterAugment > 0 && <StatRow label="Augment" value={monsterAugment} />}
@@ -691,6 +750,10 @@ const NPCCreator = ({ onBack }) => {
   const [extraField1, setExtraField1] = useState('');
   const [extraField2, setExtraField2] = useState('');
 
+  // Mage extras
+  const [quintessence, setQuintessence]     = useState(5);
+  const [mageFellowship, setMageFellowship] = useState('');
+
   // Monster extras
   const [monsterHealth, setMonsterHealth]       = useState(10);
   const [isRealmbound, setIsRealmbound]         = useState(true);
@@ -787,6 +850,18 @@ const NPCCreator = ({ onBack }) => {
     });
   }, [subfaction, isRealmbound, faction]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-add/remove Q: Manipulate Cray for Mages with Quintessence >= 3
+  useEffect(() => {
+    if (loadingRef.current) return;
+    if (subfaction !== 'Mage') return;
+    const CRAY = 'Q: Manipulate Cray';
+    setFundamentals(prev =>
+      quintessence >= 3
+        ? prev.includes(CRAY) ? prev : [...prev, CRAY]
+        : prev.filter(f => f !== CRAY)
+    );
+  }, [quintessence, subfaction]);
+
   // ── NPC Bank ─────────────────────────────────────────────────────────────
   const loadBank = useCallback(async () => {
     setBankLoading(true);
@@ -818,6 +893,7 @@ const NPCCreator = ({ onBack }) => {
       trueName, celestialName, appellation, demonicVice,
       extraField1, extraField2,
       healthOverride,
+      quintessence, mageFellowship,
       monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
       scorchTypes, immunities, weaknesses, senseFaction,
     };
@@ -841,8 +917,9 @@ const NPCCreator = ({ onBack }) => {
       virtue, virtueValue, regenRate, powerTrees, fundamentals, specialAbilities, skills, merits,
       notes, generation, road, amaranth, breed, auspice, rank, legion, guild, passions,
       shadowArchetype, thorn, lineage, court, echoes, trueName, celestialName, appellation,
-      demonicVice, extraField1, extraField2, monsterHealth, isRealmbound, isHealthAsEnergy,
-      monsterAugment, scorchTypes, immunities, weaknesses, senseFaction, healthOverride]);
+      demonicVice, extraField1, extraField2, quintessence, mageFellowship, monsterHealth,
+      isRealmbound, isHealthAsEnergy, monsterAugment, scorchTypes, immunities, weaknesses,
+      senseFaction, healthOverride]);
 
   const clearForm = useCallback(() => {
     loadingRef.current = true;
@@ -856,6 +933,7 @@ const NPCCreator = ({ onBack }) => {
     setLineage(''); setCourt(''); setEchoes('');
     setTrueName(''); setCelestialName(''); setAppellation(''); setDemonicVice('');
     setExtraField1(''); setExtraField2('');
+    setQuintessence(5); setMageFellowship('');
     setMonsterHealth(10); setIsRealmbound(true); setIsHealthAsEnergy(false); setMonsterAugment(1);
     setScorchTypes(['Fire']); setImmunities([{ text: '', condition: '' }]); setWeaknesses([{ text: '', condition: '' }]); setSenseFaction('Monster');
     setPowerTrees([]); setSpecialAbilities([]); setFundamentals([]);
@@ -913,6 +991,8 @@ const NPCCreator = ({ onBack }) => {
     setDemonicVice(d.demonicVice || '');
     setExtraField1(d.extraField1 || '');
     setExtraField2(d.extraField2 || '');
+    setQuintessence(d.quintessence ?? 5);
+    setMageFellowship(d.mageFellowship || '');
     setMonsterHealth(d.monsterHealth ?? 10);
     setHealthOverride(d.healthOverride ?? null);
     setIsRealmbound(d.isRealmbound !== false);
@@ -954,6 +1034,8 @@ const NPCCreator = ({ onBack }) => {
       if (d.breed) specs.push(`Breed: ${d.breed}`);
       if (d.auspice) specs.push(`Auspice: ${d.auspice}`);
       if (d.rank) specs.push(`Rank: ${d.rank}`);
+    } else if (d.faction === 'human' && d.subfaction === 'Mage') {
+      if (d.mageFellowship) specs.push(`Fellowship: ${d.mageFellowship}`);
     } else if (d.faction === 'monster') {
       specs.push(d.isRealmbound ? 'Realmbound.' : 'Umbrabound.');
     }
@@ -970,7 +1052,7 @@ const NPCCreator = ({ onBack }) => {
     };
     const monsterExtra = d.faction === 'monster' && d.scorchTypes?.length
       ? `<table class="stats-table">${row('Scorch', d.scorchTypes.join(', '))}</table>` : '';
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.power-detail{font-size:11px;color:#555;margin-left:20px;margin-top:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction !== 'monster' ? row('Health', d.health ?? 10) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span>` : ''}${info?.levels ? `<div class="power-detail">${Array.from({ length: s.dots }, (_, i) => `${i + 1}: ${esc(info.levels[i] || '')}`).join(' &bull; ')}</div>` : ''}</div>`; }).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', (d.merits || []).filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>NPC: ${d.name || 'Unnamed'}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:13px;color:#000;background:#fff;padding:28px 32px;max-width:680px}.header{overflow:hidden;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:10px}.badges{float:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px}.badge{border:1px solid #000;padding:1px 7px;font-size:10px;font-weight:bold}.name{font-size:24px;font-weight:bold;line-height:1.2}.npc-title{font-style:italic;color:#333;margin-top:3px;font-size:13px}.stats-table{width:100%;border-collapse:collapse;margin-bottom:8px}.stats-table td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px}.stats-table td.lbl{font-weight:bold;width:130px;color:#444;white-space:nowrap}.sec{margin-top:9px}.sec-title{font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:5px}.item{font-size:12px;margin:2px 0;line-height:1.5}.dots{font-family:monospace;letter-spacing:1px}.power-detail{font-size:11px;color:#555;margin-left:20px;margin-top:1px}.notes-text{font-style:italic;white-space:pre-wrap;color:#333}@media print{body{padding:0}@page{margin:1.2cm 1.5cm}}</style></head><body><div class="header"><div class="badges">${d.isLegendary ? '<span class="badge">⚑ LEGENDARY</span>' : ''}${d.isPermatainted ? '<span class="badge">☠ PERMATAINTED</span>' : ''}<span class="badge">NPC</span></div><div class="name">${d.name || '[ NPC Name ]'}</div>${d.title ? `<div class="npc-title">${d.title}</div>` : ''}</div><table class="stats-table">${row('Faction', fLabel)}${d.subfaction ? row('Sub-Faction', d.subfaction) : ''}${d.energyType !== 'None' ? row('Energy', `${d.energy} (${d.energyType})`) : ''}${row('Willpower', d.willpower)}${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}${d.faction === 'human' && d.subfaction === 'Mage' ? row('Quintessence', d.quintessence ?? 5) : ''}${d.faction !== 'monster' ? row('Health', d.health ?? 10) : ''}${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}</table>${monsterExtra}${specs.length > 0 ? section('Faction Specifics', specs.map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.fundamentals || []).filter(Boolean).length > 0 ? section('Fundamental Powers', d.fundamentals.filter(Boolean).map(f => `<div class="item">${f}</div>`).join('')) : ''}${innate.length > 0 ? section('Innate Trees', innate.map(powerLine).join('')) : ''}${learned.length > 0 ? section('Learned Trees', learned.map(powerLine).join('')) : ''}${(d.specialAbilities || []).filter(Boolean).length > 0 ? section('Special Abilities', d.specialAbilities.filter(Boolean).map(s => `<div class="item">${s}</div>`).join('')) : ''}${(d.skills || []).some(s => s.name) ? section('Skills', (d.skills || []).filter(s => s.name).map(s => { const info = SKILL_DATA[s.name]; return `<div class="item"><span class="dots">${powerDotsStr(s.dots)}</span> ${esc(s.name)}${info ? ` <span class="src">[${info.cat}]</span>` : ''}${info?.levels ? `<div class="power-detail">${Array.from({ length: s.dots }, (_, i) => `${i + 1}: ${esc(info.levels[i] || '')}`).join(' &bull; ')}</div>` : ''}</div>`; }).join('')) : ''}${(d.merits || []).some(m => m.trim()) ? section('Merits', (d.merits || []).filter(m => m.trim()).map(m => { const info = MERIT_DATA[m.trim()]; return `<div class="item">${esc(m)}${info ? `<div class="power-detail">${esc(info.desc)}</div>` : ''}</div>`; }).join('')) : ''}}${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}</body></html>`;
     const win = window.open('', '_blank', 'width=750,height=950');
     win.document.write(html);
     win.document.close();
@@ -993,6 +1075,7 @@ const NPCCreator = ({ onBack }) => {
     extraField1, extraField2,
     health,
     healthOverride,
+    quintessence, mageFellowship,
     monsterHealth, isRealmbound, isHealthAsEnergy, monsterAugment,
     scorchTypes, immunities, weaknesses, senseFaction,
   };
@@ -1043,6 +1126,8 @@ const NPCCreator = ({ onBack }) => {
     } else if (d.faction === 'plasmic' || d.faction === 'spirit') {
       if (d.extraField1) specs.push(`Type: ${d.extraField1}`);
       if (d.extraField2) specs.push(d.extraField2);
+    } else if (d.faction === 'human' && d.subfaction === 'Mage') {
+      if (d.mageFellowship) specs.push(`Fellowship: ${d.mageFellowship}`);
     } else if (d.faction === 'monster') {
       specs.push(d.isRealmbound ? 'Realmbound. Goes to Dead if forced into the Umbra.' : 'Umbrabound. Goes to Dead if forced into the Realm.');
       if (d.isHealthAsEnergy) specs.push('Spend Health as Energy.');
@@ -1098,6 +1183,7 @@ body { font-family: Georgia, serif; font-size: 13px; color: #000; background: #f
   ${row('Willpower', d.willpower)}
   ${row('Virtue', d.virtue !== 'None' ? `${d.virtueValue} (${d.virtue})` : 'N/A')}
   ${d.regenRate > 0 ? row('Regen Rate', d.regenRate) : ''}
+  ${d.faction === 'human' && d.subfaction === 'Mage' ? row('Quintessence', d.quintessence ?? 5) : ''}
   ${d.faction !== 'monster' ? row('Health', d.health ?? d.autoHealth ?? 10) : ''}
   ${d.faction === 'monster' ? row('Health', d.monsterHealth) : ''}
   ${d.faction === 'monster' && d.monsterAugment > 0 ? row('Augment', d.monsterAugment) : ''}
@@ -1455,6 +1541,27 @@ ${d.notes ? section('Notes', `<p class="notes-text">${d.notes}</p>`) : ''}
                 <div className="col-span-2">
                   <label className={lbl}>Demonic Vice</label>
                   <input className={inp} placeholder="e.g. Wrath, Envy" value={demonicVice} onChange={e => setDemonicVice(e.target.value)} />
+                </div>
+              </div>
+            </div>
+          )}
+          {faction === 'human' && subfaction === 'Mage' && (
+            <div className={sec}>
+              <h2 className="font-bold text-purple-300 text-sm uppercase tracking-wide">Mage Details</h2>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className={lbl}>Quintessence (1–10)</label>
+                  <input type="number" className={inp} min={1} max={10} value={quintessence} onChange={e => setQuintessence(Number(e.target.value))} />
+                  {quintessence >= 3 && <p className="text-xs text-amber-400 mt-1">Q: Manipulate Cray auto-added to Fundamentals</p>}
+                </div>
+                <div>
+                  <label className={lbl}>Fellowship</label>
+                  <select className={inp} value={mageFellowship} onChange={e => setMageFellowship(e.target.value)}>
+                    <option value="">— Select —</option>
+                    {['Ahl-i-Batin','Craftmasons','Messianic Voices','Nephandi','Old Faith','Order of Hermes','Spirit Talkers','Valdaermen','Veneficti'].map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
