@@ -1815,8 +1815,8 @@ export const powersData = [
       sources: "C1",
       cost: "None",
       call: "None",
-      description: "NPC Only. You may use claw natural weapons.",
-      searchableText: "claws self npc natural weapons charm"
+      description: "You may use claw natural weapons.",
+      searchableText: "claws self natural weapons charm"
     },
     {
       name: "<TYPE> CLAWS",
@@ -1932,8 +1932,8 @@ export const powersData = [
       sources: "C3",
       cost: "None",
       call: "None",
-      description: "NPC Only. Your Maximum Health is increased by 4.",
-      searchableText: "fortitude passive npc maximum health increased 4 charm"
+      description: "Your Maximum Health is increased by 4.",
+      searchableText: "fortitude passive maximum health increased 4 charm"
     },
     {
       name: "FREE SPIRIT",
@@ -2526,8 +2526,8 @@ export const powersData = [
       sources: "C2",
       cost: "None",
       call: "\"Sense Fae Oath\"",
-      description: "Stare at the target for 10 seconds. Ask one or both: \"Do you have any Fae Oaths or bargains?\" or \"Have you broken any Fae Oaths or bargains this weekend?\". Target must answer OOG truthfully.",
-      searchableText: "sense fae oath sensory 10 seconds oog fae oaths bargains broken weekend charm"
+      description: "NPC Only. Stare at the target for 10 seconds. Ask one or both: \"Do you have any Fae Oaths or bargains?\" or \"Have you broken any Fae Oaths or bargains this weekend?\". Target must answer OOG truthfully.",
+      searchableText: "sense fae oath sensory npc 10 seconds oog fae oaths bargains broken weekend charm"
     },
     {
       name: "SENSE PATRON",
@@ -2643,8 +2643,8 @@ export const powersData = [
       sources: "C2",
       cost: "None",
       call: "\"Resist\"",
-      description: "NPC Only. While wearing any transformation mask you may resist Status attacks for 1 Energy. Note: removed from PC trees in 2023; kept as ST power for items still in use.",
-      searchableText: "tough form mask npc transformation resist status energy st item charm"
+      description: "While wearing any transformation mask you may resist Status attacks for 1 Energy. Note: removed from PC trees in 2023; kept as ST power for items still in use.",
+      searchableText: "tough form mask transformation resist status energy st item charm"
     },
     {
       name: "VIGOR",

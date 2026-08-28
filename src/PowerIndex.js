@@ -45,7 +45,7 @@ function PowerIndex({ onBack, embedded = false }) {
       
       const sourceMatch = sourceFilter === '' || power.sources.includes(sourceFilter);
       const typeMatch = typeFilter === '' || power.type === typeFilter;
-      const npcMatch = !hideNpcOnly || !/NPC Only/i.test(power.description);
+      const npcMatch = !hideNpcOnly || !/^(Legendary,\s*)?(NPC Only)/i.test(power.description);
       
       return searchMatch && sourceMatch && typeMatch && npcMatch;
     });

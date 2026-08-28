@@ -21,6 +21,10 @@ All game mechanics, character data, and rulebook references implemented in this 
 
 ## [Unreleased]
 
+### Fixed
+- **Power database NPC Only tags corrected**: CLAWS, FORTITUDE (ST), and TOUGH FORM incorrectly had "NPC Only" in the power database — removed per rulebook. SENSE FAE OATH was missing its "NPC Only" tag — added per rulebook.
+- **Power Index NPC Only filter false positive**: "Hide NPC Only Powers" filter was incorrectly hiding the PC power BESTOW POWER because its description *references* "NPC Only tag" as a restriction. Regex now anchors to the start of the description so only powers actually tagged NPC Only are hidden.
+
 ### Added
 - **Klaive builder (2026 draft): Full Steps 2–5** — Both `MagicItemWizard.js` and `TokenWizardDraft.js` now implement the complete spirit-binding process per rulebook:
   - Step 2: Power (optional, existing)
